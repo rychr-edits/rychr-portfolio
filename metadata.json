@@ -1,0 +1,8 @@
+{
+  "name": "rychr — Professional Video Editor Portfolio",
+  "description": "Engaging content professional video editor portfolio with interactive real-time glass shard hero, work showcase, upload portal, and FAQ.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
