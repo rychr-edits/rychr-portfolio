@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>rychr — Professional Video Editor & Graphics</title>
-    <meta name="description" content="Solo professional video editor specializing in engaging content, high retention pacing, and After Effects motion graphics." />
-    <meta property="og:title" content="rychr — Professional Video Editor" />
-    <meta property="og:description" content="Solo professional video editor specializing in engaging content, high retention pacing, and After Effects motion graphics." />
+    <title>Rychr — Creative Video Editor & Motion Designer</title>
+    <meta name="description" content="Solo creative video editor & motion designer specializing in engaging content, high retention pacing, and After Effects motion graphics." />
+    <meta property="og:title" content="Rychr — Creative Video Editor & Motion Designer" />
+    <meta property="og:description" content="Solo creative video editor & motion designer specializing in engaging content, high retention pacing, and After Effects motion graphics." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/png" href="/assets/aistudio/image_5a1c3c4a.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <link href="https://fonts.cdnfonts.com/css/mazzard-m" rel="stylesheet" />
     <link href="https://fonts.cdnfonts.com/css/mazzard" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800;900&display=swap" rel="stylesheet" />
     <style>
       @import url('https://fonts.cdnfonts.com/css/mazzard-m');
       @import url('https://fonts.cdnfonts.com/css/mazzard');
@@ -25,100 +25,37 @@
         src: local('Mazzard M Black'), local('MazzardM-Black'), local('Mazzard Black');
       }
 
-      /* Apply Mazzard M Black across the entire website */
-      *,
-      *::before,
-      *::after,
-      html,
-      body,
-      div,
-      span,
-      applet,
-      object,
-      iframe,
-      h1,
+      /* Mazzard M Black - DEDICATED SOLELY to the brand name "Rychr" */
+      .font-brand-rychr {
+        font-family: 'Mazzard M Black', 'Mazzard M', 'Mazzard', 'Plus Jakarta Sans', sans-serif !important;
+        font-weight: 900 !important;
+        letter-spacing: -0.04em;
+      }
+
+      /* Headings, buttons, and subheadings use crisp, high-impact Plus Jakarta Sans */
+      .font-mazzard,
+      .font-heading,
+      h1:not(.font-brand-rychr),
       h2,
-      h3,
-      h4,
-      h5,
-      h6,
+      h3:not(.font-brand-rychr),
+      h4 {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        letter-spacing: -0.025em;
+      }
+
+      /* Body, descriptions, inputs, and regular text use Inter */
+      body,
       p,
-      blockquote,
-      pre,
-      a,
-      abbr,
-      acronym,
-      address,
-      big,
-      cite,
-      code,
-      del,
-      dfn,
-      em,
-      img,
-      ins,
-      kbd,
-      q,
-      s,
-      samp,
-      small,
-      strike,
-      strong,
-      sub,
-      sup,
-      tt,
-      var,
-      b,
-      u,
-      i,
-      center,
-      dl,
-      dt,
-      dd,
-      ol,
-      ul,
-      li,
-      fieldset,
-      form,
-      label,
-      legend,
-      table,
-      caption,
-      tbody,
-      tfoot,
-      thead,
-      tr,
-      th,
-      td,
-      article,
-      aside,
-      canvas,
-      details,
-      embed,
-      figure,
-      figcaption,
-      footer,
-      header,
-      hgroup,
-      menu,
-      nav,
-      output,
-      ruby,
-      section,
-      summary,
-      time,
-      mark,
-      audio,
-      video,
-      button,
       input,
       textarea,
       select {
-        font-family: 'Mazzard M Black', 'Mazzard M', 'Mazzard', 'Plus Jakarta Sans', sans-serif !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       }
 
-      .font-mazzard {
-        font-family: 'Mazzard M Black', 'Mazzard M', 'Mazzard', sans-serif !important;
+      /* Code / tags / technical numerals use JetBrains Mono */
+      .font-mono,
+      code {
+        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
       }
 
       @keyframes scrollPulse {
