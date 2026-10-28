@@ -13,6 +13,19 @@ interface Star {
   twinklePhase: number;
 }
 
+interface ShootingStar {
+  x: number;
+  y: number;
+  length: number;
+  speed: number;
+  cosAngle: number;
+  sinAngle: number;
+  progress: number;
+  duration: number;
+  maxAlpha: number;
+  headRadius: number;
+}
+
 export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = ({ scrollY }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -29,25 +42,58 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
     if (!ctx) return;
 
     let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    let height = (canvas.height = Math.round(window.innerHeight * 1.5));
 
-    // Create 160 twinkling stars
-    const starCount = 160;
+    // Create 180 twinkling background stars
+    const starCount = 180;
     const stars: Star[] = [];
     for (let i = 0; i < starCount; i++) {
       stars.push({
         x: Math.random() * width,
-        y: Math.random() * (height * 1.6),
-        radius: Math.random() * 1.3 + 0.4,
-        baseAlpha: Math.random() * 0.5 + 0.2,
+        y: Math.random() * height,
+        radius: Math.random() * 1.3 + 0.35,
+        baseAlpha: Math.random() * 0.45 + 0.18,
         twinkleSpeed: Math.random() * 2 + 0.8,
         twinklePhase: Math.random() * Math.PI * 2,
       });
     }
 
+    // Subtle shooting stars
+    const shootingStars: ShootingStar[] = [];
+    let nextSpawnTime = 1.2; // First shooting star appears ~1.2s after load
+    let lastTime = 0;
+
+    const spawnShootingStar = (currentTimeSec: number) => {
+      // Natural gentle angle between 32° and 44° downward-right
+      const angleDeg = Math.random() * 12 + 32;
+      const angleRad = (angleDeg * Math.PI) / 180;
+      const cosAngle = Math.cos(angleRad);
+      const sinAngle = Math.sin(angleRad);
+
+      // Start across the upper sky
+      const startX = Math.random() * (width * 0.85);
+      const startY = Math.random() * (height * 0.45);
+
+      shootingStars.push({
+        x: startX,
+        y: startY,
+        length: Math.random() * 60 + 80, // 80px - 140px elegant trail
+        speed: Math.random() * 320 + 480, // gentle cosmic glide
+        cosAngle,
+        sinAngle,
+        progress: 0,
+        duration: Math.random() * 0.45 + 0.85, // 0.85s to 1.3s
+        maxAlpha: Math.random() * 0.22 + 0.32, // 0.32 - 0.54: deliberately subtle & deep in space
+        headRadius: Math.random() * 0.3 + 0.8,
+      });
+
+      // Next spawn scheduled naturally every 4 to 8.5 seconds
+      nextSpawnTime = currentTimeSec + Math.random() * 4.5 + 4;
+    };
+
     const handleResize = () => {
       width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      height = canvas.height = Math.round(window.innerHeight * 1.5);
     };
 
     window.addEventListener('resize', handleResize);
@@ -58,7 +104,11 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
       ctx.clearRect(0, 0, width, height);
 
       const timeSec = now / 1000;
+      if (lastTime === 0) lastTime = timeSec;
+      const dt = Math.min(0.1, timeSec - lastTime);
+      lastTime = timeSec;
 
+      // 1. Draw static twinkling stars
       for (let i = 0; i < stars.length; i++) {
         const star = stars[i];
         const twinkle = Math.sin(timeSec * star.twinkleSpeed + star.twinklePhase) * 0.28;
@@ -66,8 +116,62 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
 
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(star.x, star.y % height, star.radius, 0, Math.PI * 2);
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // 2. Periodic shooting star spawn
+      if (timeSec >= nextSpawnTime) {
+        spawnShootingStar(timeSec);
+      }
+
+      // 3. Update & render subtle shooting stars
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        const ss = shootingStars[i];
+        ss.progress += dt / ss.duration;
+        ss.x += ss.cosAngle * ss.speed * dt;
+        ss.y += ss.sinAngle * ss.speed * dt;
+
+        if (ss.progress >= 1 || ss.x > width + 150 || ss.y > height + 150) {
+          shootingStars.splice(i, 1);
+          continue;
+        }
+
+        // Smooth alpha envelope: fade in -> steady -> graceful fade out
+        let alpha = ss.maxAlpha;
+        if (ss.progress < 0.15) {
+          alpha = (ss.progress / 0.15) * ss.maxAlpha;
+        } else if (ss.progress > 0.65) {
+          alpha = ((1 - ss.progress) / 0.35) * ss.maxAlpha;
+        }
+
+        const trailLen = ss.length * Math.min(1, ss.progress * 3);
+        const tailX = ss.x - ss.cosAngle * trailLen;
+        const tailY = ss.y - ss.sinAngle * trailLen;
+
+        ctx.save();
+        const grad = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
+        grad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+        grad.addColorStop(0.5, `rgba(56, 189, 248, ${alpha * 0.4})`);
+        grad.addColorStop(0.85, `rgba(186, 230, 253, ${alpha * 0.85})`);
+        grad.addColorStop(1, `rgba(255, 255, 255, ${alpha})`);
+
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.3;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(ss.x, ss.y);
+        ctx.stroke();
+
+        // Subtle glowing nucleus
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 6;
+        ctx.beginPath();
+        ctx.arc(ss.x, ss.y, ss.headRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       }
 
       animId = requestAnimationFrame(render);
