@@ -504,42 +504,6 @@ export default function App() {
             </p>
           </div>
         </div>
-
-        {/* Real Accurate Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-8 rounded-3xl bg-[#080b15]/90 backdrop-blur-xl border border-blue-500/20 shadow-2xl">
-          <div>
-            <div className="text-4xl md:text-5xl font-mazzard text-white">
-              5M+
-            </div>
-            <p className="text-xs md:text-sm text-sky-400/70 mt-1 uppercase font-mono">
-              Total Organic Views
-            </p>
-          </div>
-          <div>
-            <div className="text-4xl md:text-5xl font-mazzard text-sky-400">
-              20+
-            </div>
-            <p className="text-xs md:text-sm text-sky-400/70 mt-1 uppercase font-mono">
-              Videos Delivered
-            </p>
-          </div>
-          <div>
-            <div className="text-4xl md:text-5xl font-mazzard text-white">
-              3 Max
-            </div>
-            <p className="text-xs md:text-sm text-sky-400/70 mt-1 uppercase font-mono">
-              Revisions per Video
-            </p>
-          </div>
-          <div>
-            <div className="text-4xl md:text-5xl font-mazzard text-sky-400">
-              24-48h
-            </div>
-            <p className="text-xs md:text-sm text-sky-400/70 mt-1 uppercase font-mono">
-              Fast Turnaround
-            </p>
-          </div>
-        </div>
       </section>
 
       {/* SECTION 4: ABOUT RYCHR (GEN-Z CREATOR NATIVE VOICE) */}
@@ -557,7 +521,7 @@ export default function App() {
                   />
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-mono bg-blue-500/15 text-sky-300 border border-blue-500/30">
-                  Ready to Cook
+                  Available Now
                 </span>
               </div>
 
@@ -566,7 +530,7 @@ export default function App() {
                   rychr
                 </h3>
                 <p className="text-sm text-white/60 mt-1 font-normal">
-                  Solo After Effects Demon • Retention Specialist
+                  Video Editor • Retention Specialist
                 </p>
                 <div className="mt-4 flex items-center gap-2 text-xs font-mono text-sky-400">
                   <Check className="w-4 h-4" />
@@ -581,30 +545,30 @@ export default function App() {
               <span>no corporate yap</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white mb-6">
-              i cook in after effects. you get the views.
+              i edit in after effects. you get the views.
             </h2>
             <div className="space-y-4 text-base text-white/70 leading-relaxed font-normal">
               <p>
                 ngl most video editing out here is painfully mid. dead air everywhere, lifeless stock footage, and fonts straight out of 2017. your viewers swipe in 2 seconds and your retention graph tanks.
               </p>
               <p>
-                i don't do that. i spend ungodly hours in <strong className="text-white">Adobe After Effects</strong> keyframing whip zooms, speed ramps, kinetic captions, and sound design that keeps your audience's brain glued to the screen.
+                i don't do that. i put the time in <strong className="text-white">Adobe After Effects</strong> keyframing whip zooms, speed ramps, kinetic captions, and sound design that keeps your audience glued to the screen.
               </p>
               <p>
-                high-energy talking heads? documentary deep-dives that hit like movie trailers? viral brainrot shorts that loop 5 times on the fyp? <strong className="text-white">i adapt to your exact vibe and cook.</strong> you hit record, i turn it into a banger.
+                high-energy talking heads, documentary deep-dives, or fast-paced vertical shorts that loop on the feed: <strong className="text-white">i adapt to your exact style.</strong> you hit record, i turn it into a high-retention video.
               </p>
             </div>
 
-            {/* Gen-Z Tool Badges & Flow */}
+            {/* Clean Badges without Emojis */}
             <div className="mt-8 pt-8 border-t border-blue-500/15 flex flex-wrap items-center gap-3">
               <span className="px-4 py-2 rounded-xl bg-blue-500/15 border border-blue-500/30 text-sky-300 font-mono text-xs font-bold">
-                ⚡ 100% After Effects Workflow
+                100% After Effects Workflow
               </span>
               <span className="px-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-white/80 font-mono text-xs">
-                🎯 3 Revisions Max (we don't waste time)
+                3 Revisions Max
               </span>
               <span className="px-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-white/80 font-mono text-xs">
-                🚀 Any Style Adaptive • Zero Mid Cuts
+                Any Style Adaptive • Clean Retention Cuts
               </span>
             </div>
           </div>
@@ -739,20 +703,20 @@ export default function App() {
               <h4 className="text-lg font-mazzard text-white mb-1">Gmail</h4>
               <p className="text-xs text-white/50 mb-4">Official business inquiries</p>
               <div className="p-3 rounded-xl bg-black/50 border border-blue-500/20 font-mono text-xs text-sky-300 break-all select-all">
-                raymondchristopher360@gmail.com
+                rychr.edits@gmail.com
               </div>
             </div>
 
             <div className="mt-6 flex gap-2">
               <a
-                href="mailto:raymondchristopher360@gmail.com"
+                href="mailto:rychr.edits@gmail.com"
                 className="flex-1 py-2.5 rounded-xl bg-white text-black font-mazzard text-xs flex items-center justify-center gap-1.5 hover:bg-sky-400 transition-colors"
               >
                 <span>Send Email</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
               <button
-                onClick={() => handleCopy('raymondchristopher360@gmail.com', 'email')}
+                onClick={() => handleCopy('rychr.edits@gmail.com', 'email')}
                 className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
                 title="Copy Email"
               >
