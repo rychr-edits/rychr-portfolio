@@ -186,7 +186,7 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-[#030407]">
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-black">
       {/* 1. Twinkling Stars moving VERY SLIGHTLY with scroll (scrollY * 0.14) */}
       <div
         className="absolute inset-0 w-full h-[150vh] will-change-transform"
@@ -197,18 +197,7 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
       </div>
 
-      {/* 2. Deep Blue Ambient Nebular Lighting */}
-      <div
-        className="absolute left-1/2 -translate-x-1/2 w-[160vw] h-[80vh] rounded-full opacity-35 pointer-events-none"
-        style={{
-          top: '25vh',
-          background: 'radial-gradient(ellipse at 50% 50%, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.15) 50%, transparent 80%)',
-          filter: 'blur(90px)',
-          transform: `translate3d(-50%, ${-scrollY * 0.18}px, 0)`,
-        }}
-      />
-
-      {/* 3. TOP OF PLANET (Peak moved to the LEFT: Q 700,-100, pronounced sweeping slanted curve) */}
+      {/* 2. TOP OF PLANET (Peak moved to the LEFT: Q 700,-100, pronounced sweeping slanted curve) */}
       <div
         className="absolute left-1/2 pointer-events-none transition-opacity duration-500"
         style={{
@@ -256,13 +245,12 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
             </filter>
 
             <linearGradient id="topPlanetBody" x1="50%" y1="0%" x2="50%" y2="100%">
-              <stop offset="0%" stopColor="#060914" stopOpacity="0.98" />
-              <stop offset="35%" stopColor="#030408" stopOpacity="1" />
-              <stop offset="100%" stopColor="#020204" stopOpacity="1" />
+              <stop offset="0%" stopColor="#000000" stopOpacity="1" />
+              <stop offset="100%" stopColor="#000000" stopOpacity="1" />
             </linearGradient>
           </defs>
 
-          {/* Slanted Planet Body Silhouette: peak shifted left to X=700 for a pronounced sweeping slant */}
+          {/* Slanted Planet Body Silhouette: pure pitch black */}
           <path d="M -600,280 Q 700,-100 3800,340 L 3800,900 L -600,900 Z" fill="url(#topPlanetBody)" />
 
           {/* Wide Soft Atmospheric Blue Glow */}
@@ -290,7 +278,7 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
         </svg>
       </div>
 
-      {/* 4. UNDERSIDE OF PLANET (Properly separated: emerges after top curve departs, sits comfortably low) */}
+      {/* 3. UNDERSIDE OF PLANET (Properly separated: emerges after top curve departs, sits comfortably low) */}
       <div
         className="absolute left-1/2 pointer-events-none transition-opacity duration-700"
         style={{
@@ -338,13 +326,12 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
             </filter>
 
             <linearGradient id="bottomPlanetBody" x1="50%" y1="100%" x2="50%" y2="0%">
-              <stop offset="0%" stopColor="#060914" stopOpacity="0.98" />
-              <stop offset="35%" stopColor="#030408" stopOpacity="1" />
-              <stop offset="100%" stopColor="#020204" stopOpacity="1" />
+              <stop offset="0%" stopColor="#000000" stopOpacity="1" />
+              <stop offset="100%" stopColor="#000000" stopOpacity="1" />
             </linearGradient>
           </defs>
 
-          {/* Underside arc with peak shifted left to X=700 for matching slanted curvature */}
+          {/* Underside arc with peak shifted left to X=700: pure pitch black */}
           <path d="M -600,520 Q 700,880 3800,480 L 3800,-100 L -600,-100 Z" fill="url(#bottomPlanetBody)" />
 
           {/* Wide Soft Atmospheric Blue Glow */}
@@ -373,7 +360,7 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
       </div>
 
       {/* Deep Space Obsidian Vignettes */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#030407]/40 via-transparent to-[#030407]/80 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none" />
     </div>
   );
 };

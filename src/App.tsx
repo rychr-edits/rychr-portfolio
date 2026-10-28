@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CosmicHorizonBackground } from './CosmicHorizonBackground.tsx';
 import { RevealOnScroll } from './RevealOnScroll.tsx';
+import { CalmNavbarBorder } from './CalmNavbarBorder.tsx';
 import { FaqItem } from './types.ts';
 import {
   Play,
@@ -44,7 +45,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Your review goes here. Tell visitors what this edit helped you achieve."',
     rating: 5,
-    gradient: 'from-[#0e1a34] via-[#091022] to-[#04060e]',
+    gradient: 'from-[#141417] via-[#0a0a0c] to-[#000000]',
     colSpan: 'lg:col-span-7',
   },
   {
@@ -57,7 +58,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Add a short quote from the creator about the hook, pacing, or final result."',
     rating: 5,
-    gradient: 'from-[#0a162c] via-[#070e1e] to-[#03050c]',
+    gradient: 'from-[#161619] via-[#0a0a0d] to-[#000000]',
     colSpan: 'lg:col-span-5',
   },
   {
@@ -70,7 +71,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Leave space here for a real client testimonial when this project is ready."',
     rating: 5,
-    gradient: 'from-[#091428] via-[#060c1a] to-[#03040a]',
+    gradient: 'from-[#141418] via-[#09090c] to-[#000000]',
     colSpan: 'lg:col-span-5',
   },
   {
@@ -83,7 +84,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Your best feedback can live here under the finished video."',
     rating: 5,
-    gradient: 'from-[#0d1832] via-[#080f20] to-[#04060d]',
+    gradient: 'from-[#16161a] via-[#0a0a0e] to-[#000000]',
     colSpan: 'lg:col-span-7',
   },
 ];
@@ -151,16 +152,19 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#030407] text-white font-['Inter',sans-serif] selection:bg-blue-500/30 overflow-x-hidden">
+    <div className="relative min-h-screen bg-black text-white font-['Inter',sans-serif] selection:bg-blue-500/30 overflow-x-hidden">
       {/* PROCEDURAL PLANET HORIZON BACKGROUND (Top horizon + Underside on scroll to bottom + Glowing Cursor with Stars) */}
       <CosmicHorizonBackground scrollY={scrollY} />
 
       {/* PERSISTENT HEADER NAVBAR */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-10 py-5 transition-all duration-300">
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-2xl bg-[#090b14]/85 backdrop-blur-xl border border-blue-500/15 shadow-[0_4px_30px_rgba(0,0,0,0.7)]">
+        <div className="relative max-w-6xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
+          {/* Calm, slow subtle dual parallel glowing border covering all sides of the rounded tab */}
+          <CalmNavbarBorder />
+
           {/* Top Left: Crescent Moon Logo */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-blue-400/30 bg-[#070913] flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.2)] group-hover:shadow-[0_0_22px_rgba(56,189,248,0.4)] transition-all">
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/15 bg-black flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.2)] group-hover:shadow-[0_0_22px_rgba(56,189,248,0.4)] transition-all">
               <img
                 src="/assets/aistudio/image_5a1c3c4a.png"
                 alt="Crescent Moon"
@@ -195,7 +199,7 @@ export default function App() {
           <div className="flex items-center gap-3">
             <a
               href="#contact"
-              className="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-white text-[#050507] hover:bg-sky-400 hover:text-black shadow-[0_0_25px_rgba(56,189,248,0.25)] hover:shadow-[0_0_35px_rgba(56,189,248,0.5)] transition-all active:scale-95"
+              className="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-white text-black hover:bg-sky-400 hover:text-black shadow-[0_0_25px_rgba(56,189,248,0.25)] hover:shadow-[0_0_35px_rgba(56,189,248,0.5)] transition-all active:scale-95"
             >
               Let's Talk
             </a>
@@ -206,8 +210,8 @@ export default function App() {
       {/* HERO SECTION (Text floats cleanly above the planet horizon; description is NEVER hidden!) */}
       <section className="relative min-h-[95vh] flex flex-col justify-center items-center px-6 pt-32 pb-20 z-20 pointer-events-auto">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
-          {/* Status Badge in signature blue */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-blue-950/40 border border-blue-500/30 backdrop-blur-md mb-8 text-xs font-mono text-sky-200 shadow-[0_0_20px_rgba(56,189,248,0.15)]">
+          {/* Status Badge in signature crisp style */}
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/15 backdrop-blur-md mb-8 text-xs font-mono text-sky-200 shadow-[0_0_20px_rgba(56,189,248,0.15)]">
             <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]" />
             <span className="tracking-wide">Available for New Projects</span>
           </div>
@@ -231,7 +235,7 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
               href="#work"
-              className="px-8 py-4 rounded-xl font-mazzard text-sm md:text-base bg-white text-[#040407] hover:bg-sky-400 hover:text-black shadow-[0_0_35px_rgba(56,189,248,0.3)] hover:shadow-[0_0_45px_rgba(56,189,248,0.6)] transition-all duration-300 flex items-center gap-2 group cursor-pointer"
+              className="px-8 py-4 rounded-xl font-semibold text-sm md:text-base bg-white text-black hover:bg-sky-400 hover:text-black shadow-[0_0_35px_rgba(56,189,248,0.3)] hover:shadow-[0_0_45px_rgba(56,189,248,0.6)] transition-all duration-300 flex items-center gap-2 group cursor-pointer"
             >
               <span>Explore My Work</span>
               <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
@@ -239,7 +243,7 @@ export default function App() {
 
             <a
               href="#contact"
-              className="px-7 py-4 rounded-xl font-mazzard text-sm md:text-base bg-[#0b0e1b]/80 border border-blue-500/25 text-white hover:text-sky-300 hover:border-blue-400/50 backdrop-blur-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(56,189,248,0.2)]"
+              className="px-7 py-4 rounded-xl font-semibold text-sm md:text-base bg-black/80 border border-white/20 text-white hover:text-sky-300 hover:border-sky-400/50 backdrop-blur-md transition-all duration-300 hover:shadow-[0_0_25px_rgba(56,189,248,0.2)]"
             >
               Let's Talk
             </a>
@@ -284,11 +288,11 @@ export default function App() {
             >
               <div
                 onClick={() => setActiveVideoModal(project)}
-                className="group relative rounded-[28px] md:rounded-[34px] bg-[#070b16]/90 border border-blue-500/20 hover:border-sky-400/50 p-5 sm:p-6 md:p-7 backdrop-blur-md shadow-[0_0_40px_rgba(37,99,235,0.12)] hover:shadow-[0_0_60px_rgba(56,189,248,0.28)] transition-all duration-500 flex flex-col justify-between cursor-pointer h-full"
+                className="group relative rounded-[28px] md:rounded-[34px] bg-black/90 border border-white/10 hover:border-sky-400/50 p-5 sm:p-6 md:p-7 backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(56,189,248,0.28)] transition-all duration-500 flex flex-col justify-between cursor-pointer h-full"
               >
                 {/* Inner 16:9 Video Box with Numeral & Centered Play Button */}
                 <div
-                  className={`relative aspect-video w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br ${project.gradient} border border-blue-500/20 flex items-center justify-center p-4 shadow-inner mb-5 group-hover:border-sky-400/35 transition-all duration-500`}
+                  className={`relative aspect-video w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br ${project.gradient} border border-white/10 flex items-center justify-center p-4 shadow-inner mb-5 group-hover:border-sky-400/35 transition-all duration-500`}
                 >
                   {/* Numeral inside top-left */}
                   <span className="absolute top-4 left-4 text-xs font-mono font-medium text-sky-200/70 tracking-wider">
@@ -304,7 +308,7 @@ export default function App() {
                 {/* Below Video: Metadata row, tag, Creator review title, quote & 5 stars */}
                 <div className="flex flex-col">
                   {/* Category & Format Divider Row */}
-                  <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] text-white/50 border-b border-blue-500/15 pb-3 mb-3.5">
+                  <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] text-white/50 border-b border-white/10 pb-3 mb-3.5">
                     <span className="font-semibold">{project.category}</span>
                     <span className="text-white/40">{project.format}</span>
                   </div>
@@ -338,7 +342,7 @@ export default function App() {
       </section>
 
       {/* SECTION 2: SHORTS / VERTICAL REELS (EXACT LAYOUT FROM IMAGE_B2BF8C7B.PNG WITH STAGGERED 3-CARD COMPOSITION) */}
-      <section id="shorts" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-blue-500/10">
+      <section id="shorts" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         {/* Header from image_b2bf8c7b.png: Left tag + Split headline, Right description */}
         <RevealOnScroll className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
           <div>
@@ -364,9 +368,9 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-4 pb-8">
           {/* Card 01 */}
           <RevealOnScroll delay={0}>
-            <div className="group relative rounded-[32px] p-3.5 bg-[#080b15]/90 border border-blue-500/20 hover:border-blue-400/50 shadow-[0_0_35px_rgba(37,99,235,0.15)] hover:shadow-[0_0_60px_rgba(56,189,248,0.35)] transition-all duration-500 cursor-pointer flex flex-col justify-between">
+            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-sky-400/50 shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(56,189,248,0.35)] transition-all duration-500 cursor-pointer flex flex-col justify-between">
               {/* Inner 9:16 Screen Frame */}
-              <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#132238] via-[#09101d] to-[#04060c] border border-blue-500/20 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
+              <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#161619] via-[#09090b] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
                 <span className="text-xs font-mono text-sky-300 font-semibold">01</span>
 
                 <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
@@ -389,9 +393,9 @@ export default function App() {
 
           {/* Card 02 (Middle card staggered down as in reference image!) */}
           <RevealOnScroll delay={150}>
-            <div className="group relative rounded-[32px] p-3.5 bg-[#080b15]/90 border border-blue-500/20 hover:border-blue-400/50 shadow-[0_0_35px_rgba(37,99,235,0.15)] hover:shadow-[0_0_60px_rgba(56,189,248,0.35)] transition-all duration-500 cursor-pointer flex flex-col justify-between md:translate-y-8">
+            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-sky-400/50 shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(56,189,248,0.35)] transition-all duration-500 cursor-pointer flex flex-col justify-between md:translate-y-8">
               {/* Inner 9:16 Screen Frame */}
-              <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#1e293b] via-[#0f172a] to-[#04060c] border border-blue-500/20 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
+              <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#1a1a1e] via-[#0b0b0d] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
                 <span className="text-xs font-mono text-sky-300 font-semibold">02</span>
 
                 <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
@@ -414,9 +418,9 @@ export default function App() {
 
           {/* Card 03 */}
           <RevealOnScroll delay={300}>
-            <div className="group relative rounded-[32px] p-3.5 bg-[#080b15]/90 border border-blue-500/20 hover:border-blue-400/50 shadow-[0_0_35px_rgba(37,99,235,0.15)] hover:shadow-[0_0_60px_rgba(56,189,248,0.35)] transition-all duration-500 cursor-pointer flex flex-col justify-between">
+            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-sky-400/50 shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(56,189,248,0.35)] transition-all duration-500 cursor-pointer flex flex-col justify-between">
               {/* Inner 9:16 Screen Frame */}
-              <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#132238] via-[#09101d] to-[#04060c] border border-blue-500/20 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
+              <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#161619] via-[#09090b] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
                 <span className="text-xs font-mono text-sky-300 font-semibold">03</span>
 
                 <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
@@ -440,7 +444,7 @@ export default function App() {
       </section>
 
       {/* SECTION 3: WHY ME */}
-      <section id="whyme" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-blue-500/10">
+      <section id="whyme" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="max-w-3xl mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-sky-400 mb-3">
             <Zap className="w-3.5 h-3.5" />
@@ -457,8 +461,8 @@ export default function App() {
         {/* 6 Core Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <RevealOnScroll delay={0}>
-            <div className="rounded-3xl p-8 bg-[#080b15]/80 backdrop-blur-xl border border-blue-500/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-blue-400/40 transition-all h-full">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-6">
+            <div className="rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:border-sky-400/40 transition-all h-full">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-6">
                 <Sparkles className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-heading font-bold text-white mb-2">1. The 1.8s Hook Formula</h3>
@@ -469,8 +473,8 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={100}>
-            <div className="rounded-3xl p-8 bg-[#080b15]/80 backdrop-blur-xl border border-blue-500/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-blue-400/40 transition-all h-full">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-6">
+            <div className="rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:border-sky-400/40 transition-all h-full">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-6">
                 <Layers className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-heading font-bold text-white mb-2">2. Adaptable to Any Style</h3>
@@ -481,8 +485,8 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={200}>
-            <div className="rounded-3xl p-8 bg-[#080b15]/80 backdrop-blur-xl border border-blue-500/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-blue-400/40 transition-all h-full">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-6">
+            <div className="rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:border-sky-400/40 transition-all h-full">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-6">
                 <Volume2 className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-heading font-bold text-white mb-2">3. 5-Layer Soundscapes</h3>
@@ -493,8 +497,8 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={300}>
-            <div className="rounded-3xl p-8 bg-[#080b15]/80 backdrop-blur-xl border border-blue-500/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-blue-400/40 transition-all h-full">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-6">
+            <div className="rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:border-sky-400/40 transition-all h-full">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-6">
                 <Film className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-heading font-bold text-white mb-2">4. 100% After Effects</h3>
@@ -505,8 +509,8 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={400}>
-            <div className="rounded-3xl p-8 bg-[#080b15]/80 backdrop-blur-xl border border-blue-500/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-blue-400/40 transition-all h-full">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-6">
+            <div className="rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:border-sky-400/40 transition-all h-full">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-6">
                 <Zap className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-heading font-bold text-white mb-2">5. 24–48h Turnaround</h3>
@@ -517,8 +521,8 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={500}>
-            <div className="rounded-3xl p-8 bg-[#080b15]/80 backdrop-blur-xl border border-blue-500/20 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-blue-400/40 transition-all h-full">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-6">
+            <div className="rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:border-sky-400/40 transition-all h-full">
+              <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-6">
                 <Check className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-heading font-bold text-white mb-2">6. 3 Revisions Max Policy</h3>
@@ -531,20 +535,20 @@ export default function App() {
       </section>
 
       {/* SECTION 4: ABOUT RYCHR */}
-      <section id="about" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-blue-500/10">
+      <section id="about" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           <RevealOnScroll className="md:col-span-5 relative" delay={100}>
             {/* Glowing Avatar Glass Card */}
-            <div className="relative rounded-3xl overflow-hidden aspect-square bg-[#080b15]/90 border border-blue-500/25 p-8 flex flex-col justify-between shadow-[0_0_60px_rgba(37,99,235,0.2)]">
+            <div className="relative rounded-3xl overflow-hidden aspect-square bg-[#050505]/95 border border-white/15 p-8 flex flex-col justify-between shadow-[0_0_60px_rgba(0,0,0,0.8)]">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-[#040407] border border-blue-500/30 p-2 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-2xl bg-black border border-white/20 p-2 flex items-center justify-center">
                   <img
                     src="/assets/aistudio/image_5a1c3c4a.png"
                     alt="Crescent Logo"
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-mono bg-blue-500/15 text-sky-300 border border-blue-500/30">
+                <span className="px-3 py-1 rounded-full text-xs font-mono bg-white/[0.06] text-sky-300 border border-white/15">
                   Available Now
                 </span>
               </div>
@@ -600,7 +604,7 @@ export default function App() {
       </section>
 
       {/* SECTION 5: FAQ */}
-      <section id="faq" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-blue-500/10">
+      <section id="faq" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-sky-400 mb-3">
             <span>Got Questions?</span>
@@ -613,14 +617,14 @@ export default function App() {
           </p>
         </RevealOnScroll>
 
-        {/* Glass Accordions in signature blue */}
+        {/* Glass Accordions in neutral dark glass */}
         <div className="space-y-4">
           {FAQS.map((faq, index) => {
             const isOpen = activeFaq === index;
             return (
               <RevealOnScroll key={index} delay={index * 70}>
                 <div
-                  className="rounded-2xl bg-[#080b15]/85 backdrop-blur-xl border border-blue-500/20 hover:border-blue-400/40 transition-all overflow-hidden shadow-lg"
+                  className="rounded-2xl bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-sky-400/40 transition-all overflow-hidden shadow-lg"
                 >
                   <button
                     onClick={() => setActiveFaq(isOpen ? null : index)}
@@ -629,13 +633,13 @@ export default function App() {
                     <span className="text-base md:text-lg font-mazzard text-white">
                       {faq.question}
                     </span>
-                    <div className={`w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/25 flex items-center justify-center shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 bg-blue-500/25' : ''}`}>
+                    <div className={`w-8 h-8 rounded-full bg-white/[0.05] border border-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 bg-white/20' : ''}`}>
                       <ChevronDown className="w-4 h-4 text-sky-400" />
                     </div>
                   </button>
 
                   {isOpen && (
-                    <div className="px-6 pb-6 pt-1 text-sm md:text-base text-white/70 leading-relaxed border-t border-blue-500/10 font-normal">
+                    <div className="px-6 pb-6 pt-1 text-sm md:text-base text-white/70 leading-relaxed border-t border-white/10 font-normal">
                       {faq.answer}
                     </div>
                   )}
@@ -647,7 +651,7 @@ export default function App() {
       </section>
 
       {/* SECTION 6: CONTACT & SOCIALS */}
-      <section id="contact" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-blue-500/10">
+      <section id="contact" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-sky-400 mb-3">
             <span>Direct Channels</span>
@@ -660,18 +664,18 @@ export default function App() {
           </p>
         </RevealOnScroll>
 
-        {/* 3 Explicit Social Cards in Signature Blue */}
+        {/* 3 Explicit Social Cards in Deep Obsidian Glass */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {/* Discord: @ray_christo */}
           <RevealOnScroll delay={0}>
-            <div className="rounded-3xl p-6 bg-[#080b15]/85 backdrop-blur-xl border border-blue-500/20 hover:border-blue-400/50 shadow-[0_0_35px_rgba(37,99,235,0.15)] hover:shadow-[0_0_50px_rgba(56,189,248,0.3)] transition-all flex flex-col justify-between h-full">
+            <div className="rounded-3xl p-6 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-sky-400/50 shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_50px_rgba(56,189,248,0.3)] transition-all flex flex-col justify-between h-full">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-5">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-5">
                   <MessageSquare className="w-6 h-6" />
                 </div>
                 <h4 className="text-lg font-mazzard text-white mb-1">Discord</h4>
                 <p className="text-xs text-white/50 mb-4">Fast messaging & file reviews</p>
-                <div className="p-3 rounded-xl bg-black/50 border border-blue-500/20 font-mono text-sm text-sky-300 break-all select-all font-semibold">
+                <div className="p-3 rounded-xl bg-black border border-white/15 font-mono text-sm text-sky-300 break-all select-all font-semibold">
                   @ray_christo
                 </div>
               </div>
@@ -690,14 +694,14 @@ export default function App() {
 
           {/* Instagram: rychr.prod */}
           <RevealOnScroll delay={120}>
-            <div className="rounded-3xl p-6 bg-[#080b15]/85 backdrop-blur-xl border border-blue-500/20 hover:border-blue-400/50 shadow-[0_0_35px_rgba(37,99,235,0.15)] hover:shadow-[0_0_50px_rgba(56,189,248,0.3)] transition-all flex flex-col justify-between h-full">
+            <div className="rounded-3xl p-6 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-sky-400/50 shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_50px_rgba(56,189,248,0.3)] transition-all flex flex-col justify-between h-full">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-5">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-5">
                   <Instagram className="w-6 h-6" />
                 </div>
                 <h4 className="text-lg font-mazzard text-white mb-1">Instagram</h4>
                 <p className="text-xs text-white/50 mb-4">Direct messages & reel edits</p>
-                <div className="p-3 rounded-xl bg-black/50 border border-blue-500/20 font-mono text-sm text-sky-300 break-all select-all font-semibold">
+                <div className="p-3 rounded-xl bg-black border border-white/15 font-mono text-sm text-sky-300 break-all select-all font-semibold">
                   rychr.prod
                 </div>
               </div>
@@ -725,14 +729,14 @@ export default function App() {
 
           {/* Gmail */}
           <RevealOnScroll delay={240}>
-            <div className="rounded-3xl p-6 bg-[#080b15]/85 backdrop-blur-xl border border-blue-500/20 hover:border-blue-400/50 shadow-[0_0_35px_rgba(37,99,235,0.15)] hover:shadow-[0_0_50px_rgba(56,189,248,0.3)] transition-all flex flex-col justify-between h-full">
+            <div className="rounded-3xl p-6 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-sky-400/50 shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_50px_rgba(56,189,248,0.3)] transition-all flex flex-col justify-between h-full">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-sky-400 mb-5">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/15 flex items-center justify-center text-sky-400 mb-5">
                   <Mail className="w-6 h-6" />
                 </div>
                 <h4 className="text-lg font-mazzard text-white mb-1">Gmail</h4>
                 <p className="text-xs text-white/50 mb-4">Official business inquiries</p>
-                <div className="p-3 rounded-xl bg-black/50 border border-blue-500/20 font-mono text-xs text-sky-300 break-all select-all">
+                <div className="p-3 rounded-xl bg-black border border-white/15 font-mono text-xs text-sky-300 break-all select-all">
                   rychr.edits@gmail.com
                 </div>
               </div>
@@ -759,7 +763,7 @@ export default function App() {
 
         {/* Payments Notice Box */}
         <RevealOnScroll delay={150}>
-          <div className="p-6 rounded-2xl bg-blue-950/20 border border-blue-500/20 backdrop-blur-md mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <span className="text-xs uppercase font-mono tracking-wider text-sky-400 block mb-1">
                 Accepted Payment Channels
@@ -768,7 +772,7 @@ export default function App() {
                 Direct <strong className="text-white">Bank Transfer</strong> and <strong className="text-white">UPI</strong>. For any other payment methods, contact directly.
               </p>
             </div>
-            <span className="px-3 py-1.5 rounded-lg bg-blue-500/15 border border-blue-500/30 text-sky-300 text-xs font-mono shrink-0">
+            <span className="px-3 py-1.5 rounded-lg bg-white/[0.06] border border-white/15 text-sky-300 text-xs font-mono shrink-0">
               Secure Onboarding
             </span>
           </div>
@@ -776,7 +780,7 @@ export default function App() {
 
         {/* Quick Project Inquiry Box */}
         <RevealOnScroll delay={250}>
-          <div className="rounded-3xl p-8 bg-[#080b15]/90 backdrop-blur-xl border border-blue-500/20 shadow-2xl">
+          <div className="rounded-3xl p-8 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-2xl">
             <h3 className="text-2xl font-mazzard text-white mb-2">
               Direct Inquiry Form
             </h3>
@@ -785,7 +789,7 @@ export default function App() {
             </p>
 
             {contactSubmitted ? (
-              <div className="p-6 rounded-2xl bg-blue-500/15 border border-blue-400/30 text-center">
+              <div className="p-6 rounded-2xl bg-white/[0.06] border border-sky-400/30 text-center">
                 <Check className="w-10 h-10 text-sky-400 mx-auto mb-2" />
                 <h4 className="text-lg font-mazzard text-white">Inquiry Sent Successfully!</h4>
                 <p className="text-sm text-white/70 mt-1 font-normal">
@@ -811,7 +815,7 @@ export default function App() {
                       placeholder="e.g. Blyvs Media"
                       value={contactForm.name}
                       onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-blue-500/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-sky-400"
+                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-sky-400"
                     />
                   </div>
                   <div>
@@ -824,7 +828,7 @@ export default function App() {
                       placeholder="e.g. @your_discord or you@gmail.com"
                       value={contactForm.emailOrDiscord}
                       onChange={(e) => setContactForm({ ...contactForm, emailOrDiscord: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-black/50 border border-blue-500/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-sky-400"
+                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-sky-400"
                     />
                   </div>
                 </div>
@@ -836,7 +840,7 @@ export default function App() {
                   <select
                     value={contactForm.service}
                     onChange={(e) => setContactForm({ ...contactForm, service: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-[#0b0e1b] border border-blue-500/20 text-white text-sm focus:outline-none focus:border-sky-400"
+                    className="w-full px-4 py-3 rounded-xl bg-[#0a0a0c] border border-white/15 text-white text-sm focus:outline-none focus:border-sky-400"
                   >
                     <option value="YouTube Long-form">YouTube Long-form (Talking Head / Documentary / Gaming)</option>
                     <option value="Shorts / Reels Batch">Shorts / Reels Batch</option>
@@ -855,13 +859,13 @@ export default function App() {
                     placeholder="Share your channel link, what editing style you need, and any reference videos..."
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-blue-500/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-sky-400 resize-none font-normal"
+                    className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-sky-400 resize-none font-normal"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-4 rounded-xl bg-white hover:bg-sky-400 hover:text-black text-[#040407] font-semibold text-sm transition-all duration-300 shadow-[0_0_30px_rgba(56,189,248,0.25)] hover:shadow-[0_0_40px_rgba(56,189,248,0.5)] cursor-pointer"
+                  className="w-full py-4 rounded-xl bg-white hover:bg-sky-400 hover:text-black text-black font-semibold text-sm transition-all duration-300 shadow-[0_0_30px_rgba(56,189,248,0.25)] hover:shadow-[0_0_40px_rgba(56,189,248,0.5)] cursor-pointer"
                 >
                   Send Message to <span className="font-brand-rychr font-bold">Rychr</span> →
                 </button>
@@ -872,7 +876,7 @@ export default function App() {
       </section>
 
       {/* FOOTER */}
-      <footer className="relative py-12 px-6 border-t border-blue-500/15 z-20 text-center text-xs text-white/40 font-mono">
+      <footer className="relative py-12 px-6 border-t border-white/10 z-20 text-center text-xs text-white/40 font-mono">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <img
@@ -900,17 +904,17 @@ export default function App() {
       {/* VIDEO PREVIEW MODAL */}
       {activeVideoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-2xl">
-          <div className="relative w-full max-w-4xl rounded-3xl p-6 bg-[#090c18] border border-blue-500/30 shadow-[0_0_100px_rgba(37,99,235,0.4)] overflow-hidden">
+          <div className="relative w-full max-w-4xl rounded-3xl p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden">
             <button
               onClick={() => setActiveVideoModal(null)}
-              className="absolute top-5 right-5 z-20 p-2.5 rounded-full bg-black/60 hover:bg-sky-400 hover:text-black text-white border border-blue-500/25 transition-all cursor-pointer"
+              className="absolute top-5 right-5 z-20 p-2.5 rounded-full bg-black/60 hover:bg-sky-400 hover:text-black text-white border border-white/20 transition-all cursor-pointer"
             >
               ✕
             </button>
 
             <div className="relative w-full rounded-2xl overflow-hidden bg-black mb-6 aspect-video">
               <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}>
-                <div className="w-20 h-20 rounded-full bg-blue-500/20 border border-blue-400/40 backdrop-blur-md flex items-center justify-center mb-4 text-white">
+                <div className="w-20 h-20 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center mb-4 text-white">
                   <Play className="w-8 h-8 fill-current ml-1" />
                 </div>
                 <h4 className="text-2xl font-heading font-bold text-white mb-2">
@@ -919,7 +923,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-blue-500/15">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
               <div>
                 <h3 className="text-xl font-heading font-bold text-white">
                   {activeVideoModal.title}
