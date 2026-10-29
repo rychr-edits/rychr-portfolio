@@ -163,13 +163,18 @@ export default function App() {
           {/* Calm, slow subtle dual parallel glowing border covering all sides of the rounded tab */}
           <CalmNavbarBorder />
 
-          {/* Top Left: Crescent Moon Logo */}
+          {/* Top Left: Animated Crescent Moon & Brand Video Playing as GIF */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-white/15 bg-black flex items-center justify-center shadow-[0_0_15px_rgba(129,140,248,0.25)] group-hover:shadow-[0_0_24px_rgba(168,85,247,0.45)] transition-all">
-              <img
-                src="/assets/aistudio/image_5a1c3c4a.png"
-                alt="Crescent Moon"
-                className="w-full h-full object-cover scale-110"
+            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-white/20 bg-black flex items-center justify-center shadow-[0_0_18px_rgba(129,140,248,0.3)] group-hover:shadow-[0_0_26px_rgba(168,85,247,0.5)] group-hover:border-indigo-400/40 transition-all shrink-0">
+              <video
+                src="/assets/aistudio/export_2_a0dfa2e9.mp4"
+                poster="/assets/aistudio/image_5a1c3c4a.png"
+                autoPlay
+                loop
+                muted
+                playsInline
+                disablePictureInPicture
+                className="w-full h-full object-cover scale-[1.03] pointer-events-none select-none"
               />
             </div>
             <span className="font-brand-rychr text-xl tracking-tight text-white group-hover:text-indigo-200 transition-colors">
@@ -701,11 +706,16 @@ export default function App() {
                 angleOffset={45}
               />
               <div className="relative z-10 flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-black border border-white/20 p-2 flex items-center justify-center">
-                  <img
-                    src="/assets/aistudio/image_5a1c3c4a.png"
-                    alt="Crescent Logo"
-                    className="w-full h-full object-contain"
+                <div className="w-12 h-12 rounded-2xl bg-black border border-white/20 overflow-hidden flex items-center justify-center shadow-[0_0_20px_rgba(129,140,248,0.25)] shrink-0">
+                  <video
+                    src="/assets/aistudio/export_2_a0dfa2e9.mp4"
+                    poster="/assets/aistudio/image_5a1c3c4a.png"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    disablePictureInPicture
+                    className="w-full h-full object-cover pointer-events-none select-none"
                   />
                 </div>
                 <span className="px-3 py-1 rounded-full text-xs font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-400/30">
@@ -1132,11 +1142,18 @@ export default function App() {
       <footer className="relative py-12 px-6 border-t border-white/10 z-20 text-center text-xs text-white/40 font-mono">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <img
-              src="/assets/aistudio/image_5a1c3c4a.png"
-              alt="Logo"
-              className="w-5 h-5 rounded-md object-contain"
-            />
+            <div className="w-5 h-5 rounded-md overflow-hidden bg-black border border-white/20 shrink-0 flex items-center justify-center">
+              <video
+                src="/assets/aistudio/export_2_a0dfa2e9.mp4"
+                poster="/assets/aistudio/image_5a1c3c4a.png"
+                autoPlay
+                loop
+                muted
+                playsInline
+                disablePictureInPicture
+                className="w-full h-full object-cover pointer-events-none select-none"
+              />
+            </div>
             <span className="text-white/90 font-brand-rychr text-base">Rychr</span>
             <span>— Creative Video Editor & Motion Designer (After Effects)</span>
           </div>
