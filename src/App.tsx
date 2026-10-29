@@ -754,20 +754,27 @@ export default function App() {
 
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-purple-400 mb-3">
-                  <span>no corporate yap</span>
+                  <span>About the editor</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-mazzard tracking-tight text-white mb-6">
-                  i edit in after effects. you get the views.
-                </h2>
+
+                <div className="flex flex-wrap items-baseline gap-2.5 sm:gap-3 mb-5">
+                  <h2 className="text-4xl sm:text-5xl font-mazzard font-bold text-white tracking-tight">
+                    I'm Ray.
+                  </h2>
+                  <span className="font-brand-rychr text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-300 to-purple-400 font-bold">
+                    (Rychr)
+                  </span>
+                </div>
+
                 <div className="space-y-4 text-sm sm:text-base text-white/70 leading-relaxed font-normal">
                   <p>
-                    ngl most video editing out here is painfully mid. dead air everywhere, lifeless stock footage, and fonts straight out of 2017. your viewers swipe in 2 seconds and your retention graph tanks.
+                    I’ve spent the last 3+ years deep in <strong className="text-white">Adobe After Effects</strong>, engineering and cutting 50+ high-retention videos for creators across YouTube, Reels, and TikTok. Video editing isn't just trimming fat—it's pacing mathematics, auditory immersion, and keeping a viewer hooked from frame zero.
                   </p>
                   <p>
-                    i don't do that. i put the time in <strong className="text-white">Adobe After Effects</strong> keyframing whip zooms, speed ramps, kinetic captions, and sound design that keeps your audience glued to the screen.
+                    Whether your channel runs on fast-paced gaming cuts, documentary storytelling, clean talking-head essays, or viral vertical hooks: <strong className="text-white">I adapt completely to your exact style and brand voice.</strong> No generic cookie-cutter templates—every cut is built from scratch to match your channel rhythm.
                   </p>
                   <p>
-                    high-energy talking heads, documentary deep-dives, or fast-paced vertical shorts that loop on the feed: <strong className="text-white">i adapt to your exact style.</strong> you hit record, i turn it into a high-retention video.
+                    From surgical keyframing, whip zooms, and kinetic captions to 5-layer sound design with atmospheric risers and sub-drops: you bring the vision and raw footage, I engineer the cut that turns casual scrollers into loyal subscribers.
                   </p>
                 </div>
 
