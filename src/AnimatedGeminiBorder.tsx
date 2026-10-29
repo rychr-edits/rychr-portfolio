@@ -48,62 +48,63 @@ export const AnimatedGeminiBorder: React.FC<AnimatedGeminiBorderProps> = ({
       let gradient = '';
 
       if (preset === 'discord') {
-        // Asymmetric Discord spectrum: Electric Blurple (#5865F2) -> Cyber Cyan (#38bdf8) -> Deep Indigo (#818cf8)
+        // Sunset Magenta & Royal Orchid with Deep Velvet Plum accent
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
-          rgba(88, 101, 242, ${(0.85 * breath).toFixed(3)}) 30deg,
-          rgba(56, 189, 248, ${(0.95 * breath).toFixed(3)}) 70deg,
-          rgba(129, 140, 248, ${(0.75 * breath).toFixed(3)}) 105deg,
-          transparent 145deg,
-          transparent 215deg,
-          rgba(88, 101, 242, ${(0.45 * breath).toFixed(3)}) 255deg,
-          rgba(56, 189, 248, ${(0.40 * breath).toFixed(3)}) 290deg,
-          transparent 330deg,
-          transparent 360deg
-        )`;
-      } else if (preset === 'instagram') {
-        // Asymmetric Instagram spectrum: Sunset Magenta (#ec4899) -> Royal Orchid (#c084fc) -> Electric Rose (#f43f5e) -> Warm Violet
-        gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
-          transparent 0deg,
-          rgba(236, 72, 153, ${(0.90 * breath).toFixed(3)}) 30deg,
-          rgba(192, 132, 252, ${(0.95 * breath).toFixed(3)}) 70deg,
-          rgba(244, 63, 94, ${(0.80 * breath).toFixed(3)}) 100deg,
-          rgba(168, 85, 247, ${(0.60 * breath).toFixed(3)}) 125deg,
-          transparent 155deg,
+          rgba(244, 63, 94, ${(0.88 * breath).toFixed(3)}) 25deg,
+          rgba(236, 72, 153, ${(0.95 * breath).toFixed(3)}) 65deg,
+          rgba(192, 132, 252, ${(0.90 * breath).toFixed(3)}) 100deg,
+          rgba(168, 85, 247, ${(0.65 * breath).toFixed(3)}) 130deg,
+          transparent 160deg,
           transparent 220deg,
-          rgba(236, 72, 153, ${(0.50 * breath).toFixed(3)}) 260deg,
-          rgba(192, 132, 252, ${(0.45 * breath).toFixed(3)}) 295deg,
+          rgba(236, 72, 153, ${(0.45 * breath).toFixed(3)}) 260deg,
+          rgba(192, 132, 252, ${(0.40 * breath).toFixed(3)}) 295deg,
           transparent 335deg,
           transparent 360deg
         )`;
       } else if (preset === 'gmail') {
-        // Asymmetric Gmail / Google spectrum: Celestial Sapphire (#3b82f6) -> Radiant Cyan (#38bdf8) -> Soft Lilac (#c084fc)
+        // Radiant Fuchsia & Soft Orchid with Ruby Crimson accent
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
-          rgba(59, 130, 246, ${(0.90 * breath).toFixed(3)}) 25deg,
-          rgba(56, 189, 248, ${(0.95 * breath).toFixed(3)}) 65deg,
-          rgba(129, 140, 248, ${(0.75 * breath).toFixed(3)}) 95deg,
-          rgba(192, 132, 252, ${(0.55 * breath).toFixed(3)}) 120deg,
-          transparent 150deg,
+          rgba(236, 72, 153, ${(0.92 * breath).toFixed(3)}) 25deg,
+          rgba(251, 113, 133, ${(0.90 * breath).toFixed(3)}) 60deg,
+          rgba(192, 132, 252, ${(0.95 * breath).toFixed(3)}) 95deg,
+          rgba(225, 29, 72, ${(0.70 * breath).toFixed(3)}) 125deg,
+          transparent 155deg,
           transparent 225deg,
-          rgba(59, 130, 246, ${(0.50 * breath).toFixed(3)}) 265deg,
-          rgba(56, 189, 248, ${(0.40 * breath).toFixed(3)}) 295deg,
+          rgba(236, 72, 153, ${(0.45 * breath).toFixed(3)}) 265deg,
+          rgba(192, 132, 252, ${(0.40 * breath).toFixed(3)}) 295deg,
+          transparent 330deg,
+          transparent 360deg
+        )`;
+      } else if (preset === 'cyan-purple') {
+        // Sunset Magenta into Electric Violet & Orchid with subtle Ice Cyan spark
+        gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
+          transparent 0deg,
+          rgba(236, 72, 153, ${(0.95 * breath).toFixed(3)}) 25deg,
+          rgba(192, 132, 252, ${(0.90 * breath).toFixed(3)}) 65deg,
+          rgba(56, 189, 248, ${(0.75 * breath).toFixed(3)}) 95deg,
+          rgba(244, 63, 94, ${(0.80 * breath).toFixed(3)}) 125deg,
+          transparent 155deg,
+          transparent 220deg,
+          rgba(236, 72, 153, ${(0.50 * breath).toFixed(3)}) 260deg,
+          rgba(192, 132, 252, ${(0.40 * breath).toFixed(3)}) 290deg,
           transparent 330deg,
           transparent 360deg
         )`;
       } else {
-        // Default Gemini / Cyan-Purple spectrum
+        // Primary Signature Sunset Magenta / Royal Orchid / Electric Rose spectrum (from Card 02 screenshot)
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
-          rgba(56, 189, 248, ${(0.80 * breath).toFixed(3)}) 25deg,
-          rgba(129, 140, 248, ${(0.85 * breath).toFixed(3)}) 65deg,
-          rgba(192, 132, 252, ${(0.70 * breath).toFixed(3)}) 95deg,
-          rgba(56, 189, 248, ${(0.35 * breath).toFixed(3)}) 120deg,
-          transparent 150deg,
+          rgba(236, 72, 153, ${(0.95 * breath).toFixed(3)}) 25deg,
+          rgba(192, 132, 252, ${(0.95 * breath).toFixed(3)}) 65deg,
+          rgba(244, 63, 94, ${(0.85 * breath).toFixed(3)}) 100deg,
+          rgba(168, 85, 247, ${(0.70 * breath).toFixed(3)}) 128deg,
+          transparent 158deg,
           transparent 220deg,
-          rgba(99, 102, 241, ${(0.40 * breath).toFixed(3)}) 260deg,
-          rgba(56, 189, 248, ${(0.35 * breath).toFixed(3)}) 285deg,
-          transparent 315deg,
+          rgba(236, 72, 153, ${(0.50 * breath).toFixed(3)}) 260deg,
+          rgba(192, 132, 252, ${(0.45 * breath).toFixed(3)}) 295deg,
+          transparent 335deg,
           transparent 360deg
         )`;
       }

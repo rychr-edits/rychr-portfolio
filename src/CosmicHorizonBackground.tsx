@@ -151,10 +151,10 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
 
         ctx.save();
         const grad = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
-        grad.addColorStop(0, 'rgba(168, 85, 247, 0)');
-        grad.addColorStop(0.3, `rgba(168, 85, 247, ${alpha * 0.35})`);
-        grad.addColorStop(0.65, `rgba(129, 140, 248, ${alpha * 0.55})`);
-        grad.addColorStop(0.85, `rgba(56, 189, 248, ${alpha * 0.85})`);
+        grad.addColorStop(0, 'rgba(236, 72, 153, 0)');
+        grad.addColorStop(0.3, `rgba(192, 132, 252, ${alpha * 0.35})`);
+        grad.addColorStop(0.65, `rgba(236, 72, 153, ${alpha * 0.55})`);
+        grad.addColorStop(0.85, `rgba(244, 63, 94, ${alpha * 0.85})`);
         grad.addColorStop(1, `rgba(255, 255, 255, ${alpha})`);
 
         ctx.strokeStyle = grad;
@@ -165,9 +165,9 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
         ctx.lineTo(ss.x, ss.y);
         ctx.stroke();
 
-        // Subtle glowing nucleus with celestial cyan-indigo halo
+        // Subtle glowing nucleus with sunset magenta-rose halo
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.shadowColor = '#818cf8';
+        ctx.shadowColor = '#ec4899';
         ctx.shadowBlur = 7;
         ctx.beginPath();
         ctx.arc(ss.x, ss.y, ss.headRadius, 0, Math.PI * 2);
@@ -210,28 +210,28 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
           opacity: Math.max(0, 1 - progress * 3.6),
         }}
       >
-        {/* Soft Celestial Cyan-Indigo-Purple Atmospheric Glow behind slanted top arc */}
+        {/* Soft Sunset Magenta / Royal Orchid Atmospheric Glow behind slanted top arc */}
         <div
           className="absolute -top-[200px] left-1/2 -translate-x-1/2 w-[200vw] h-[400px] pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse at 42% 100%, rgba(56, 189, 248, 0.35) 0%, rgba(129, 140, 248, 0.28) 32%, rgba(168, 85, 247, 0.16) 58%, transparent 80%)',
+              'radial-gradient(ellipse at 42% 100%, rgba(236, 72, 153, 0.40) 0%, rgba(192, 132, 252, 0.32) 32%, rgba(244, 63, 94, 0.18) 58%, transparent 80%)',
             filter: 'blur(50px)',
           }}
         />
 
         <svg viewBox="0 0 3200 800" preserveAspectRatio="none" className="w-full h-[750px] overflow-visible">
           <defs>
-            {/* Slanted beam gradient with cosmic cyan to indigo-purple spectrum */}
+            {/* Slanted beam gradient with Sunset Magenta to Royal Orchid spectrum */}
             <linearGradient id="topHorizonBeam" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.25" />
-              <stop offset="12%" stopColor="#6366f1" stopOpacity="0.5" />
-              <stop offset="28%" stopColor="#38bdf8" stopOpacity="0.95" />
+              <stop offset="14%" stopColor="#c084fc" stopOpacity="0.5" />
+              <stop offset="28%" stopColor="#ec4899" stopOpacity="0.95" />
               <stop offset="38%" stopColor="#ffffff" stopOpacity="1" />
-              <stop offset="48%" stopColor="#38bdf8" stopOpacity="0.95" />
-              <stop offset="70%" stopColor="#818cf8" stopOpacity="0.6" />
-              <stop offset="86%" stopColor="#a855f7" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#6d28d9" stopOpacity="0.15" />
+              <stop offset="48%" stopColor="#f43f5e" stopOpacity="0.95" />
+              <stop offset="70%" stopColor="#ec4899" stopOpacity="0.65" />
+              <stop offset="86%" stopColor="#c084fc" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.15" />
             </linearGradient>
 
             <filter id="topNeonGlow" x="-20%" y="-100%" width="140%" height="300%">
@@ -255,11 +255,11 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
           {/* Slanted Planet Body Silhouette: pure pitch black */}
           <path d="M -600,280 Q 700,-100 3800,340 L 3800,900 L -600,900 Z" fill="url(#topPlanetBody)" />
 
-          {/* Wide Soft Atmospheric Cosmic Purple-Cyan Glow */}
+          {/* Wide Soft Atmospheric Sunset Magenta Glow */}
           <path
             d="M -500,280 Q 700,-100 3700,340"
             fill="none"
-            stroke="#818cf8"
+            stroke="#ec4899"
             strokeWidth="28"
             strokeOpacity="0.32"
             style={{ filter: 'blur(24px)' }}
@@ -275,7 +275,7 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
             strokeOpacity="0.95"
           />
 
-          {/* Core Crisp Razor White-Cyan Rim */}
+          {/* Core Crisp Razor White-Rose Rim */}
           <path d="M -500,280 Q 700,-100 3700,340" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeOpacity="0.95" />
         </svg>
       </div>
@@ -286,19 +286,17 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
         style={{
           width: '240vw',
           maxWidth: '4800px',
-          // Sits comfortably down at the bottom of the viewport and rises gently toward the footer
           bottom: `${-250 + Math.pow(Math.max(0, (progress - 0.28) / 0.72), 1.1) * 260}px`,
           transform: 'translate3d(-50%, 0, 0)',
-          // Completely transparent until progress > 0.28, ensuring clear separation from top curve
           opacity: Math.min(1.0, Math.max(0, (progress - 0.28) * 2.2)),
         }}
       >
-        {/* Soft Celestial Cyan-Indigo-Purple Atmospheric Glow below underside arc */}
+        {/* Soft Sunset Magenta / Royal Orchid Atmospheric Glow below underside arc */}
         <div
           className="absolute -bottom-[200px] left-1/2 -translate-x-1/2 w-[200vw] h-[400px] pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse at 32% 0%, rgba(56, 189, 248, 0.40) 0%, rgba(129, 140, 248, 0.32) 32%, rgba(168, 85, 247, 0.18) 60%, transparent 80%)',
+              'radial-gradient(ellipse at 32% 0%, rgba(236, 72, 153, 0.42) 0%, rgba(192, 132, 252, 0.32) 32%, rgba(244, 63, 94, 0.18) 60%, transparent 80%)',
             filter: 'blur(50px)',
           }}
         />
@@ -307,13 +305,13 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
           <defs>
             <linearGradient id="bottomHorizonBeam" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.25" />
-              <stop offset="10%" stopColor="#6366f1" stopOpacity="0.5" />
-              <stop offset="22%" stopColor="#38bdf8" stopOpacity="0.95" />
-              <stop offset="30%" stopColor="#ffffff" stopOpacity="1" />
-              <stop offset="40%" stopColor="#38bdf8" stopOpacity="0.95" />
-              <stop offset="68%" stopColor="#818cf8" stopOpacity="0.6" />
-              <stop offset="85%" stopColor="#a855f7" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#6d28d9" stopOpacity="0.15" />
+              <stop offset="12%" stopColor="#c084fc" stopOpacity="0.5" />
+              <stop offset="26%" stopColor="#ec4899" stopOpacity="0.95" />
+              <stop offset="34%" stopColor="#ffffff" stopOpacity="1" />
+              <stop offset="44%" stopColor="#f43f5e" stopOpacity="0.95" />
+              <stop offset="68%" stopColor="#ec4899" stopOpacity="0.65" />
+              <stop offset="85%" stopColor="#c084fc" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.15" />
             </linearGradient>
 
             <filter id="bottomNeonGlow" x="-20%" y="-100%" width="140%" height="300%">
