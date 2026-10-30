@@ -78,12 +78,12 @@ export const AnimatedGeminiBorder: React.FC<AnimatedGeminiBorderProps> = ({
           transparent 360deg
         )`;
       } else if (preset === 'cyan-purple') {
-        // Sunset Magenta into Electric Violet & Orchid with subtle Ice Cyan spark
+        // Sunset Magenta into Electric Violet & Orchid with subtle Rose spark
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
           rgba(236, 72, 153, ${(0.95 * breath).toFixed(3)}) 25deg,
           rgba(192, 132, 252, ${(0.90 * breath).toFixed(3)}) 65deg,
-          rgba(56, 189, 248, ${(0.75 * breath).toFixed(3)}) 95deg,
+          rgba(251, 113, 133, ${(0.80 * breath).toFixed(3)}) 95deg,
           rgba(244, 63, 94, ${(0.80 * breath).toFixed(3)}) 125deg,
           transparent 155deg,
           transparent 220deg,

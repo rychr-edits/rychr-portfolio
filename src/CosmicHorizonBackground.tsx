@@ -339,7 +339,7 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
           <path
             d="M -500,520 Q 700,880 3700,480"
             fill="none"
-            stroke="#818cf8"
+            stroke="#ec4899"
             strokeWidth="28"
             strokeOpacity="0.32"
             style={{ filter: 'blur(24px)' }}
