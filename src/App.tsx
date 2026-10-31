@@ -46,7 +46,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Your review goes here. Tell visitors what this edit helped you achieve."',
     rating: 5,
-    gradient: 'from-[#14121b] via-[#09080d] to-[#000000]',
+    gradient: 'from-[#191919] via-[#0d0d0d] to-[#000000]',
     colSpan: 'lg:col-span-7',
   },
   {
@@ -59,7 +59,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Add a short quote from the creator about the hook, pacing, or final result."',
     rating: 5,
-    gradient: 'from-[#161320] via-[#09080f] to-[#000000]',
+    gradient: 'from-[#171717] via-[#0b0b0b] to-[#000000]',
     colSpan: 'lg:col-span-5',
   },
   {
@@ -72,7 +72,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Leave space here for a real client testimonial when this project is ready."',
     rating: 5,
-    gradient: 'from-[#13111c] via-[#08070e] to-[#000000]',
+    gradient: 'from-[#181818] via-[#0c0c0c] to-[#000000]',
     colSpan: 'lg:col-span-5',
   },
   {
@@ -85,7 +85,7 @@ const WORK_PROJECTS: WorkProject[] = [
     reviewTitle: 'Creator review',
     quote: '"Your best feedback can live here under the finished video."',
     rating: 5,
-    gradient: 'from-[#161222] via-[#090810] to-[#000000]',
+    gradient: 'from-[#161616] via-[#0a0a0a] to-[#000000]',
     colSpan: 'lg:col-span-7',
   },
 ];
@@ -153,7 +153,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-white font-['Inter',sans-serif] selection:bg-pink-500/35 overflow-x-hidden">
+    <div className="relative min-h-screen bg-black text-white font-['Inter',sans-serif] selection:bg-white/20 selection:text-white overflow-x-hidden">
       {/* PROCEDURAL PLANET HORIZON BACKGROUND (Top horizon + Underside on scroll to bottom + Glowing Cursor with Stars) */}
       <CosmicHorizonBackground scrollY={scrollY} />
 
@@ -163,9 +163,9 @@ export default function App() {
           {/* Calm, slow subtle dual parallel glowing border covering all sides of the rounded tab */}
           <CalmNavbarBorder />
 
-          {/* Top Left: Animated Crescent Moon & Brand Video Playing as GIF (15 FPS) */}
+          {/* Top Left: Animated Crescent Moon & Brand Video Playing as GIF (15 FPS, Monochromatic) */}
           <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-white/20 bg-black flex items-center justify-center shadow-[0_0_18px_rgba(236,72,153,0.35)] group-hover:shadow-[0_0_26px_rgba(244,63,94,0.55)] group-hover:border-pink-400/40 transition-all shrink-0">
+            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-white/20 bg-black flex items-center justify-center shadow-[0_0_18px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_26px_rgba(255,255,255,0.45)] group-hover:border-white/50 transition-all shrink-0">
               <video
                 src="/assets/aistudio/export_2_-_15_fps_dc6d6217.mp4"
                 poster="/assets/aistudio/image_5a1c3c4a.png"
@@ -174,38 +174,38 @@ export default function App() {
                 muted
                 playsInline
                 disablePictureInPicture
-                className="w-full h-full object-cover scale-[1.03] pointer-events-none select-none"
+                className="w-full h-full object-cover scale-[1.03] grayscale contrast-125 pointer-events-none select-none"
               />
             </div>
-            <span className="font-brand-rychr text-xl tracking-tight text-white group-hover:text-pink-200 transition-colors">
+            <span className="font-brand-rychr text-xl tracking-tight text-white group-hover:text-white/80 transition-colors">
               Rychr
             </span>
           </a>
 
           {/* Center Tabs: Work, Shorts, Why me, About, FAQ */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
-            <a href="#work" className="hover:text-pink-300 transition-colors">
+            <a href="#work" className="hover:text-white transition-colors">
               Work
             </a>
-            <a href="#shorts" className="hover:text-pink-300 transition-colors">
+            <a href="#shorts" className="hover:text-white transition-colors">
               Shorts
             </a>
-            <a href="#whyme" className="hover:text-pink-300 transition-colors">
+            <a href="#whyme" className="hover:text-white transition-colors">
               Why me
             </a>
-            <a href="#about" className="hover:text-pink-300 transition-colors">
+            <a href="#about" className="hover:text-white transition-colors">
               About
             </a>
-            <a href="#faq" className="hover:text-pink-300 transition-colors">
+            <a href="#faq" className="hover:text-white transition-colors">
               FAQ
             </a>
           </nav>
 
-          {/* Right Action: Let's Talk CTA with Sunset Magenta Outline */}
+          {/* Right Action: Let's Talk CTA with Glowing White Outline */}
           <div className="flex items-center gap-3">
             <a
               href="#contact"
-              className="relative px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(236,72,153,0.35)] hover:shadow-[0_0_30px_rgba(244,63,94,0.55)] transition-all active:scale-95 cursor-pointer overflow-visible group/btn"
+              className="relative px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all active:scale-95 cursor-pointer overflow-visible group/btn"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -216,7 +216,7 @@ export default function App() {
                 speedMs={12000}
                 angleOffset={60}
               />
-              <span className="relative z-10 group-hover/btn:text-pink-200 transition-colors">
+              <span className="relative z-10 group-hover/btn:text-white/90 transition-colors">
                 Let's Talk
               </span>
             </a>
@@ -227,14 +227,14 @@ export default function App() {
       {/* HERO SECTION (Text floats cleanly above the planet horizon; description is NEVER hidden!) */}
       <section className="relative min-h-[95vh] flex flex-col justify-center items-center px-6 pt-32 pb-20 z-20 pointer-events-auto">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
-          {/* Status Badge in signature crisp style with Sunset Magenta rim */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/15 backdrop-blur-md mb-8 text-xs font-mono text-pink-200 shadow-[0_0_20px_rgba(236,72,153,0.3)]">
-            <span className="w-2 h-2 rounded-full bg-gradient-to-r from-pink-400 to-rose-400 shadow-[0_0_8px_#ec4899]" />
+          {/* Status Badge in signature crisp style with Pure White rim */}
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/20 backdrop-blur-md mb-8 text-xs font-mono text-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+            <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
             <span className="tracking-wide">Available for New Projects</span>
           </div>
 
-          {/* Main Title: Rychr strictly in Mazzard M Black with deep sunset magenta aura */}
-          <h1 className="text-7xl sm:text-8xl md:text-9xl font-brand-rychr tracking-tight mb-4 text-white drop-shadow-[0_10px_45px_rgba(236,72,153,0.35)]">
+          {/* Main Title: Rychr strictly in Mazzard M Black with deep luminous white aura */}
+          <h1 className="text-7xl sm:text-8xl md:text-9xl font-brand-rychr tracking-tight mb-4 text-white drop-shadow-[0_10px_45px_rgba(255,255,255,0.22)]">
             Rychr
           </h1>
 
@@ -252,7 +252,7 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
               href="#work"
-              className="px-8 py-4 rounded-xl font-semibold text-sm md:text-base bg-white text-black hover:bg-gradient-to-r hover:from-pink-300 hover:via-rose-300 hover:to-purple-300 hover:text-black shadow-[0_0_35px_rgba(236,72,153,0.3)] hover:shadow-[0_0_45px_rgba(244,63,94,0.55)] transition-all duration-300 flex items-center gap-2 group cursor-pointer"
+              className="px-8 py-4 rounded-xl font-semibold text-sm md:text-base bg-white text-black hover:bg-neutral-200 transition-all duration-300 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:shadow-[0_0_45px_rgba(255,255,255,0.45)] flex items-center gap-2 group cursor-pointer"
             >
               <span>Explore My Work</span>
               <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
@@ -260,7 +260,7 @@ export default function App() {
 
             <a
               href="#contact"
-              className="relative px-7 py-4 rounded-xl font-semibold text-sm md:text-base bg-black/90 hover:bg-black text-white hover:text-pink-200 transition-all duration-300 shadow-[0_0_25px_rgba(236,72,153,0.3)] hover:shadow-[0_0_35px_rgba(244,63,94,0.55)] overflow-visible group/btn active:scale-95"
+              className="relative px-7 py-4 rounded-xl font-semibold text-sm md:text-base bg-black/90 hover:bg-black text-white hover:text-white/80 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] overflow-visible group/btn active:scale-95"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -275,26 +275,26 @@ export default function App() {
             </a>
           </div>
 
-          {/* Indicator: text "scroll" and glowing line that animates downward */}
+          {/* Indicator: text "scroll" and glowing white line that animates downward */}
           <div className="mt-14 flex flex-col items-center gap-2 select-none pointer-events-none">
-            <span className="text-[11px] uppercase tracking-[0.35em] font-mono text-pink-300/70 font-medium">
+            <span className="text-[11px] uppercase tracking-[0.35em] font-mono text-white/70 font-medium">
               scroll
             </span>
-            <div className="w-[1.5px] h-12 bg-pink-500/20 relative overflow-hidden rounded-full">
-              <div className="absolute top-0 left-0 w-full h-5 bg-gradient-to-b from-transparent via-pink-400 to-purple-400 shadow-[0_0_10px_#ec4899] animate-scrollIndicator" />
+            <div className="w-[1.5px] h-12 bg-white/20 relative overflow-hidden rounded-full">
+              <div className="absolute top-0 left-0 w-full h-5 bg-gradient-to-b from-transparent via-white to-white/60 shadow-[0_0_10px_#ffffff] animate-scrollIndicator" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 1: WORK (EXACT ASYMMETRICAL 4-CARD LAYOUT WITH CELESTIAL CYAN & PURPLE HARMONY) */}
+      {/* SECTION 1: WORK (EXACT ASYMMETRICAL 4-CARD LAYOUT WITH MONOCHROME PURE WHITE GLOW) */}
       <section id="work" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24">
-        {/* Subtle grid texture overlay with faint cosmic magenta touch */}
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(236,72,153,0.08)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none rounded-3xl" />
+        {/* Subtle grid texture overlay with faint white touch */}
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none rounded-3xl" />
 
         <RevealOnScroll className="mb-14 relative z-10">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 mb-3">
-            <Film className="w-3.5 h-3.5 text-pink-400" />
+          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
+            <Film className="w-3.5 h-3.5 text-white" />
             <span>01 / Selected Work</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white">
@@ -314,7 +314,7 @@ export default function App() {
             >
               <div
                 onClick={() => setActiveVideoModal(project)}
-                className="group relative rounded-[28px] md:rounded-[34px] bg-black/90 border border-white/10 hover:border-transparent p-5 sm:p-6 md:p-7 backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(236,72,153,0.3)] transition-all duration-500 flex flex-col justify-between cursor-pointer h-full overflow-visible"
+                className="group relative rounded-[28px] md:rounded-[34px] bg-black/90 border border-white/10 hover:border-transparent p-5 sm:p-6 md:p-7 backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 flex flex-col justify-between cursor-pointer h-full overflow-visible"
               >
                 {/* Asymmetric Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -339,15 +339,15 @@ export default function App() {
                 <div className="relative z-10 flex flex-col justify-between h-full">
                   {/* Inner 16:9 Video Box with Numeral & Centered Play Button */}
                   <div
-                    className={`relative aspect-video w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br ${project.gradient} border border-white/10 flex items-center justify-center p-4 shadow-inner mb-5 group-hover:border-pink-400/40 transition-all duration-500`}
+                    className={`relative aspect-video w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br ${project.gradient} border border-white/10 flex items-center justify-center p-4 shadow-inner mb-5 group-hover:border-white/40 transition-all duration-500`}
                   >
                     {/* Numeral inside top-left */}
-                    <span className="absolute top-4 left-4 text-xs font-mono font-medium text-pink-200/90 tracking-wider">
+                    <span className="absolute top-4 left-4 text-xs font-mono font-medium text-white/80 tracking-wider">
                       {project.num}
                     </span>
 
                     {/* Central Glowing Play Button */}
-                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:via-rose-500 group-hover:to-purple-500 group-hover:text-white transition-all shadow-[0_0_25px_rgba(236,72,153,0.4)] group-hover:shadow-[0_0_35px_rgba(244,63,94,0.7)]">
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
                       <Play className="w-6 h-6 fill-current ml-0.5" />
                     </div>
                   </div>
@@ -360,8 +360,8 @@ export default function App() {
                       <span className="text-white/40">{project.format}</span>
                     </div>
 
-                    {/* Sunset Magenta Accent Tag */}
-                    <div className="text-xs font-mono font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 uppercase mb-1.5">
+                    {/* Pure Silver / White Accent Tag */}
+                    <div className="text-xs font-mono font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 uppercase mb-1.5">
                       {project.tag}
                     </div>
 
@@ -393,12 +393,12 @@ export default function App() {
       <section id="shorts" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
           <div>
-            <div className="text-xs font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 uppercase mb-4">
+            <div className="text-xs font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 uppercase mb-4">
               02 / SHORTS & REELS
             </div>
             <h2 className="text-5xl sm:text-6xl md:text-7xl font-mazzard tracking-tight text-white leading-[0.95]">
               Small screen.<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 drop-shadow-[0_0_30px_rgba(236,72,153,0.35)]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 drop-shadow-[0_0_30px_rgba(255,255,255,0.25)]">
                 Big energy.
               </span>
             </h2>
@@ -415,7 +415,7 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-4 pb-8">
           {/* Card 01 */}
           <RevealOnScroll delay={0}>
-            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(236,72,153,0.3)] transition-all duration-500 cursor-pointer flex flex-col justify-between overflow-visible">
+            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 cursor-pointer flex flex-col justify-between overflow-visible">
               <AnimatedGeminiBorder
                 preset="discord"
                 mode="hover-brighten"
@@ -428,16 +428,16 @@ export default function App() {
               />
               <div className="relative z-10 flex flex-col justify-between h-full">
                 {/* Inner 9:16 Screen Frame */}
-                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181524] via-[#09080f] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <span className="text-xs font-mono text-pink-300 font-semibold drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]">01</span>
+                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181818] via-[#090909] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
+                  <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">01</span>
 
                   <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
                     FAST / FUN / REPLAYABLE
                   </h4>
 
                   <div className="flex justify-end">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_18px_rgba(236,72,153,0.65)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(244,63,94,0.85)] transition-all">
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-white" />
+                    <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
+                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
                     </div>
                   </div>
                 </div>
@@ -452,7 +452,7 @@ export default function App() {
 
           {/* Card 02 (Middle card staggered down as in reference image!) */}
           <RevealOnScroll delay={150}>
-            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(236,72,153,0.35)] transition-all duration-500 cursor-pointer flex flex-col justify-between md:translate-y-8 overflow-visible">
+            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 cursor-pointer flex flex-col justify-between md:translate-y-8 overflow-visible">
               <AnimatedGeminiBorder
                 preset="instagram"
                 mode="hover-brighten"
@@ -465,16 +465,16 @@ export default function App() {
               />
               <div className="relative z-10 flex flex-col justify-between h-full">
                 {/* Inner 9:16 Screen Frame */}
-                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#1c172a] via-[#0b0914] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <span className="text-xs font-mono text-pink-300 font-semibold drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]">02</span>
+                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#1a1a1a] via-[#0a0a0a] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
+                  <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">02</span>
 
                   <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
                     THE HOOK IS EVERYTHING
                   </h4>
 
                   <div className="flex justify-end">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_18px_rgba(236,72,153,0.65)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(244,63,94,0.85)] transition-all">
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-white" />
+                    <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
+                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
                     </div>
                   </div>
                 </div>
@@ -489,7 +489,7 @@ export default function App() {
 
           {/* Card 03 */}
           <RevealOnScroll delay={300}>
-            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(236,72,153,0.3)] transition-all duration-500 cursor-pointer flex flex-col justify-between overflow-visible">
+            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 cursor-pointer flex flex-col justify-between overflow-visible">
               <AnimatedGeminiBorder
                 preset="gemini"
                 mode="hover-brighten"
@@ -502,16 +502,16 @@ export default function App() {
               />
               <div className="relative z-10 flex flex-col justify-between h-full">
                 {/* Inner 9:16 Screen Frame */}
-                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181524] via-[#09080f] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <span className="text-xs font-mono text-pink-300 font-semibold drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]">03</span>
+                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181818] via-[#090909] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
+                  <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">03</span>
 
                   <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
                     CUT FOR THE FEED
                   </h4>
 
                   <div className="flex justify-end">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-[0_0_18px_rgba(236,72,153,0.65)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(244,63,94,0.85)] transition-all">
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-white" />
+                    <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
+                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
                     </div>
                   </div>
                 </div>
@@ -529,8 +529,8 @@ export default function App() {
       {/* SECTION 3: WHY ME */}
       <section id="whyme" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="max-w-3xl mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 mb-3">
-            <Zap className="w-3.5 h-3.5 text-pink-400" />
+          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
+            <Zap className="w-3.5 h-3.5 text-white" />
             <span>The Competitive Edge</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-heading font-bold tracking-tight text-white">
@@ -556,7 +556,7 @@ export default function App() {
                 angleOffset={0}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-pink-500/[0.08] border border-pink-400/25 flex items-center justify-center text-pink-300 mb-6 group-hover:scale-105 group-hover:border-pink-400/50 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-heading font-bold text-white mb-2">1. The 1.8s Hook Formula</h3>
@@ -580,7 +580,7 @@ export default function App() {
                 angleOffset={60}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-pink-500/[0.08] border border-pink-400/25 flex items-center justify-center text-pink-300 mb-6 group-hover:scale-105 group-hover:border-pink-400/50 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Layers className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-heading font-bold text-white mb-2">2. Adaptable to Any Style</h3>
@@ -604,7 +604,7 @@ export default function App() {
                 angleOffset={120}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-pink-500/[0.08] border border-pink-400/25 flex items-center justify-center text-pink-300 mb-6 group-hover:scale-105 group-hover:border-pink-400/50 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Volume2 className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-heading font-bold text-white mb-2">3. 5-Layer Soundscapes</h3>
@@ -628,7 +628,7 @@ export default function App() {
                 angleOffset={180}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-pink-500/[0.08] border border-pink-400/25 flex items-center justify-center text-pink-300 mb-6 group-hover:scale-105 group-hover:border-pink-400/50 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Film className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-heading font-bold text-white mb-2">4. 100% After Effects</h3>
@@ -652,7 +652,7 @@ export default function App() {
                 angleOffset={240}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-pink-500/[0.08] border border-pink-400/25 flex items-center justify-center text-pink-300 mb-6 group-hover:scale-105 group-hover:border-pink-400/50 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Zap className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-heading font-bold text-white mb-2">5. 24–48h Turnaround</h3>
@@ -676,7 +676,7 @@ export default function App() {
                 angleOffset={300}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-pink-500/[0.08] border border-pink-400/25 flex items-center justify-center text-pink-300 mb-6 group-hover:scale-105 group-hover:border-pink-400/50 shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all">
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Check className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-heading font-bold text-white mb-2">6. 3 Revisions Max Policy</h3>
@@ -693,8 +693,8 @@ export default function App() {
       <section id="about" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           <RevealOnScroll className="md:col-span-5 relative" delay={100}>
-            {/* Glowing Motion Showcase Card - Full Animation */}
-            <div className="group relative rounded-3xl overflow-visible aspect-square bg-[#050505] border border-white/15 hover:border-transparent shadow-[0_0_60px_rgba(236,72,153,0.3)] transition-all">
+            {/* Glowing Motion Showcase Card - Full Animation in Monochromatic Grayscale */}
+            <div className="group relative rounded-3xl overflow-visible aspect-square bg-[#050505] border border-white/15 hover:border-transparent shadow-[0_0_60px_rgba(255,255,255,0.15)] transition-all">
               {/* Animated Gemini Outline & Outer Aura */}
               <AnimatedGeminiBorder
                 preset="gemini"
@@ -707,7 +707,7 @@ export default function App() {
                 angleOffset={45}
               />
 
-              {/* Full-Card Looping After Effects Video Animation (15 FPS) */}
+              {/* Full-Card Looping After Effects Video Animation (15 FPS, Monochromatic) */}
               <div className="relative w-full h-full rounded-3xl overflow-hidden bg-black z-10">
                 <video
                   src="/assets/aistudio/export_2_-_15_fps_dc6d6217.mp4"
@@ -717,20 +717,20 @@ export default function App() {
                   muted
                   playsInline
                   disablePictureInPicture
-                  className="w-full h-full object-cover scale-[1.01] pointer-events-none select-none"
+                  className="w-full h-full object-cover scale-[1.01] grayscale contrast-125 pointer-events-none select-none"
                 />
 
                 {/* Floating "Available Now" Status Badge in Top Right */}
                 <div className="absolute top-5 right-5 z-20 pointer-events-none">
-                  <span className="px-3.5 py-1.5 rounded-full text-xs font-mono bg-black/75 backdrop-blur-md text-pink-300 border border-pink-400/30 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
+                  <span className="px-3.5 py-1.5 rounded-full text-xs font-mono bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
                     Available Now
                   </span>
                 </div>
 
                 {/* Floating "Taking on Select Creators" Glass Pill in Bottom Left */}
                 <div className="absolute bottom-5 left-5 z-20 pointer-events-none">
-                  <div className="px-3.5 py-1.5 rounded-full bg-black/75 backdrop-blur-md border border-white/15 text-[11px] font-mono text-pink-300 flex items-center gap-1.5 shadow-[0_4px_20px_rgba(0,0,0,0.6)]">
-                    <Check className="w-3.5 h-3.5 text-pink-400" />
+                  <div className="px-3.5 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-[11px] font-mono text-white flex items-center gap-1.5 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+                    <Check className="w-3.5 h-3.5 text-white" />
                     <span>Taking on Select Creators</span>
                   </div>
                 </div>
@@ -753,7 +753,7 @@ export default function App() {
               />
 
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 mb-3">
+                <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
                   <span>About the editor</span>
                 </div>
 
@@ -761,7 +761,7 @@ export default function App() {
                   <h2 className="text-4xl sm:text-5xl font-mazzard font-bold text-white tracking-tight">
                     I'm Ray.
                   </h2>
-                  <span className="font-brand-rychr text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 font-bold">
+                  <span className="font-brand-rychr text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 font-bold">
                     (Rychr)
                   </span>
                 </div>
@@ -793,7 +793,7 @@ export default function App() {
                       angleOffset={30}
                     />
                     <div className="relative z-10">
-                      <div className="text-xl sm:text-2xl font-mazzard font-bold text-white tracking-tight group-hover/stat:text-pink-200 transition-colors">
+                      <div className="text-xl sm:text-2xl font-mazzard font-bold text-white tracking-tight group-hover/stat:text-white transition-colors">
                         3+ Years
                       </div>
                       <div className="text-xs font-mono text-white/55 mt-1 tracking-wider uppercase">
@@ -815,7 +815,7 @@ export default function App() {
                       angleOffset={150}
                     />
                     <div className="relative z-10">
-                      <div className="text-xl sm:text-2xl font-mazzard font-bold text-white tracking-tight group-hover/stat:text-pink-200 transition-colors">
+                      <div className="text-xl sm:text-2xl font-mazzard font-bold text-white tracking-tight group-hover/stat:text-white transition-colors">
                         50+ Videos
                       </div>
                       <div className="text-xs font-mono text-white/55 mt-1 tracking-wider uppercase">
@@ -840,7 +840,7 @@ export default function App() {
                       <div className="text-xs font-mono text-white/50 tracking-wider uppercase mb-1">
                         Turnaround Time
                       </div>
-                      <div className="text-sm sm:text-[15px] font-mazzard font-semibold text-white leading-snug group-hover/stat:text-rose-200 transition-colors">
+                      <div className="text-sm sm:text-[15px] font-mazzard font-semibold text-white leading-snug group-hover/stat:text-white transition-colors">
                         Depends on project
                       </div>
                     </div>
@@ -855,7 +855,7 @@ export default function App() {
       {/* SECTION 5: FAQ */}
       <section id="faq" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 mb-3">
+          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
             <span>Got Questions?</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white">
@@ -898,7 +898,7 @@ export default function App() {
                         {faq.question}
                       </span>
                       <div className={`w-8 h-8 rounded-full bg-white/[0.05] border border-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 bg-white/20' : ''}`}>
-                        <ChevronDown className="w-4 h-4 text-pink-400" />
+                        <ChevronDown className="w-4 h-4 text-white" />
                       </div>
                     </button>
 
@@ -918,7 +918,7 @@ export default function App() {
       {/* SECTION 6: CONTACT & SOCIALS */}
       <section id="contact" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 mb-3">
+          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
             <span>Direct Channels</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white">
@@ -931,7 +931,7 @@ export default function App() {
 
         {/* 3 Explicit Social Cards with Asymmetric Animated Gemini Outlines */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {/* Discord: @ray_christo (Sunset Magenta & Royal Orchid) */}
+          {/* Discord: @ray_christo (Monochromatic Pure White & Silver) */}
           <RevealOnScroll delay={0}>
             <div className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group">
               {/* Animated Gemini Outline on Card */}
@@ -946,12 +946,12 @@ export default function App() {
               />
 
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-pink-500/30 flex items-center justify-center text-pink-300 mb-5 shadow-[0_0_20px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-transform">
-                  <MessageSquare className="w-6 h-6 text-pink-400" />
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] group-hover:scale-105 transition-transform">
+                  <MessageSquare className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="text-lg font-mazzard text-white mb-1">Discord</h4>
                 <p className="text-xs text-white/50 mb-4">Fast messaging & file reviews</p>
-                <div className="p-3 rounded-xl bg-black border border-white/15 font-mono text-sm text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-rose-300 to-purple-300 break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(236,72,153,0.15)]">
+                <div className="p-3 rounded-xl bg-black border border-white/20 font-mono text-sm text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)]">
                   @ray_christo
                 </div>
               </div>
@@ -959,7 +959,7 @@ export default function App() {
               <div className="relative z-10 mt-6 flex gap-2">
                 <button
                   onClick={() => handleCopy('@ray_christo', 'discord')}
-                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.3)] hover:shadow-[0_0_35px_rgba(244,63,94,0.55)] group/btn overflow-visible active:scale-[0.98]"
+                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible active:scale-[0.98]"
                 >
                   <AnimatedGeminiBorder
                     preset="discord"
@@ -970,16 +970,16 @@ export default function App() {
                     speedMs={14000}
                     angleOffset={45}
                   />
-                  <span className="relative z-10 flex items-center gap-1.5 group-hover/btn:text-pink-200 transition-colors">
+                  <span className="relative z-10 flex items-center gap-1.5 group-hover/btn:text-white transition-colors">
                     <span>{copiedSocial === 'discord' ? 'Copied @ray_christo!' : 'Copy Discord ID'}</span>
-                    {copiedSocial === 'discord' ? <Check className="w-3.5 h-3.5 text-pink-400" /> : <Copy className="w-3.5 h-3.5 text-pink-300" />}
+                    {copiedSocial === 'discord' ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5 text-white/70" />}
                   </span>
                 </button>
               </div>
             </div>
           </RevealOnScroll>
 
-          {/* Instagram: rychr.prod (Sunset Magenta, Orchid & Violet) */}
+          {/* Instagram: rychr.prod (Monochromatic Pure White & Silver) */}
           <RevealOnScroll delay={120}>
             <div className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group">
               {/* Animated Gemini Outline on Card */}
@@ -994,12 +994,12 @@ export default function App() {
               />
 
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-[#ec4899]/30 flex items-center justify-center text-[#ec4899] mb-5 shadow-[0_0_20px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-transform">
-                  <Instagram className="w-6 h-6 text-[#ec4899]" />
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] group-hover:scale-105 transition-transform">
+                  <Instagram className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="text-lg font-mazzard text-white mb-1">Instagram</h4>
                 <p className="text-xs text-white/50 mb-4">Direct messages & reel edits</p>
-                <div className="p-3 rounded-xl bg-black border border-white/15 font-mono text-sm text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-rose-300 to-purple-300 break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(236,72,153,0.12)]">
+                <div className="p-3 rounded-xl bg-black border border-white/20 font-mono text-sm text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)]">
                   rychr.prod
                 </div>
               </div>
@@ -1009,7 +1009,7 @@ export default function App() {
                   href="https://instagram.com/rychr.prod"
                   target="_blank"
                   rel="noreferrer"
-                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.3)] hover:shadow-[0_0_35px_rgba(236,72,153,0.55)] group/btn overflow-visible active:scale-[0.98]"
+                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible active:scale-[0.98]"
                 >
                   <AnimatedGeminiBorder
                     preset="instagram"
@@ -1020,23 +1020,23 @@ export default function App() {
                     speedMs={14000}
                     angleOffset={165}
                   />
-                  <span className="relative z-10 flex items-center gap-1.5 group-hover/btn:text-pink-200 transition-colors">
+                  <span className="relative z-10 flex items-center gap-1.5 group-hover/btn:text-white transition-colors">
                     <span>Open Profile</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-pink-300" />
+                    <ExternalLink className="w-3.5 h-3.5 text-white/70" />
                   </span>
                 </a>
                 <button
                   onClick={() => handleCopy('rychr.prod', 'instagram')}
-                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-pink-400/40 transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] active:scale-95"
+                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-white/40 transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95"
                   title="Copy Instagram Handle"
                 >
-                  {copiedSocial === 'instagram' ? <Check className="w-4 h-4 text-pink-400" /> : <Copy className="w-4 h-4 text-white/70" />}
+                  {copiedSocial === 'instagram' ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white/70" />}
                 </button>
               </div>
             </div>
           </RevealOnScroll>
 
-          {/* Gmail: rychr.edits@gmail.com (Sunset Magenta & Rose) */}
+          {/* Gmail: rychr.edits@gmail.com (Monochromatic Pure White & Silver) */}
           <RevealOnScroll delay={240}>
             <div className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group">
               {/* Animated Gemini Outline on Card */}
@@ -1051,12 +1051,12 @@ export default function App() {
               />
 
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-[#ec4899]/30 flex items-center justify-center text-[#ec4899] mb-5 shadow-[0_0_20px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-transform">
-                  <Mail className="w-6 h-6 text-[#ec4899]" />
+                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] group-hover:scale-105 transition-transform">
+                  <Mail className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="text-lg font-mazzard text-white mb-1">Gmail</h4>
                 <p className="text-xs text-white/50 mb-4">Official business inquiries</p>
-                <div className="p-3 rounded-xl bg-black border border-white/15 font-mono text-xs text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-rose-300 to-purple-300 break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(236,72,153,0.15)]">
+                <div className="p-3 rounded-xl bg-black border border-white/20 font-mono text-xs text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)]">
                   rychr.edits@gmail.com
                 </div>
               </div>
@@ -1064,7 +1064,7 @@ export default function App() {
               <div className="relative z-10 mt-6 flex gap-2">
                 <a
                   href="mailto:rychr.edits@gmail.com"
-                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(236,72,153,0.3)] hover:shadow-[0_0_35px_rgba(244,63,94,0.55)] group/btn overflow-visible active:scale-[0.98]"
+                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible active:scale-[0.98]"
                 >
                   <AnimatedGeminiBorder
                     preset="gmail"
@@ -1075,17 +1075,17 @@ export default function App() {
                     speedMs={14000}
                     angleOffset={285}
                   />
-                  <span className="relative z-10 flex items-center gap-1.5 group-hover/btn:text-pink-200 transition-colors">
+                  <span className="relative z-10 flex items-center gap-1.5 group-hover/btn:text-white transition-colors">
                     <span>Send Email</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-pink-300" />
+                    <ExternalLink className="w-3.5 h-3.5 text-white/70" />
                   </span>
                 </a>
                 <button
                   onClick={() => handleCopy('rychr.edits@gmail.com', 'email')}
-                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-pink-400/40 transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] active:scale-95"
+                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-white/40 transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95"
                   title="Copy Email"
                 >
-                  {copiedSocial === 'email' ? <Check className="w-4 h-4 text-pink-400" /> : <Copy className="w-4 h-4 text-white/70" />}
+                  {copiedSocial === 'email' ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white/70" />}
                 </button>
               </div>
             </div>
@@ -1096,14 +1096,14 @@ export default function App() {
         <RevealOnScroll delay={150}>
           <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <span className="text-xs uppercase font-mono tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-purple-400 block mb-1">
+              <span className="text-xs uppercase font-mono tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 block mb-1">
                 Accepted Payment Channels
               </span>
               <p className="text-sm text-white/80 font-medium">
                 Direct <strong className="text-white">Bank Transfer</strong> and <strong className="text-white">UPI</strong>. For any other payment methods, contact directly.
               </p>
             </div>
-            <span className="px-3 py-1.5 rounded-lg bg-pink-500/15 border border-pink-400/30 text-pink-300 text-xs font-mono shrink-0">
+            <span className="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-xs font-mono shrink-0">
               Secure Onboarding
             </span>
           </div>
@@ -1120,8 +1120,8 @@ export default function App() {
             </p>
 
             {contactSubmitted ? (
-              <div className="p-6 rounded-2xl bg-white/[0.06] border border-pink-400/30 text-center">
-                <Check className="w-10 h-10 text-pink-400 mx-auto mb-2" />
+              <div className="p-6 rounded-2xl bg-white/[0.06] border border-white/20 text-center">
+                <Check className="w-10 h-10 text-white mx-auto mb-2" />
                 <h4 className="text-lg font-mazzard text-white">Inquiry Sent Successfully!</h4>
                 <p className="text-sm text-white/70 mt-1 font-normal">
                   Thank you! I will review your project details and reach out within 24 hours via Discord (@ray_christo) or email.
@@ -1146,7 +1146,7 @@ export default function App() {
                       placeholder="e.g. Blyvs Media"
                       value={contactForm.name}
                       onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/30"
+                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30"
                     />
                   </div>
                   <div>
@@ -1159,7 +1159,7 @@ export default function App() {
                       placeholder="e.g. @your_discord or you@gmail.com"
                       value={contactForm.emailOrDiscord}
                       onChange={(e) => setContactForm({ ...contactForm, emailOrDiscord: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/30"
+                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30"
                     />
                   </div>
                 </div>
@@ -1171,7 +1171,7 @@ export default function App() {
                   <select
                     value={contactForm.service}
                     onChange={(e) => setContactForm({ ...contactForm, service: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-[#0a0a0c] border border-white/15 text-white text-sm focus:outline-none focus:border-pink-400"
+                    className="w-full px-4 py-3 rounded-xl bg-[#0a0a0c] border border-white/15 text-white text-sm focus:outline-none focus:border-white"
                   >
                     <option value="YouTube Long-form">YouTube Long-form (Talking Head / Documentary / Gaming)</option>
                     <option value="Shorts / Reels Batch">Shorts / Reels Batch</option>
@@ -1190,13 +1190,13 @@ export default function App() {
                     placeholder="Share your channel link, what editing style you need, and any reference videos..."
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400/30 resize-none font-normal"
+                    className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30 resize-none font-normal"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="relative w-full py-4 rounded-xl bg-black/95 hover:bg-black text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_30px_rgba(236,72,153,0.35)] hover:shadow-[0_0_40px_rgba(244,63,94,0.6)] cursor-pointer overflow-visible active:scale-[0.99] group/btn"
+                  className="relative w-full py-4 rounded-xl bg-black/95 hover:bg-black text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.45)] cursor-pointer overflow-visible active:scale-[0.99] group/btn"
                 >
                   <AnimatedGeminiBorder
                     preset="gemini"
@@ -1207,7 +1207,7 @@ export default function App() {
                     speedMs={14000}
                     angleOffset={180}
                   />
-                  <span className="relative z-10 flex items-center justify-center gap-2 group-hover/btn:text-pink-200 transition-colors">
+                  <span className="relative z-10 flex items-center justify-center gap-2 group-hover/btn:text-white transition-colors">
                     <span>Send Message to <span className="font-brand-rychr font-bold text-white">Rychr</span> →</span>
                   </span>
                 </button>
@@ -1230,7 +1230,7 @@ export default function App() {
                 muted
                 playsInline
                 disablePictureInPicture
-                className="w-full h-full object-cover pointer-events-none select-none"
+                className="w-full h-full object-cover grayscale contrast-125 pointer-events-none select-none"
               />
             </div>
             <span className="text-white/90 font-brand-rychr text-base">Rychr</span>
@@ -1238,12 +1238,12 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-6 font-medium text-xs text-white/70">
-            <a href="#work" className="hover:text-pink-300 transition-colors">Work</a>
-            <a href="#shorts" className="hover:text-pink-300 transition-colors">Shorts</a>
-            <a href="#whyme" className="hover:text-pink-300 transition-colors">Why me</a>
-            <a href="#about" className="hover:text-pink-300 transition-colors">About</a>
-            <a href="#faq" className="hover:text-pink-300 transition-colors">FAQ</a>
-            <a href="#contact" className="hover:text-pink-300 transition-colors">Contact</a>
+            <a href="#work" className="hover:text-white transition-colors">Work</a>
+            <a href="#shorts" className="hover:text-white transition-colors">Shorts</a>
+            <a href="#whyme" className="hover:text-white transition-colors">Why me</a>
+            <a href="#about" className="hover:text-white transition-colors">About</a>
+            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
+            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
           </div>
 
           <span>© {new Date().getFullYear()} <span className="font-brand-rychr font-bold text-white/70">Rychr</span>. All rights reserved.</span>
@@ -1256,14 +1256,14 @@ export default function App() {
           <div className="relative w-full max-w-4xl rounded-3xl p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden">
             <button
               onClick={() => setActiveVideoModal(null)}
-              className="absolute top-5 right-5 z-20 p-2.5 rounded-full bg-black/60 hover:bg-gradient-to-r hover:from-pink-500 hover:to-rose-500 hover:text-white text-white border border-white/20 transition-all cursor-pointer"
+              className="absolute top-5 right-5 z-20 p-2.5 rounded-full bg-black/60 hover:bg-white hover:text-black text-white border border-white/20 transition-all cursor-pointer"
             >
               ✕
             </button>
 
             <div className="relative w-full rounded-2xl overflow-hidden bg-black mb-6 aspect-video">
               <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}>
-                <div className="w-20 h-20 rounded-full bg-pink-500/20 border border-pink-400/40 backdrop-blur-md flex items-center justify-center mb-4 text-white shadow-[0_0_35px_rgba(236,72,153,0.55)]">
+                <div className="w-20 h-20 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center mb-4 text-white shadow-[0_0_35px_rgba(255,255,255,0.35)]">
                   <Play className="w-8 h-8 fill-current ml-1 text-white" />
                 </div>
                 <h4 className="text-2xl font-heading font-bold text-white mb-2">
@@ -1282,7 +1282,7 @@ export default function App() {
               <a
                 href="#contact"
                 onClick={() => setActiveVideoModal(null)}
-                className="relative px-6 py-3 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-xs transition-all shrink-0 shadow-[0_0_25px_rgba(236,72,153,0.35)] hover:shadow-[0_0_35px_rgba(244,63,94,0.6)] overflow-visible group/btn active:scale-95"
+                className="relative px-6 py-3 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-xs transition-all shrink-0 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.5)] overflow-visible group/btn active:scale-95"
               >
                 <AnimatedGeminiBorder
                   preset="gemini"
@@ -1293,7 +1293,7 @@ export default function App() {
                   speedMs={12000}
                   angleOffset={210}
                 />
-                <span className="relative z-10 group-hover/btn:text-pink-200 transition-colors">
+                <span className="relative z-10 group-hover/btn:text-white transition-colors">
                   Hire <span className="font-brand-rychr font-bold text-white">Rychr</span> for Similar Edit
                 </span>
               </a>

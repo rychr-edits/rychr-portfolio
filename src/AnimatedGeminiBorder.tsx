@@ -48,62 +48,62 @@ export const AnimatedGeminiBorder: React.FC<AnimatedGeminiBorderProps> = ({
       let gradient = '';
 
       if (preset === 'discord') {
-        // Sunset Magenta & Royal Orchid with Deep Velvet Plum accent
+        // Pure Brilliant White & Platinum Beam with Crisp Silver Fade
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
-          rgba(244, 63, 94, ${(0.88 * breath).toFixed(3)}) 25deg,
-          rgba(236, 72, 153, ${(0.95 * breath).toFixed(3)}) 65deg,
-          rgba(192, 132, 252, ${(0.90 * breath).toFixed(3)}) 100deg,
-          rgba(168, 85, 247, ${(0.65 * breath).toFixed(3)}) 130deg,
-          transparent 160deg,
-          transparent 220deg,
-          rgba(236, 72, 153, ${(0.45 * breath).toFixed(3)}) 260deg,
-          rgba(192, 132, 252, ${(0.40 * breath).toFixed(3)}) 295deg,
+          rgba(255, 255, 255, ${(0.95 * breath).toFixed(3)}) 30deg,
+          rgba(235, 235, 240, ${(0.90 * breath).toFixed(3)}) 70deg,
+          rgba(190, 190, 200, ${(0.70 * breath).toFixed(3)}) 105deg,
+          rgba(130, 130, 140, ${(0.35 * breath).toFixed(3)}) 135deg,
+          transparent 165deg,
+          transparent 225deg,
+          rgba(255, 255, 255, ${(0.55 * breath).toFixed(3)}) 265deg,
+          rgba(200, 200, 210, ${(0.35 * breath).toFixed(3)}) 300deg,
           transparent 335deg,
           transparent 360deg
         )`;
       } else if (preset === 'gmail') {
-        // Radiant Fuchsia & Soft Orchid with Ruby Crimson accent
+        // High-Luminance Razor White Beam
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
-          rgba(236, 72, 153, ${(0.92 * breath).toFixed(3)}) 25deg,
-          rgba(251, 113, 133, ${(0.90 * breath).toFixed(3)}) 60deg,
-          rgba(192, 132, 252, ${(0.95 * breath).toFixed(3)}) 95deg,
-          rgba(225, 29, 72, ${(0.70 * breath).toFixed(3)}) 125deg,
+          rgba(255, 255, 255, ${(0.98 * breath).toFixed(3)}) 25deg,
+          rgba(240, 240, 245, ${(0.88 * breath).toFixed(3)}) 60deg,
+          rgba(180, 180, 190, ${(0.65 * breath).toFixed(3)}) 95deg,
+          rgba(120, 120, 130, ${(0.30 * breath).toFixed(3)}) 125deg,
           transparent 155deg,
           transparent 225deg,
-          rgba(236, 72, 153, ${(0.45 * breath).toFixed(3)}) 265deg,
-          rgba(192, 132, 252, ${(0.40 * breath).toFixed(3)}) 295deg,
+          rgba(255, 255, 255, ${(0.50 * breath).toFixed(3)}) 265deg,
+          rgba(190, 190, 200, ${(0.30 * breath).toFixed(3)}) 295deg,
           transparent 330deg,
           transparent 360deg
         )`;
       } else if (preset === 'cyan-purple') {
-        // Sunset Magenta into Electric Violet & Orchid with subtle Rose spark
+        // Silvery Starlight Pure White Glow
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
-          rgba(236, 72, 153, ${(0.95 * breath).toFixed(3)}) 25deg,
-          rgba(192, 132, 252, ${(0.90 * breath).toFixed(3)}) 65deg,
-          rgba(251, 113, 133, ${(0.80 * breath).toFixed(3)}) 95deg,
-          rgba(244, 63, 94, ${(0.80 * breath).toFixed(3)}) 125deg,
-          transparent 155deg,
+          rgba(255, 255, 255, ${(0.96 * breath).toFixed(3)}) 25deg,
+          rgba(225, 225, 235, ${(0.85 * breath).toFixed(3)}) 65deg,
+          rgba(175, 175, 185, ${(0.60 * breath).toFixed(3)}) 100deg,
+          rgba(110, 110, 120, ${(0.30 * breath).toFixed(3)}) 130deg,
+          transparent 160deg,
           transparent 220deg,
-          rgba(236, 72, 153, ${(0.50 * breath).toFixed(3)}) 260deg,
-          rgba(192, 132, 252, ${(0.40 * breath).toFixed(3)}) 290deg,
+          rgba(255, 255, 255, ${(0.60 * breath).toFixed(3)}) 260deg,
+          rgba(185, 185, 195, ${(0.35 * breath).toFixed(3)}) 295deg,
           transparent 330deg,
           transparent 360deg
         )`;
       } else {
-        // Primary Signature Sunset Magenta / Royal Orchid / Electric Rose spectrum (from Card 02 screenshot)
+        // Signature Pure Glowing White Outline & Halo
         gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
           transparent 0deg,
-          rgba(236, 72, 153, ${(0.95 * breath).toFixed(3)}) 25deg,
-          rgba(192, 132, 252, ${(0.95 * breath).toFixed(3)}) 65deg,
-          rgba(244, 63, 94, ${(0.85 * breath).toFixed(3)}) 100deg,
-          rgba(168, 85, 247, ${(0.70 * breath).toFixed(3)}) 128deg,
-          transparent 158deg,
+          rgba(255, 255, 255, ${(0.98 * breath).toFixed(3)}) 25deg,
+          rgba(245, 245, 250, ${(0.90 * breath).toFixed(3)}) 65deg,
+          rgba(195, 195, 205, ${(0.70 * breath).toFixed(3)}) 100deg,
+          rgba(130, 130, 140, ${(0.35 * breath).toFixed(3)}) 130deg,
+          transparent 160deg,
           transparent 220deg,
-          rgba(236, 72, 153, ${(0.50 * breath).toFixed(3)}) 260deg,
-          rgba(192, 132, 252, ${(0.45 * breath).toFixed(3)}) 295deg,
+          rgba(255, 255, 255, ${(0.60 * breath).toFixed(3)}) 260deg,
+          rgba(190, 190, 200, ${(0.40 * breath).toFixed(3)}) 295deg,
           transparent 335deg,
           transparent 360deg
         )`;

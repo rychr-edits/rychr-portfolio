@@ -19,24 +19,24 @@ export const CalmNavbarBorder: React.FC = () => {
       // Organic, slow breathing modulation (period ~13s)
       const breath = 0.55 + 0.45 * Math.sin(currentTime * 0.00048);
 
-      // Asymmetric Sunset Magenta / Royal Orchid / Electric Rose palette:
+      // Monochromatic Pure Glowing White & Silver Palette
       const gradient = `conic-gradient(from ${angle.toFixed(1)}deg,
         transparent 0deg,
-        rgba(236, 72, 153, ${(0.65 * breath).toFixed(3)}) 25deg,
-        rgba(192, 132, 252, ${(0.70 * breath).toFixed(3)}) 65deg,
-        rgba(244, 63, 94, ${(0.55 * breath).toFixed(3)}) 100deg,
-        rgba(168, 85, 247, ${(0.35 * breath).toFixed(3)}) 125deg,
+        rgba(255, 255, 255, ${(0.88 * breath).toFixed(3)}) 25deg,
+        rgba(235, 235, 245, ${(0.75 * breath).toFixed(3)}) 65deg,
+        rgba(190, 190, 200, ${(0.50 * breath).toFixed(3)}) 100deg,
+        rgba(130, 130, 140, ${(0.25 * breath).toFixed(3)}) 125deg,
         transparent 155deg,
         transparent 220deg,
-        rgba(236, 72, 153, ${(0.35 * breath).toFixed(3)}) 260deg,
-        rgba(192, 132, 252, ${(0.30 * breath).toFixed(3)}) 295deg,
+        rgba(255, 255, 255, ${(0.55 * breath).toFixed(3)}) 260deg,
+        rgba(200, 200, 215, ${(0.35 * breath).toFixed(3)}) 295deg,
         transparent 335deg,
         transparent 360deg
       )`;
 
       if (outerAuraRef.current) {
         outerAuraRef.current.style.background = gradient;
-        outerAuraRef.current.style.opacity = `${(0.50 * breath).toFixed(3)}`;
+        outerAuraRef.current.style.opacity = `${(0.45 * breath).toFixed(3)}`;
       }
 
       if (borderMaskRef.current) {
