@@ -1088,7 +1088,9 @@ export default function App() {
 
               <div className="relative z-10 mt-6 flex gap-2">
                 <a
-                  href="mailto:rychr.edits@gmail.com"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=rychr.edits@gmail.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible active:scale-[0.98]"
                 >
                   <AnimatedGeminiBorder
@@ -1187,7 +1189,9 @@ export default function App() {
                 Need custom milestones, PayPal, international escrow, or alternative payment options? Let's discuss directly.
               </p>
               <a
-                href="mailto:rychr.edits@gmail.com"
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=rychr.edits@gmail.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-white hover:underline font-mono text-xs font-semibold shrink-0"
               >
                 rychr.edits@gmail.com →
