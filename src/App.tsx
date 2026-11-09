@@ -20,6 +20,8 @@ import {
   Check,
   Film,
   Star,
+  CreditCard,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface WorkProject {
@@ -130,13 +132,6 @@ export default function App() {
   const [activeVideoModal, setActiveVideoModal] = useState<WorkProject | null>(null);
 
   const [copiedSocial, setCopiedSocial] = useState<string | null>(null);
-  const [contactSubmitted, setContactSubmitted] = useState(false);
-  const [contactForm, setContactForm] = useState({
-    name: '',
-    emailOrDiscord: '',
-    service: 'YouTube Long-form',
-    message: '',
-  });
 
   // Smooth scroll tracker
   useEffect(() => {
@@ -1122,127 +1117,82 @@ export default function App() {
           </RevealOnScroll>
         </div>
 
-        {/* Payments Notice Box */}
+        {/* ENHANCED PROMINENT ACCEPTED PAYMENTS CARD */}
         <RevealOnScroll delay={150}>
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <span className="text-xs uppercase font-mono tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 block mb-1">
-                Accepted Payment Channels
-              </span>
-              <p className="text-sm text-white/80 font-medium">
-                Direct <strong className="text-white">Bank Transfer</strong> and <strong className="text-white">UPI</strong>. For any other payment methods, contact directly.
-              </p>
+          <div className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible">
+            {/* Animated Gemini Glowing White Halo */}
+            <AnimatedGeminiBorder
+              preset="gemini"
+              borderRadius="rounded-3xl"
+              borderWidth="1.5px"
+              auraBlur="blur-xl"
+              auraOpacity={0.45}
+              speedMs={16000}
+              angleOffset={60}
+            />
+
+            <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-white/10">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/25 flex items-center justify-center text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] shrink-0">
+                  <CreditCard className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="text-xs uppercase font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400">
+                    Payment Terms & Invoicing
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-mazzard font-bold text-white tracking-tight mt-0.5">
+                    Accepted Payment Channels
+                  </h3>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-mono text-white/90 shadow-sm shrink-0">
+                <ShieldCheck className="w-4 h-4 text-white" />
+                <span>Verified Creator Invoicing</span>
+              </div>
             </div>
-            <span className="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-xs font-mono shrink-0">
-              Secure Onboarding
-            </span>
-          </div>
-        </RevealOnScroll>
 
-        {/* Quick Project Inquiry Box */}
-        <RevealOnScroll delay={250}>
-          <div className="rounded-3xl p-8 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-2xl">
-            <h3 className="text-2xl font-mazzard text-white mb-2">
-              Direct Inquiry Form
-            </h3>
-            <p className="text-sm text-white/60 mb-6 font-normal">
-              Tell me about your channel, video goals, and desired schedule.
-            </p>
-
-            {contactSubmitted ? (
-              <div className="p-6 rounded-2xl bg-white/[0.06] border border-white/20 text-center">
-                <Check className="w-10 h-10 text-white mx-auto mb-2" />
-                <h4 className="text-lg font-mazzard text-white">Inquiry Sent Successfully!</h4>
-                <p className="text-sm text-white/70 mt-1 font-normal">
-                  Thank you! I will review your project details and reach out within 24 hours via Discord (@ray_christo) or email.
+            {/* Payment Method Cards */}
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              {/* Method 1: Direct Bank Transfer */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-mazzard font-bold text-white">Direct Bank Transfer</span>
+                  <span className="px-2.5 py-1 rounded-md bg-white/10 text-[11px] font-mono text-white/85 border border-white/15">
+                    Wire / NEFT / IMPS
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-normal">
+                  Domestic & international wire transfers directly to verified business accounts. Formal invoices with itemized project scope provided for accounting.
                 </p>
               </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setContactSubmitted(true);
-                }}
-                className="space-y-4"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-mono text-white/60 mb-1.5">
-                      Your Name / Channel
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Blyvs Media"
-                      value={contactForm.name}
-                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-mono text-white/60 mb-1.5">
-                      Discord (@username) or Email
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. @your_discord or you@gmail.com"
-                      value={contactForm.emailOrDiscord}
-                      onChange={(e) => setContactForm({ ...contactForm, emailOrDiscord: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30"
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-mono text-white/60 mb-1.5">
-                    Content Style & Type
-                  </label>
-                  <select
-                    value={contactForm.service}
-                    onChange={(e) => setContactForm({ ...contactForm, service: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-[#0a0a0c] border border-white/15 text-white text-sm focus:outline-none focus:border-white"
-                  >
-                    <option value="YouTube Long-form">YouTube Long-form (Talking Head / Documentary / Gaming)</option>
-                    <option value="Shorts / Reels Batch">Shorts / Reels Batch</option>
-                    <option value="Commercial / SaaS">Commercial / SaaS Launch Video</option>
-                    <option value="Monthly Dedicated Editing">Monthly Dedicated Retainer</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-mono text-white/60 mb-1.5">
-                    Project Details & Video Links
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    placeholder="Share your channel link, what editing style you need, and any reference videos..."
-                    value={contactForm.message}
-                    onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-black border border-white/15 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/30 resize-none font-normal"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="relative w-full py-4 rounded-xl bg-black/95 hover:bg-black text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_40px_rgba(255,255,255,0.45)] cursor-pointer overflow-visible active:scale-[0.99] group/btn"
-                >
-                  <AnimatedGeminiBorder
-                    preset="gemini"
-                    borderRadius="rounded-xl"
-                    borderWidth="1.5px"
-                    auraBlur="blur-md"
-                    auraOpacity={0.65}
-                    speedMs={14000}
-                    angleOffset={180}
-                  />
-                  <span className="relative z-10 flex items-center justify-center gap-2 group-hover/btn:text-white transition-colors">
-                    <span>Send Message to <span className="font-brand-rychr font-bold text-white">Rychr</span> →</span>
+              {/* Method 2: UPI */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-mazzard font-bold text-white">UPI (Instant)</span>
+                  <span className="px-2.5 py-1 rounded-md bg-white/10 text-[11px] font-mono text-white/85 border border-white/15">
+                    Zero Fees • Instant QR
                   </span>
-                </button>
-              </form>
-            )}
+                </div>
+                <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-normal">
+                  Instant settlement via UPI ID & QR code for milestone releases, rapid turnarounds, and rush edits with zero settlement delay.
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom Support Footnote */}
+            <div className="relative z-10 mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-white/60">
+              <p>
+                Need custom milestones, PayPal, international escrow, or alternative payment options? Let's discuss directly.
+              </p>
+              <a
+                href="mailto:rychr.edits@gmail.com"
+                className="text-white hover:underline font-mono text-xs font-semibold shrink-0"
+              >
+                rychr.edits@gmail.com →
+              </a>
+            </div>
           </div>
         </RevealOnScroll>
       </section>
