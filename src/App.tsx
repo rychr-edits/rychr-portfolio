@@ -22,6 +22,10 @@ import {
   Star,
   CreditCard,
   ShieldCheck,
+  Loader2,
+  Send,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 
 interface WorkProject {
@@ -132,6 +136,70 @@ export default function App() {
   const [activeVideoModal, setActiveVideoModal] = useState<WorkProject | null>(null);
 
   const [copiedSocial, setCopiedSocial] = useState<string | null>(null);
+
+  // Real On-Site Working Contact Form State
+  const [formData, setFormData] = useState({
+    name: '',
+    contact: '',
+    service: 'YouTube Long-form',
+    message: '',
+  });
+  const [formStatus, setFormStatus] = useState<
+    'idle' | 'submitting' | 'success' | 'needs_activation' | 'error'
+  >('idle');
+  const [formErrorMsg, setFormErrorMsg] = useState('');
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('submitting');
+    setFormErrorMsg('');
+
+    try {
+      const response = await fetch(
+        'https://formsubmit.co/ajax/raymondchristopher360@gmail.com',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            'Client Name': formData.name,
+            'Client Contact (Email or Discord)': formData.contact,
+            'Requested Service': formData.service,
+            'Project Scope & Details': formData.message,
+            _subject: `New Video Editing Inquiry from ${formData.name} — Rychr`,
+            _cc: 'rychr.edits@gmail.com',
+            _template: 'table',
+            _captcha: 'false',
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success === 'true' || result.success === true) {
+        setFormStatus('success');
+        setFormData({
+          name: '',
+          contact: '',
+          service: 'YouTube Long-form',
+          message: '',
+        });
+      } else if (
+        result.message &&
+        result.message.toLowerCase().includes('activation')
+      ) {
+        setFormStatus('needs_activation');
+      } else {
+        setFormStatus('error');
+        setFormErrorMsg(result.message || 'Submission failed. Please try again or reach out on Discord.');
+      }
+    } catch {
+      setFormStatus('error');
+      setFormErrorMsg('Network error. Please try again or message directly via Discord / Gmail.');
+    }
+  };
 
   // Smooth scroll tracker
   useEffect(() => {
@@ -1118,6 +1186,205 @@ export default function App() {
             </div>
           </RevealOnScroll>
         </div>
+
+        {/* WORKING ON-SITE INQUIRY FORM */}
+        <RevealOnScroll delay={140} className="mb-14">
+          <div className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible">
+            {/* Animated Gemini Glowing White Halo */}
+            <AnimatedGeminiBorder
+              preset="gemini"
+              borderRadius="rounded-3xl"
+              borderWidth="1.5px"
+              auraBlur="blur-xl"
+              auraOpacity={0.4}
+              speedMs={18000}
+              angleOffset={140}
+            />
+
+            <div className="relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-7">
+                <div>
+                  <div className="text-xs uppercase font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-1">
+                    Send Direct Message
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-mazzard font-bold text-white tracking-tight">
+                    Project Inquiry & Booking
+                  </h3>
+                </div>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-mono text-white/80 shrink-0 self-start sm:self-auto">
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <span>Direct to Inbox • 24h Response</span>
+                </div>
+              </div>
+
+              {/* SUCCESS STATE */}
+              {formStatus === 'success' && (
+                <div className="p-8 rounded-2xl bg-white/[0.04] border border-white/20 text-center">
+                  <div className="w-14 h-14 rounded-full bg-white/10 border border-white/30 text-white flex items-center justify-center mx-auto mb-4 shadow-[0_0_25px_rgba(255,255,255,0.4)]">
+                    <CheckCircle2 className="w-7 h-7 text-white" />
+                  </div>
+                  <h4 className="text-2xl font-mazzard font-bold text-white mb-2">
+                    Inquiry Delivered Successfully!
+                  </h4>
+                  <p className="text-sm text-white/70 max-w-lg mx-auto leading-relaxed mb-6 font-normal">
+                    Thank you! Your project details have been transmitted directly to Ray's email inbox. I'll review your footage links and reply within 24 hours.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setFormStatus('idle')}
+                    className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition-all cursor-pointer shadow-md"
+                  >
+                    Send Another Message
+                  </button>
+                </div>
+              )}
+
+              {/* NEEDS 1-TIME ACTIVATION STATE */}
+              {formStatus === 'needs_activation' && (
+                <div className="p-8 rounded-2xl bg-white/[0.04] border border-white/30 text-center">
+                  <div className="w-14 h-14 rounded-full bg-white/10 border border-white/30 text-white flex items-center justify-center mx-auto mb-4 shadow-[0_0_25px_rgba(255,255,255,0.4)]">
+                    <Mail className="w-7 h-7 text-white" />
+                  </div>
+                  <h4 className="text-2xl font-mazzard font-bold text-white mb-2">
+                    Activation Email Sent!
+                  </h4>
+                  <p className="text-sm text-white/75 max-w-lg mx-auto leading-relaxed mb-6 font-normal">
+                    FormSubmit sent a one-time activation link to your inbox. Simply click <strong className="text-white">"Activate Form"</strong> once in that email, and every future submission will land directly in your inbox!
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setFormStatus('idle')}
+                    className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition-all cursor-pointer shadow-md"
+                  >
+                    Back to Form
+                  </button>
+                </div>
+              )}
+
+              {/* ACTIVE FORM */}
+              {formStatus !== 'success' && formStatus !== 'needs_activation' && (
+                <form onSubmit={handleFormSubmit} className="space-y-5">
+                  {formStatus === 'error' && (
+                    <div className="p-4 rounded-xl bg-white/10 border border-white/30 flex items-center gap-3 text-sm text-white">
+                      <AlertCircle className="w-5 h-5 text-white shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-white">Message couldn't be sent automatically</p>
+                        <p className="text-xs text-white/70">{formErrorMsg}</p>
+                      </div>
+                      <a
+                        href="https://mail.google.com/mail/?view=cm&fs=1&to=rychr.edits@gmail.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition-all shrink-0"
+                      >
+                        Open Gmail
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
+                        Your Name / Channel Name <span className="text-white">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Liam | Apex Creator"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
+                        Your Email or Discord Tag <span className="text-white">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. you@creator.com or @discord_tag"
+                        value={formData.contact}
+                        onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+                        className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
+                      What type of video editing do you need?
+                    </label>
+                    <select
+                      value={formData.service}
+                      onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                      className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all"
+                    >
+                      <option value="YouTube Long-form (Talking Head / Documentary / Storytelling)">
+                        YouTube Long-form (Talking Head / Documentary / Gaming)
+                      </option>
+                      <option value="Shorts & Reels High-Retention Batch (9:16)">
+                        Shorts & Reels High-Retention Batch (9:16)
+                      </option>
+                      <option value="Commercial / SaaS / Product Launch Edit">
+                        Commercial / SaaS / Product Launch Edit
+                      </option>
+                      <option value="Full-Time Dedicated Monthly Retainer">
+                        Full-Time Dedicated Monthly Retainer
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
+                      Project Details, Footage Links & Deadlines <span className="text-white">*</span>
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      placeholder="Share your raw footage length, turnaround deadline, channel link, and any reference editing styles you want me to match..."
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all resize-none font-normal"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={formStatus === 'submitting'}
+                      className="relative w-full py-4 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:shadow-[0_0_45px_rgba(255,255,255,0.5)] cursor-pointer overflow-visible active:scale-[0.99] group/btn disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <AnimatedGeminiBorder
+                        preset="gemini"
+                        borderRadius="rounded-xl"
+                        borderWidth="1.5px"
+                        auraBlur="blur-md"
+                        auraOpacity={0.7}
+                        speedMs={14000}
+                        angleOffset={180}
+                      />
+                      <span className="relative z-10 flex items-center justify-center gap-2 group-hover/btn:text-white transition-colors">
+                        {formStatus === 'submitting' ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin text-white" />
+                            <span>Sending Directly to Ray's Inbox...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Send Message Directly to <span className="font-brand-rychr font-bold text-white">Rychr</span></span>
+                            <Send className="w-4 h-4 text-white group-hover/btn:translate-x-0.5 transition-transform" />
+                          </>
+                        )}
+                      </span>
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </RevealOnScroll>
 
         {/* ENHANCED PROMINENT ACCEPTED PAYMENTS CARD */}
         <RevealOnScroll delay={150}>
