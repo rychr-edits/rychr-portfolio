@@ -3,7 +3,6 @@ import { CosmicHorizonBackground } from './CosmicHorizonBackground.tsx';
 import { RevealOnScroll } from './RevealOnScroll.tsx';
 import { CalmNavbarBorder } from './CalmNavbarBorder.tsx';
 import { AnimatedGeminiBorder, GeminiColorPreset } from './AnimatedGeminiBorder.tsx';
-import { FilmGrainOverlay, FilmGrainCardTexture } from './FilmGrainOverlay.tsx';
 import { FaqItem } from './types.ts';
 import {
   Play,
@@ -97,6 +96,39 @@ const WORK_PROJECTS: WorkProject[] = [
   },
 ];
 
+const SHORTS_PROJECTS = [
+  {
+    id: 's1',
+    num: '01',
+    title: 'High-Paced Viral Short Hook',
+    format: 'SHORTS • 9:16',
+    gradient: 'from-[#191919] via-[#090909] to-[#000000]',
+    preset: 'discord' as const,
+    stagger: '',
+    delay: 0,
+  },
+  {
+    id: 's2',
+    num: '02',
+    title: 'Kinetic Retention Reel',
+    format: 'REEL • 9:16',
+    gradient: 'from-[#1a1a1a] via-[#0a0a0a] to-[#000000]',
+    preset: 'instagram' as const,
+    stagger: 'md:translate-y-8',
+    delay: 150,
+  },
+  {
+    id: 's3',
+    num: '03',
+    title: 'Vertical Storytelling Cut',
+    format: 'TIKTOK • 9:16',
+    gradient: 'from-[#181818] via-[#090909] to-[#000000]',
+    preset: 'gemini' as const,
+    stagger: '',
+    delay: 300,
+  },
+];
+
 const FAQS: FaqItem[] = [
   {
     question: 'What is your turnaround time?',
@@ -106,7 +138,7 @@ const FAQS: FaqItem[] = [
   {
     question: 'How many revisions do you offer?',
     answer:
-      'I offer up to 3 revisions max per video. This keeps our feedback focused, respects deadlines, and ensures every single hook, sound cut, and visual element is refined without dragging out the schedule.',
+      'Each project includes up to 3 focused revisions. If you ever want to change more or explore additional passes beyond that, simply contact me and we can easily arrange extra passes.',
   },
   {
     question: 'What software do you edit with?',
@@ -220,9 +252,6 @@ export default function App() {
     <div className="relative min-h-screen bg-black text-white font-['Inter',sans-serif] selection:bg-white/20 selection:text-white overflow-x-hidden">
       {/* PROCEDURAL PLANET HORIZON BACKGROUND (Top horizon + Underside on scroll to bottom + Glowing Cursor with Stars) */}
       <CosmicHorizonBackground scrollY={scrollY} />
-
-      {/* NOTICEABLE CINEMATIC FILM GRAIN TEXTURE & SWITCHER */}
-      <FilmGrainOverlay initialMode="35mm" />
 
       {/* PERSISTENT HEADER NAVBAR */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-10 py-5 transition-all duration-300">
@@ -365,25 +394,26 @@ export default function App() {
             <span>01 / Selected Work</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white">
-            Featured Edits & Reviews
+            Featured Edits
           </h2>
         </RevealOnScroll>
 
-        {/* 4 Cards in Asymmetrical Layout:
+        {/* 4 Cards in Asymmetric Dynamic Layout:
             Row 1: Card 01 Wide (lg:col-span-7) + Card 02 (lg:col-span-5)
-            Row 2: Card 03 (lg:col-span-5) + Card 04 Wide (lg:col-span-7) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 relative z-10">
+            Row 2: Card 03 (lg:col-span-5) + Card 04 Wide (lg:col-span-7)
+            items-center & self-center vertically center the 5-col cards alongside 7-col cards with zero empty space */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
           {WORK_PROJECTS.map((project, index) => (
             <RevealOnScroll
               key={project.id}
-              className={`${project.colSpan} h-full`}
+              className={`${project.colSpan} w-full self-center flex items-center justify-center`}
               delay={index * 120}
             >
               <div
                 onClick={() => setActiveVideoModal(project)}
-                className="group relative rounded-[28px] md:rounded-[34px] bg-black/90 border border-white/10 hover:border-transparent p-5 sm:p-6 md:p-7 backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 flex flex-col justify-between cursor-pointer h-full overflow-visible"
+                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${project.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
               >
-                {/* Asymmetric Gemini Rotating Border Halo */}
+                {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
                   preset={
                     index === 0
@@ -395,7 +425,7 @@ export default function App() {
                       : 'gmail'
                   }
                   mode="hover-brighten"
-                  borderRadius="rounded-[28px] md:rounded-[34px]"
+                  borderRadius="rounded-2xl md:rounded-3xl"
                   borderWidth="1.5px"
                   auraBlur="blur-xl"
                   auraOpacity={0.4}
@@ -403,60 +433,22 @@ export default function App() {
                   angleOffset={index * 90}
                 />
 
-                <div className="relative z-10 flex flex-col justify-between h-full">
-                  {/* Inner 16:9 Video Box with Numeral & Centered Play Button */}
-                  <div
-                    className={`relative aspect-video w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br ${project.gradient} border border-white/10 flex items-center justify-center p-4 shadow-inner mb-5 group-hover:border-white/40 transition-all duration-500`}
-                  >
-                    {/* Noticeable Film Grain & Vignette */}
-                    <FilmGrainCardTexture intensity="standard" />
+                {/* Subtle Inner Background Noise / Depth glow */}
+                <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
-                    {/* Numeral inside top-left */}
-                    <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
-                      {project.num}
-                    </span>
+                {/* Numeral inside top-left */}
+                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                  {project.num}
+                </span>
 
-                    {/* Film Stock Stamp inside top-right */}
-                    <span className="absolute top-4 right-4 z-20 text-[10px] font-mono tracking-widest text-white/40 uppercase">
-                      35MM • 24FPS
-                    </span>
+                {/* 16:9 aspect ratio label inside top-right */}
+                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                  16:9
+                </span>
 
-                    {/* Central Glowing Play Button */}
-                    <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
-                      <Play className="w-6 h-6 fill-current ml-0.5" />
-                    </div>
-                  </div>
-
-                  {/* Below Video: Metadata row, tag, Creator review title, quote & 5 stars */}
-                  <div className="flex flex-col">
-                    {/* Category & Format Divider Row */}
-                    <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono uppercase tracking-[0.16em] text-white/50 border-b border-white/10 pb-3 mb-3.5">
-                      <span className="font-semibold">{project.category}</span>
-                      <span className="text-white/40">{project.format}</span>
-                    </div>
-
-                    {/* Pure Silver / White Accent Tag */}
-                    <div className="text-xs font-mono font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 uppercase mb-1.5">
-                      {project.tag}
-                    </div>
-
-                    {/* Creator review Heading */}
-                    <h3 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight mb-2">
-                      {project.reviewTitle}
-                    </h3>
-
-                    {/* Review Quote (Space for client testimonials & feedback) */}
-                    <p className="text-white/70 text-sm md:text-[15px] leading-relaxed font-normal mb-4">
-                      {project.quote}
-                    </p>
-
-                    {/* 5 Solid White Stars */}
-                    <div className="flex items-center gap-1 text-white">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-white text-white drop-shadow-[0_0_4px_rgba(255,255,255,0.4)]" />
-                      ))}
-                    </div>
-                  </div>
+                {/* Central Glowing Play Button */}
+                <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                  <Play className="w-6 h-6 fill-current ml-0.5" />
                 </div>
               </div>
             </RevealOnScroll>
@@ -486,133 +478,59 @@ export default function App() {
           </div>
         </RevealOnScroll>
 
-        {/* 3 Staggered Phone-style Vertical Cards matching layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-4 pb-8">
-          {/* Card 01 */}
-          <RevealOnScroll delay={0}>
-            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 cursor-pointer flex flex-col justify-between overflow-visible">
-              <AnimatedGeminiBorder
-                preset="discord"
-                mode="hover-brighten"
-                borderRadius="rounded-[32px]"
-                borderWidth="1.5px"
-                auraBlur="blur-xl"
-                auraOpacity={0.45}
-                speedMs={18000}
-                angleOffset={0}
-              />
-              <div className="relative z-10 flex flex-col justify-between h-full">
-                {/* Inner 9:16 Screen Frame */}
-                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181818] via-[#090909] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <FilmGrainCardTexture intensity="heavy" />
+        {/* 3 Staggered Phone-style Vertical Preview Frames with No Subtitles (Only Preview) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-4 pb-12">
+          {SHORTS_PROJECTS.map((short) => (
+            <RevealOnScroll key={short.id} delay={short.delay} className={short.stagger}>
+              <div
+                onClick={() =>
+                  setActiveVideoModal({
+                    id: short.id,
+                    num: short.num,
+                    title: short.title,
+                    category: 'VERTICAL EDIT',
+                    format: short.format,
+                    tag: 'HIGH RETENTION SHORT',
+                    reviewTitle: '',
+                    quote: '',
+                    rating: 5,
+                    gradient: short.gradient,
+                    colSpan: '',
+                  })
+                }
+                className={`group relative aspect-[9/16] w-full rounded-2xl md:rounded-3xl bg-gradient-to-b ${short.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+              >
+                <AnimatedGeminiBorder
+                  preset={short.preset}
+                  mode="hover-brighten"
+                  borderRadius="rounded-2xl md:rounded-3xl"
+                  borderWidth="1.5px"
+                  auraBlur="blur-xl"
+                  auraOpacity={0.45}
+                  speedMs={18000}
+                  angleOffset={short.delay}
+                />
 
-                  <div className="relative z-20 flex items-center justify-between">
-                    <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">01</span>
-                    <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">16MM GRAIN</span>
-                  </div>
+                {/* Subtle Inner Background Noise / Depth glow */}
+                <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
-                  <h4 className="relative z-20 text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
-                    FAST / FUN / REPLAYABLE
-                  </h4>
+                {/* Numeral inside top-left */}
+                <span className="absolute top-5 left-5 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                  {short.num}
+                </span>
 
-                  <div className="relative z-20 flex justify-end">
-                    <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
-                    </div>
-                  </div>
-                </div>
+                {/* 9:16 aspect ratio label inside top-right */}
+                <span className="absolute top-5 right-5 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                  9:16
+                </span>
 
-                {/* Bottom Tag Outside Screen */}
-                <div className="px-3 pt-3 pb-1 text-[11px] font-mono text-white/50 tracking-wider">
-                  SHORTS • 9:16
-                </div>
-              </div>
-            </div>
-          </RevealOnScroll>
-
-          {/* Card 02 (Middle card staggered down as in reference image!) */}
-          <RevealOnScroll delay={150}>
-            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 cursor-pointer flex flex-col justify-between md:translate-y-8 overflow-visible">
-              <AnimatedGeminiBorder
-                preset="instagram"
-                mode="hover-brighten"
-                borderRadius="rounded-[32px]"
-                borderWidth="1.5px"
-                auraBlur="blur-xl"
-                auraOpacity={0.45}
-                speedMs={18000}
-                angleOffset={120}
-              />
-              <div className="relative z-10 flex flex-col justify-between h-full">
-                {/* Inner 9:16 Screen Frame */}
-                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#1a1a1a] via-[#0a0a0a] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <FilmGrainCardTexture intensity="heavy" />
-
-                  <div className="relative z-20 flex items-center justify-between">
-                    <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">02</span>
-                    <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">16MM GRAIN</span>
-                  </div>
-
-                  <h4 className="relative z-20 text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
-                    THE HOOK IS EVERYTHING
-                  </h4>
-
-                  <div className="relative z-20 flex justify-end">
-                    <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Tag Outside Screen */}
-                <div className="px-3 pt-3 pb-1 text-[11px] font-mono text-white/50 tracking-wider">
-                  REEL • 9:16
+                {/* Central Glowing Play Button */}
+                <div className="relative z-20 w-14 h-14 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                  <Play className="w-5 h-5 fill-current ml-0.5" />
                 </div>
               </div>
-            </div>
-          </RevealOnScroll>
-
-          {/* Card 03 */}
-          <RevealOnScroll delay={300}>
-            <div className="group relative rounded-[32px] p-3.5 bg-black/90 border border-white/10 hover:border-transparent shadow-[0_0_35px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.18)] transition-all duration-500 cursor-pointer flex flex-col justify-between overflow-visible">
-              <AnimatedGeminiBorder
-                preset="gemini"
-                mode="hover-brighten"
-                borderRadius="rounded-[32px]"
-                borderWidth="1.5px"
-                auraBlur="blur-xl"
-                auraOpacity={0.45}
-                speedMs={18000}
-                angleOffset={240}
-              />
-              <div className="relative z-10 flex flex-col justify-between h-full">
-                {/* Inner 9:16 Screen Frame */}
-                <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181818] via-[#090909] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <FilmGrainCardTexture intensity="heavy" />
-
-                  <div className="relative z-20 flex items-center justify-between">
-                    <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">03</span>
-                    <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">16MM GRAIN</span>
-                  </div>
-
-                  <h4 className="relative z-20 text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
-                    CUT FOR THE FEED
-                  </h4>
-
-                  <div className="relative z-20 flex justify-end">
-                    <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
-                      <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Tag Outside Screen */}
-                <div className="px-3 pt-3 pb-1 text-[11px] font-mono text-white/50 tracking-wider">
-                  TIKTOK • 9:16
-                </div>
-              </div>
-            </div>
-          </RevealOnScroll>
+            </RevealOnScroll>
+          ))}
         </div>
       </section>
 
@@ -697,9 +615,9 @@ export default function App() {
                 <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Volume2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">3. 5-Layer Soundscapes</h3>
+                <h3 className="text-xl font-heading font-bold text-white mb-2">3. 3-Layer Soundscapes</h3>
                 <p className="text-sm text-white/65 leading-relaxed font-normal">
-                  70% of perceived quality is audio. Every cut is paired with custom risers, whooshes, sub-drops, and atmospheric foley to deliver high-impact punch.
+                  70% of perceived quality is audio. Every cut is paired with tailored risers, whooshes, sub-drops, and atmospheric foley to deliver crisp, immersive punch.
                 </p>
               </div>
             </div>
@@ -745,9 +663,9 @@ export default function App() {
                 <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">5. 24–48h Turnaround</h3>
+                <h3 className="text-xl font-heading font-bold text-white mb-2">5. Reliable Turnaround</h3>
                 <p className="text-sm text-white/65 leading-relaxed font-normal">
-                  Content calendars move fast. I deliver lightning-fast first drafts, respect deadlines, and communicate transparently through Discord.
+                  Content calendars move fast. I deliver consistent drafts on schedule, respect agreed delivery dates, and keep communication clear and transparent.
                 </p>
               </div>
             </div>
@@ -769,9 +687,9 @@ export default function App() {
                 <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
                   <Check className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">6. 3 Revisions Max Policy</h3>
+                <h3 className="text-xl font-heading font-bold text-white mb-2">6. Up to 3 Revisions</h3>
                 <p className="text-sm text-white/65 leading-relaxed font-normal">
-                  Clear, structured feedback rounds via timestamped notes to finalize the cut efficiently and protect creative quality.
+                  Each project includes up to 3 focused revisions. If you ever want to change more or explore additional passes, just contact me to discuss!
                 </p>
               </div>
             </div>
@@ -809,9 +727,6 @@ export default function App() {
                   disablePictureInPicture
                   className="w-full h-full object-cover scale-[1.01] grayscale contrast-125 pointer-events-none select-none"
                 />
-
-                {/* Noticeable Film Grain Overlay over Video */}
-                <FilmGrainCardTexture intensity="standard" />
 
                 {/* Floating "Available Now" Status Badge in Top Right */}
                 <div className="absolute top-5 right-5 z-20 pointer-events-none">
@@ -867,7 +782,7 @@ export default function App() {
                     Whether your channel runs on fast-paced gaming cuts, documentary storytelling, clean talking-head essays, or viral vertical hooks: <strong className="text-white">I adapt completely to your exact style and brand voice.</strong> No generic cookie-cutter templates—every cut is built from scratch to match your channel rhythm.
                   </p>
                   <p>
-                    From surgical keyframing, whip zooms, and kinetic captions to 5-layer sound design with atmospheric risers and sub-drops: you bring the vision and raw footage, I engineer the cut that turns casual scrollers into loyal subscribers.
+                    From surgical keyframing, whip zooms, and kinetic captions to 3-layer sound design with atmospheric risers and sub-drops: you bring the vision and raw footage, I engineer the cut that turns casual scrollers into loyal subscribers.
                   </p>
                 </div>
 
@@ -1504,7 +1419,7 @@ export default function App() {
       {/* VIDEO PREVIEW MODAL */}
       {activeVideoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-2xl">
-          <div className="relative w-full max-w-4xl rounded-3xl p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden">
+          <div className={`relative w-full ${activeVideoModal.format.includes('9:16') ? 'max-w-md' : 'max-w-4xl'} rounded-3xl p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden`}>
             <button
               onClick={() => setActiveVideoModal(null)}
               className="absolute top-5 right-5 z-20 p-2.5 rounded-full bg-black/60 hover:bg-white hover:text-black text-white border border-white/20 transition-all cursor-pointer"
@@ -1512,13 +1427,12 @@ export default function App() {
               ✕
             </button>
 
-            <div className="relative w-full rounded-2xl overflow-hidden bg-black mb-6 aspect-video">
-              <FilmGrainCardTexture intensity="heavy" />
-              <div className={`relative z-20 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}>
-                <div className="w-20 h-20 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center mb-4 text-white shadow-[0_0_35px_rgba(255,255,255,0.35)]">
-                  <Play className="w-8 h-8 fill-current ml-1 text-white" />
+            <div className={`relative w-full rounded-2xl overflow-hidden bg-black mb-6 ${activeVideoModal.format.includes('9:16') ? 'aspect-[9/16] max-h-[60vh] mx-auto' : 'aspect-video'}`}>
+              <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}>
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center mb-4 text-white shadow-[0_0_35px_rgba(255,255,255,0.35)]">
+                  <Play className="w-7 h-7 md:w-8 md:h-8 fill-current ml-1 text-white" />
                 </div>
-                <h4 className="text-2xl font-heading font-bold text-white mb-2">
+                <h4 className="text-xl md:text-2xl font-heading font-bold text-white mb-2">
                   {activeVideoModal.title}
                 </h4>
               </div>
