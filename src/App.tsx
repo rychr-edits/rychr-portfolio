@@ -3,6 +3,7 @@ import { CosmicHorizonBackground } from './CosmicHorizonBackground.tsx';
 import { RevealOnScroll } from './RevealOnScroll.tsx';
 import { CalmNavbarBorder } from './CalmNavbarBorder.tsx';
 import { AnimatedGeminiBorder, GeminiColorPreset } from './AnimatedGeminiBorder.tsx';
+import { FilmGrainOverlay, FilmGrainCardTexture } from './FilmGrainOverlay.tsx';
 import { FaqItem } from './types.ts';
 import {
   Play,
@@ -156,6 +157,9 @@ export default function App() {
     <div className="relative min-h-screen bg-black text-white font-['Inter',sans-serif] selection:bg-white/20 selection:text-white overflow-x-hidden">
       {/* PROCEDURAL PLANET HORIZON BACKGROUND (Top horizon + Underside on scroll to bottom + Glowing Cursor with Stars) */}
       <CosmicHorizonBackground scrollY={scrollY} />
+
+      {/* NOTICEABLE CINEMATIC FILM GRAIN TEXTURE & SWITCHER */}
+      <FilmGrainOverlay initialMode="35mm" />
 
       {/* PERSISTENT HEADER NAVBAR */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-10 py-5 transition-all duration-300">
@@ -341,13 +345,21 @@ export default function App() {
                   <div
                     className={`relative aspect-video w-full rounded-2xl md:rounded-3xl overflow-hidden bg-gradient-to-br ${project.gradient} border border-white/10 flex items-center justify-center p-4 shadow-inner mb-5 group-hover:border-white/40 transition-all duration-500`}
                   >
+                    {/* Noticeable Film Grain & Vignette */}
+                    <FilmGrainCardTexture intensity="standard" />
+
                     {/* Numeral inside top-left */}
-                    <span className="absolute top-4 left-4 text-xs font-mono font-medium text-white/80 tracking-wider">
+                    <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
                       {project.num}
                     </span>
 
+                    {/* Film Stock Stamp inside top-right */}
+                    <span className="absolute top-4 right-4 z-20 text-[10px] font-mono tracking-widest text-white/40 uppercase">
+                      35MM • 24FPS
+                    </span>
+
                     {/* Central Glowing Play Button */}
-                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                    <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
                       <Play className="w-6 h-6 fill-current ml-0.5" />
                     </div>
                   </div>
@@ -429,13 +441,18 @@ export default function App() {
               <div className="relative z-10 flex flex-col justify-between h-full">
                 {/* Inner 9:16 Screen Frame */}
                 <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181818] via-[#090909] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">01</span>
+                  <FilmGrainCardTexture intensity="heavy" />
 
-                  <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
+                  <div className="relative z-20 flex items-center justify-between">
+                    <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">01</span>
+                    <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">16MM GRAIN</span>
+                  </div>
+
+                  <h4 className="relative z-20 text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
                     FAST / FUN / REPLAYABLE
                   </h4>
 
-                  <div className="flex justify-end">
+                  <div className="relative z-20 flex justify-end">
                     <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
                       <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
                     </div>
@@ -466,13 +483,18 @@ export default function App() {
               <div className="relative z-10 flex flex-col justify-between h-full">
                 {/* Inner 9:16 Screen Frame */}
                 <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#1a1a1a] via-[#0a0a0a] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">02</span>
+                  <FilmGrainCardTexture intensity="heavy" />
 
-                  <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
+                  <div className="relative z-20 flex items-center justify-between">
+                    <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">02</span>
+                    <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">16MM GRAIN</span>
+                  </div>
+
+                  <h4 className="relative z-20 text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
                     THE HOOK IS EVERYTHING
                   </h4>
 
-                  <div className="flex justify-end">
+                  <div className="relative z-20 flex justify-end">
                     <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
                       <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
                     </div>
@@ -503,13 +525,18 @@ export default function App() {
               <div className="relative z-10 flex flex-col justify-between h-full">
                 {/* Inner 9:16 Screen Frame */}
                 <div className="relative w-full aspect-[9/16] rounded-[24px] overflow-hidden bg-gradient-to-b from-[#181818] via-[#090909] to-[#000000] border border-white/10 p-6 flex flex-col justify-between shadow-inner group-hover:scale-[1.01] transition-transform duration-500">
-                  <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">03</span>
+                  <FilmGrainCardTexture intensity="heavy" />
 
-                  <h4 className="text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
+                  <div className="relative z-20 flex items-center justify-between">
+                    <span className="text-xs font-mono text-white/90 font-semibold drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">03</span>
+                    <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">16MM GRAIN</span>
+                  </div>
+
+                  <h4 className="relative z-20 text-2xl sm:text-3xl font-mazzard text-white tracking-tight uppercase leading-snug">
                     CUT FOR THE FEED
                   </h4>
 
-                  <div className="flex justify-end">
+                  <div className="relative z-20 flex justify-end">
                     <div className="w-8 h-8 rounded-full bg-white text-black shadow-[0_0_18px_rgba(255,255,255,0.7)] flex items-center justify-center group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,1)] transition-all">
                       <Play className="w-3.5 h-3.5 fill-current ml-0.5 text-black" />
                     </div>
@@ -719,6 +746,9 @@ export default function App() {
                   disablePictureInPicture
                   className="w-full h-full object-cover scale-[1.01] grayscale contrast-125 pointer-events-none select-none"
                 />
+
+                {/* Noticeable Film Grain Overlay over Video */}
+                <FilmGrainCardTexture intensity="standard" />
 
                 {/* Floating "Available Now" Status Badge in Top Right */}
                 <div className="absolute top-5 right-5 z-20 pointer-events-none">
@@ -1262,7 +1292,8 @@ export default function App() {
             </button>
 
             <div className="relative w-full rounded-2xl overflow-hidden bg-black mb-6 aspect-video">
-              <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}>
+              <FilmGrainCardTexture intensity="heavy" />
+              <div className={`relative z-20 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}>
                 <div className="w-20 h-20 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center mb-4 text-white shadow-[0_0_35px_rgba(255,255,255,0.35)]">
                   <Play className="w-8 h-8 fill-current ml-1 text-white" />
                 </div>
