@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CosmicHorizonBackground } from './CosmicHorizonBackground.tsx';
 import { RevealOnScroll } from './RevealOnScroll.tsx';
 import { CalmNavbarBorder } from './CalmNavbarBorder.tsx';
 import { AnimatedGeminiBorder, GeminiColorPreset } from './AnimatedGeminiBorder.tsx';
+import { CustomVideoPlayer } from './CustomVideoPlayer.tsx';
 import { FaqItem } from './types.ts';
 import {
   Play,
@@ -25,6 +26,7 @@ import {
   Send,
   CheckCircle2,
   AlertCircle,
+  X,
 } from 'lucide-react';
 
 interface WorkProject {
@@ -39,21 +41,62 @@ interface WorkProject {
   rating: number;
   gradient: string;
   colSpan: string;
+  aspectClass?: string;
+  aspectBadge?: string;
+  videoUrl?: string; // YouTube URL, Vimeo, Drive, or direct MP4/WebM URL
+  thumbnailUrl?: string; // Image thumbnail URL or local file path
+}
+
+function getVideoEmbedInfo(url?: string): { type: 'youtube' | 'vimeo' | 'video' | 'none'; src: string } {
+  if (!url) return { type: 'none', src: '' };
+
+  // YouTube (standard, shorts, embed, youtu.be)
+  const ytMatch = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/
+  );
+  if (ytMatch && ytMatch[1]) {
+    return {
+      type: 'youtube',
+      src: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0&modestbranding=1`,
+    };
+  }
+
+  // Vimeo
+  const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?([0-9]+)/);
+  if (vimeoMatch && vimeoMatch[1]) {
+    return {
+      type: 'vimeo',
+      src: `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`,
+    };
+  }
+
+  // Direct video file (.mp4, .webm, etc.) or local file path
+  if (url.match(/\.(mp4|webm|ogg|mov)($|\?)/i) || url.startsWith('/')) {
+    return {
+      type: 'video',
+      src: url,
+    };
+  }
+
+  return { type: 'video', src: url };
 }
 
 const WORK_PROJECTS: WorkProject[] = [
   {
     id: '1',
     num: '01',
-    title: 'High-Retention Storyline Masterclass',
-    category: 'LONG-FORM EDIT',
-    format: 'GAMEPLAY • 16:9',
-    tag: 'YOUTUBE EDIT • HIGH RETENTION',
+    title: 'Bags - Mograph',
+    category: 'KINETIC MOTION',
+    format: 'AFTER EFFECTS • 1:1',
+    tag: 'SQUARE EDIT • 1:1',
     reviewTitle: 'Creator review',
     quote: '"Your review goes here. Tell visitors what this edit helped you achieve."',
     rating: 5,
     gradient: 'from-[#191919] via-[#0d0d0d] to-[#000000]',
-    colSpan: 'lg:col-span-7',
+    colSpan: 'lg:col-span-5',
+    aspectClass: 'aspect-square',
+    aspectBadge: '1:1',
+    videoUrl: '/assets/aistudio/done_5440f745.mp4',
   },
   {
     id: '2',
@@ -66,7 +109,9 @@ const WORK_PROJECTS: WorkProject[] = [
     quote: '"Add a short quote from the creator about the hook, pacing, or final result."',
     rating: 5,
     gradient: 'from-[#171717] via-[#0b0b0b] to-[#000000]',
-    colSpan: 'lg:col-span-5',
+    colSpan: 'lg:col-span-7',
+    aspectClass: 'aspect-video',
+    aspectBadge: '16:9',
   },
   {
     id: '3',
@@ -79,20 +124,24 @@ const WORK_PROJECTS: WorkProject[] = [
     quote: '"Leave space here for a real client testimonial when this project is ready."',
     rating: 5,
     gradient: 'from-[#181818] via-[#0c0c0c] to-[#000000]',
-    colSpan: 'lg:col-span-5',
+    colSpan: 'lg:col-span-7',
+    aspectClass: 'aspect-video',
+    aspectBadge: '16:9',
   },
   {
     id: '4',
     num: '04',
     title: 'Creator Tech & Studio Overhaul Vlog',
     category: 'CREATOR EDIT',
-    format: 'VLOG • 16:9',
-    tag: 'YOUTUBE EDIT • HIGH RETENTION',
+    format: 'VLOG • 1:1',
+    tag: 'SQUARE EDIT • 1:1',
     reviewTitle: 'Creator review',
     quote: '"Your best feedback can live here under the finished video."',
     rating: 5,
     gradient: 'from-[#161616] via-[#0a0a0a] to-[#000000]',
-    colSpan: 'lg:col-span-7',
+    colSpan: 'lg:col-span-5',
+    aspectClass: 'aspect-square',
+    aspectBadge: '1:1',
   },
 ];
 
@@ -162,6 +211,45 @@ const FAQS: FaqItem[] = [
   },
 ];
 
+interface ServiceOption {
+  value: string;
+  label: string;
+  desc: string;
+}
+
+const SERVICE_OPTIONS: ServiceOption[] = [
+  {
+    value: 'Mix of All / Dedicated Account Manager',
+    label: 'Mix of All / Dedicated Account Manager',
+    desc: 'Complete channel management: long-form edits, viral shorts, thumbnails & packaging strategy',
+  },
+  {
+    value: 'YouTube Long-form (Talking Head / Documentary / Gaming)',
+    label: 'YouTube Long-form (Talking Head / Documentary / Gaming)',
+    desc: 'High-retention story cuts, narrative pacing, cinematic sound design & custom motion design',
+  },
+  {
+    value: 'Shorts & Reels High-Retention Batch (9:16)',
+    label: 'Shorts & Reels High-Retention Batch (9:16)',
+    desc: 'Rapid vertical hooks, kinetic motion typography, and punchy cuts tailored for TikTok, Reels & Shorts',
+  },
+  {
+    value: 'Commercial / SaaS / Product Launch Edit',
+    label: 'Commercial / SaaS / Product Launch Edit',
+    desc: 'Premium commercial polish, feature showcases, sleek 3D camera sweeps & launch trailers',
+  },
+  {
+    value: 'Full-Time Dedicated Monthly Retainer',
+    label: 'Full-Time Dedicated Monthly Retainer',
+    desc: 'Priority queue, dedicated weekly video volume, direct Slack/Discord workflow access',
+  },
+  {
+    value: 'Custom Scope / Multiple Styles',
+    label: 'Custom Scope / Multiple Styles',
+    desc: 'Tailored timeline, custom VFX milestone, documentary series, or specific channel requirements',
+  },
+];
+
 export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
@@ -173,9 +261,31 @@ export default function App() {
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
-    service: 'YouTube Long-form',
+    service: 'Mix of All / Dedicated Account Manager',
     message: '',
   });
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Smooth Dropdown Outside Click & Escape Key Listener
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
   const [formStatus, setFormStatus] = useState<
     'idle' | 'submitting' | 'success' | 'needs_activation' | 'error'
   >('idle');
@@ -215,7 +325,7 @@ export default function App() {
         setFormData({
           name: '',
           contact: '',
-          service: 'YouTube Long-form',
+          service: 'Mix of All / Dedicated Account Manager',
           message: '',
         });
       } else if (
@@ -398,50 +508,125 @@ export default function App() {
           </h2>
         </RevealOnScroll>
 
-        {/* 4 Cards in Asymmetric Dynamic Layout:
-            Row 1: Card 01 Wide (lg:col-span-7) + Card 02 (lg:col-span-5)
-            Row 2: Card 03 (lg:col-span-5) + Card 04 Wide (lg:col-span-7)
-            items-center & self-center vertically center the 5-col cards alongside 7-col cards with zero empty space */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center relative z-10">
-          {WORK_PROJECTS.map((project, index) => (
-            <RevealOnScroll
-              key={project.id}
-              className={`${project.colSpan} w-full self-center flex items-center justify-center`}
-              delay={index * 120}
-            >
+        {/* Asymmetrical Interlocking Row Layout:
+            - Top Row: [ Card 01 (1:1 Square) ] + [ Card 02 (16:9 Widescreen) ]
+                Shifted a little towards the center (pr-8 lg:pr-14), not fully centered, preserving refined asymmetry.
+            - Bottom Row: [ Card 03 (16:9 Widescreen) ] + [ Card 04 (1:1 Square) ]
+                Shifted a little towards the center (pl-8 lg:pl-14), not fully centered, preserving refined asymmetry.
+            - 1:1 previews made a little bigger (~38% of row width vs ~58% for 16:9 widescreen), giving them bold visual presence.
+            - Top and bottom rows pulled closer to the center both horizontally and vertically.
+        */}
+        <div className="flex flex-col gap-6 lg:gap-7 relative z-10 w-full">
+          {/* TOP ROW: Card 01 (1:1) on left + Card 02 (16:9) on right */}
+          <div className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-end md:pr-8 lg:pr-14 gap-6 lg:gap-8 w-full">
+            {/* Card 01: 1:1 Square Preview (a little bigger) */}
+            <RevealOnScroll className="w-full md:w-[38%] max-w-[440px] shrink-0" delay={0}>
               <div
-                onClick={() => setActiveVideoModal(project)}
-                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${project.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+                onClick={() => setActiveVideoModal(WORK_PROJECTS[0])}
+                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[0].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
-                  preset={
-                    index === 0
-                      ? 'gemini'
-                      : index === 1
-                      ? 'instagram'
-                      : index === 2
-                      ? 'discord'
-                      : 'gmail'
-                  }
+                  preset="gemini"
                   mode="hover-brighten"
                   borderRadius="rounded-2xl md:rounded-3xl"
                   borderWidth="1.5px"
                   auraBlur="blur-xl"
                   auraOpacity={0.4}
                   speedMs={20000}
-                  angleOffset={index * 90}
+                  angleOffset={0}
                 />
+
+                {/* Background Looping Muted Video Preview */}
+                {WORK_PROJECTS[0].videoUrl && (
+                  <video
+                    src={WORK_PROJECTS[0].videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    disablePictureInPicture
+                    className="absolute inset-0 w-full h-full object-cover rounded-2xl md:rounded-3xl pointer-events-none"
+                  />
+                )}
+
+                {/* Thumbnail image if provided and no video */}
+                {!WORK_PROJECTS[0].videoUrl && WORK_PROJECTS[0].thumbnailUrl && (
+                  <img
+                    src={WORK_PROJECTS[0].thumbnailUrl}
+                    alt={WORK_PROJECTS[0].title}
+                    className="absolute inset-0 w-full h-full object-cover rounded-2xl md:rounded-3xl opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 pointer-events-none"
+                  />
+                )}
+
+                {/* Dark Vignette Overlay for Text & Button Contrast */}
+                <div
+                  className={`absolute inset-0 rounded-2xl md:rounded-3xl pointer-events-none transition-colors duration-300 ${
+                    WORK_PROJECTS[0].videoUrl
+                      ? 'bg-black/25 group-hover:bg-black/50'
+                      : 'bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)]'
+                  }`}
+                />
+
+                {/* Numeral inside top-left */}
+                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/90 drop-shadow-md tracking-wider">
+                  {WORK_PROJECTS[0].num}
+                </span>
+
+                {/* Aspect ratio label inside top-right (1:1) */}
+                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/70 drop-shadow-md tracking-wider">
+                  1:1
+                </span>
+
+                {/* Central Glowing Play Button (hidden on idle when video plays, reveals on hover) */}
+                <div
+                  className={`relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/15 border border-white/30 backdrop-blur-md flex items-center justify-center text-white transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_40px_rgba(255,255,255,0.7)] group-hover:scale-110 group-hover:bg-white group-hover:text-black ${
+                    WORK_PROJECTS[0].videoUrl
+                      ? 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-110'
+                      : 'opacity-100'
+                  }`}
+                >
+                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                </div>
+              </div>
+            </RevealOnScroll>
+
+            {/* Card 02: 16:9 Widescreen Preview */}
+            <RevealOnScroll className="w-full md:w-[58%] max-w-[680px]" delay={120}>
+              <div
+                onClick={() => setActiveVideoModal(WORK_PROJECTS[1])}
+                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[1].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+              >
+                {/* Gemini Rotating Border Halo */}
+                <AnimatedGeminiBorder
+                  preset="instagram"
+                  mode="hover-brighten"
+                  borderRadius="rounded-2xl md:rounded-3xl"
+                  borderWidth="1.5px"
+                  auraBlur="blur-xl"
+                  auraOpacity={0.4}
+                  speedMs={20000}
+                  angleOffset={90}
+                />
+
+                {/* Thumbnail image if provided */}
+                {WORK_PROJECTS[1].thumbnailUrl && (
+                  <img
+                    src={WORK_PROJECTS[1].thumbnailUrl}
+                    alt={WORK_PROJECTS[1].title}
+                    className="absolute inset-0 w-full h-full object-cover rounded-2xl md:rounded-3xl opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 pointer-events-none"
+                  />
+                )}
 
                 {/* Subtle Inner Background Noise / Depth glow */}
                 <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
                 {/* Numeral inside top-left */}
                 <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
-                  {project.num}
+                  {WORK_PROJECTS[1].num}
                 </span>
 
-                {/* 16:9 aspect ratio label inside top-right */}
+                {/* Aspect ratio label inside top-right (16:9) */}
                 <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
                   16:9
                 </span>
@@ -452,7 +637,104 @@ export default function App() {
                 </div>
               </div>
             </RevealOnScroll>
-          ))}
+          </div>
+
+          {/* BOTTOM ROW: Card 03 (16:9) on left + Card 04 (1:1) on right */}
+          <div className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-start md:pl-8 lg:pl-14 gap-6 lg:gap-8 w-full">
+            {/* Card 03: 16:9 Widescreen Preview */}
+            <RevealOnScroll className="w-full md:w-[58%] max-w-[680px]" delay={240}>
+              <div
+                onClick={() => setActiveVideoModal(WORK_PROJECTS[2])}
+                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[2].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+              >
+                {/* Gemini Rotating Border Halo */}
+                <AnimatedGeminiBorder
+                  preset="discord"
+                  mode="hover-brighten"
+                  borderRadius="rounded-2xl md:rounded-3xl"
+                  borderWidth="1.5px"
+                  auraBlur="blur-xl"
+                  auraOpacity={0.4}
+                  speedMs={20000}
+                  angleOffset={180}
+                />
+
+                {/* Thumbnail image if provided */}
+                {WORK_PROJECTS[2].thumbnailUrl && (
+                  <img
+                    src={WORK_PROJECTS[2].thumbnailUrl}
+                    alt={WORK_PROJECTS[2].title}
+                    className="absolute inset-0 w-full h-full object-cover rounded-2xl md:rounded-3xl opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 pointer-events-none"
+                  />
+                )}
+
+                {/* Subtle Inner Background Noise / Depth glow */}
+                <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
+
+                {/* Numeral inside top-left */}
+                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                  {WORK_PROJECTS[2].num}
+                </span>
+
+                {/* Aspect ratio label inside top-right (16:9) */}
+                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                  16:9
+                </span>
+
+                {/* Central Glowing Play Button */}
+                <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                </div>
+              </div>
+            </RevealOnScroll>
+
+            {/* Card 04: 1:1 Square Preview (a little bigger) */}
+            <RevealOnScroll className="w-full md:w-[38%] max-w-[440px] shrink-0" delay={360}>
+              <div
+                onClick={() => setActiveVideoModal(WORK_PROJECTS[3])}
+                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[3].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+              >
+                {/* Gemini Rotating Border Halo */}
+                <AnimatedGeminiBorder
+                  preset="gmail"
+                  mode="hover-brighten"
+                  borderRadius="rounded-2xl md:rounded-3xl"
+                  borderWidth="1.5px"
+                  auraBlur="blur-xl"
+                  auraOpacity={0.4}
+                  speedMs={20000}
+                  angleOffset={270}
+                />
+
+                {/* Thumbnail image if provided */}
+                {WORK_PROJECTS[3].thumbnailUrl && (
+                  <img
+                    src={WORK_PROJECTS[3].thumbnailUrl}
+                    alt={WORK_PROJECTS[3].title}
+                    className="absolute inset-0 w-full h-full object-cover rounded-2xl md:rounded-3xl opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 pointer-events-none"
+                  />
+                )}
+
+                {/* Subtle Inner Background Noise / Depth glow */}
+                <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
+
+                {/* Numeral inside top-left */}
+                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                  {WORK_PROJECTS[3].num}
+                </span>
+
+                {/* Aspect ratio label inside top-right (1:1) */}
+                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                  1:1
+                </span>
+
+                {/* Central Glowing Play Button */}
+                <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                </div>
+              </div>
+            </RevealOnScroll>
+          </div>
         </div>
       </section>
 
@@ -496,6 +778,10 @@ export default function App() {
                     rating: 5,
                     gradient: short.gradient,
                     colSpan: '',
+                    aspectClass: 'aspect-[9/16]',
+                    aspectBadge: '9:16',
+                    videoUrl: (short as any).videoUrl,
+                    thumbnailUrl: (short as any).thumbnailUrl,
                   })
                 }
                 className={`group relative aspect-[9/16] w-full rounded-2xl md:rounded-3xl bg-gradient-to-b ${short.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
@@ -510,6 +796,15 @@ export default function App() {
                   speedMs={18000}
                   angleOffset={short.delay}
                 />
+
+                {/* Thumbnail image if provided */}
+                {(short as any).thumbnailUrl && (
+                  <img
+                    src={(short as any).thumbnailUrl}
+                    alt={short.title}
+                    className="absolute inset-0 w-full h-full object-cover rounded-2xl md:rounded-3xl opacity-75 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500 pointer-events-none"
+                  />
+                )}
 
                 {/* Subtle Inner Background Noise / Depth glow */}
                 <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
@@ -1227,28 +1522,99 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div>
+                  {/* CUSTOM ANIMATED MONOCHROMATIC DROPDOWN */}
+                  <div className="relative" ref={dropdownRef}>
                     <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
                       What type of video editing do you need?
                     </label>
-                    <select
-                      value={formData.service}
-                      onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all"
+
+                    {/* Hidden input to ensure native form data captures the service value */}
+                    <input type="hidden" name="service" value={formData.service} />
+
+                    {/* Custom Animated Trigger Button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsDropdownOpen((prev) => !prev)}
+                      aria-expanded={isDropdownOpen}
+                      aria-haspopup="listbox"
+                      className={`w-full px-4 py-3.5 rounded-xl bg-black border text-left text-sm text-white flex items-center justify-between transition-all duration-300 cursor-pointer shadow-inner ${
+                        isDropdownOpen
+                          ? 'border-white ring-1 ring-white/50 shadow-[0_0_25px_rgba(255,255,255,0.2)] bg-neutral-950'
+                          : 'border-white/20 hover:border-white/40 hover:bg-neutral-950/80'
+                      }`}
                     >
-                      <option value="YouTube Long-form (Talking Head / Documentary / Storytelling)">
-                        YouTube Long-form (Talking Head / Documentary / Gaming)
-                      </option>
-                      <option value="Shorts & Reels High-Retention Batch (9:16)">
-                        Shorts & Reels High-Retention Batch (9:16)
-                      </option>
-                      <option value="Commercial / SaaS / Product Launch Edit">
-                        Commercial / SaaS / Product Launch Edit
-                      </option>
-                      <option value="Full-Time Dedicated Monthly Retainer">
-                        Full-Time Dedicated Monthly Retainer
-                      </option>
-                    </select>
+                      <div className="flex items-center gap-2.5 overflow-hidden pr-2">
+                        <span className="font-medium text-white truncate">
+                          {formData.service}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        className={`w-4 h-4 text-white/70 transition-transform duration-300 ease-out shrink-0 ml-3 ${
+                          isDropdownOpen ? 'rotate-180 text-white' : 'rotate-0'
+                        }`}
+                      />
+                    </button>
+
+                    {/* Smoothly Animated Dropdown Menu with Monochromatic Glass Effect */}
+                    <div
+                      role="listbox"
+                      className={`absolute left-0 right-0 top-full mt-2.5 z-50 rounded-2xl bg-[#0a0a0a]/98 border border-white/20 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-300 ease-out origin-top ${
+                        isDropdownOpen
+                          ? 'opacity-100 scale-100 translate-y-0 pointer-events-auto visible'
+                          : 'opacity-0 scale-95 -translate-y-2 pointer-events-none invisible'
+                      }`}
+                    >
+                      <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.15em] text-white/40 border-b border-white/10 mb-1 flex items-center justify-between">
+                        <span>Select Service Tier</span>
+                        <span>{SERVICE_OPTIONS.length} options</span>
+                      </div>
+
+                      <div className="space-y-1 max-h-72 overflow-y-auto pr-1 select-none">
+                        {SERVICE_OPTIONS.map((option) => {
+                          const isSelected = formData.service === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              role="option"
+                              aria-selected={isSelected}
+                              onClick={() => {
+                                setFormData((prev) => ({ ...prev, service: option.value }));
+                                setIsDropdownOpen(false);
+                              }}
+                              className={`w-full text-left p-3 rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-between group ${
+                                isSelected
+                                  ? 'bg-white/15 text-white border border-white/30 shadow-sm'
+                                  : 'hover:bg-white/10 text-white/80 hover:text-white border border-transparent'
+                              }`}
+                            >
+                              <div className="flex-1 pr-3">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span
+                                    className={`text-sm font-medium ${
+                                      isSelected
+                                        ? 'text-white font-semibold'
+                                        : 'text-white/90 group-hover:text-white'
+                                    }`}
+                                  >
+                                    {option.label}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-white/50 group-hover:text-white/75 transition-colors line-clamp-1">
+                                  {option.desc}
+                                </p>
+                              </div>
+
+                              {isSelected && (
+                                <div className="w-5 h-5 rounded-full bg-white text-black flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(255,255,255,0.6)]">
+                                  <Check className="w-3 h-3 stroke-[2.5]" />
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
 
                   <div>
@@ -1418,51 +1784,118 @@ export default function App() {
 
       {/* VIDEO PREVIEW MODAL */}
       {activeVideoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-2xl">
-          <div className={`relative w-full ${activeVideoModal.format.includes('9:16') ? 'max-w-md' : 'max-w-4xl'} rounded-3xl p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden`}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10 bg-black/90 backdrop-blur-2xl"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveVideoModal(null);
+          }}
+        >
+          {/* Modal Outer Container with Floating Corner Close Button */}
+          <div
+            className={`relative w-full ${
+              activeVideoModal.format.includes('9:16')
+                ? 'max-w-md'
+                : activeVideoModal.format.includes('1:1')
+                ? 'max-w-2xl'
+                : 'max-w-4xl'
+            }`}
+          >
+            {/* Close Button positioned outside preview next to top-right corner */}
             <button
               onClick={() => setActiveVideoModal(null)}
-              className="absolute top-5 right-5 z-20 p-2.5 rounded-full bg-black/60 hover:bg-white hover:text-black text-white border border-white/20 transition-all cursor-pointer"
+              aria-label="Close preview"
+              title="Close (Esc)"
+              className="absolute -top-3.5 -right-3.5 md:-top-5 md:-right-5 z-50 w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#0a0a0a] hover:bg-white text-white hover:text-black border border-white/25 hover:border-white shadow-[0_0_25px_rgba(0,0,0,0.9)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110 active:scale-95"
             >
-              ✕
+              <X className="w-4 h-4 md:w-5 md:h-5 stroke-[2.2]" />
             </button>
 
-            <div className={`relative w-full rounded-2xl overflow-hidden bg-black mb-6 ${activeVideoModal.format.includes('9:16') ? 'aspect-[9/16] max-h-[60vh] mx-auto' : 'aspect-video'}`}>
-              <div className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}>
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center mb-4 text-white shadow-[0_0_35px_rgba(255,255,255,0.35)]">
-                  <Play className="w-7 h-7 md:w-8 md:h-8 fill-current ml-1 text-white" />
+            {/* Inner Modal Card */}
+            <div className="relative w-full rounded-3xl p-5 md:p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden">
+              {(() => {
+                const embed = getVideoEmbedInfo(activeVideoModal.videoUrl);
+                const aspectClass = activeVideoModal.format.includes('9:16')
+                  ? 'aspect-[9/16]'
+                  : activeVideoModal.format.includes('1:1')
+                  ? 'aspect-square'
+                  : 'aspect-video';
+
+                if (embed.type === 'video') {
+                  return (
+                    <div className="mb-6 w-full">
+                      <CustomVideoPlayer
+                        src={embed.src}
+                        title={activeVideoModal.title}
+                        aspectClass={aspectClass}
+                        autoPlayWithSound={true}
+                      />
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    className={`relative w-full rounded-2xl overflow-hidden bg-black mb-6 ${
+                      activeVideoModal.format.includes('9:16')
+                        ? 'aspect-[9/16] max-h-[70vh] mx-auto'
+                        : activeVideoModal.format.includes('1:1')
+                        ? 'aspect-square max-h-[60vh] mx-auto'
+                        : 'aspect-video'
+                    }`}
+                  >
+                    {embed.type === 'youtube' || embed.type === 'vimeo' ? (
+                      <iframe
+                        src={embed.src}
+                        title={activeVideoModal.title}
+                        className="w-full h-full border-0 rounded-2xl"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <div
+                        className={`w-full h-full flex flex-col items-center justify-center bg-gradient-to-br ${activeVideoModal.gradient} p-6 text-center`}
+                      >
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center mb-4 text-white shadow-[0_0_35px_rgba(255,255,255,0.35)]">
+                          <Play className="w-7 h-7 md:w-8 md:h-8 fill-current ml-1 text-white" />
+                        </div>
+                        <h4 className="text-xl md:text-2xl font-heading font-bold text-white mb-2">
+                          {activeVideoModal.title}
+                        </h4>
+                        <p className="text-xs text-white/50 font-mono tracking-wider">
+                          PREVIEW READY • DROP YOUR VIDEO URL IN WORK_PROJECTS
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
+                <div>
+                  <h3 className="text-xl font-heading font-bold text-white">
+                    {activeVideoModal.title}
+                  </h3>
                 </div>
-                <h4 className="text-xl md:text-2xl font-heading font-bold text-white mb-2">
-                  {activeVideoModal.title}
-                </h4>
-              </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
-              <div>
-                <h3 className="text-xl font-heading font-bold text-white">
-                  {activeVideoModal.title}
-                </h3>
+                <a
+                  href="#contact"
+                  onClick={() => setActiveVideoModal(null)}
+                  className="relative px-6 py-3 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-xs transition-all shrink-0 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.5)] overflow-visible group/btn active:scale-95"
+                >
+                  <AnimatedGeminiBorder
+                    preset="gemini"
+                    borderRadius="rounded-xl"
+                    borderWidth="1.2px"
+                    auraBlur="blur-sm"
+                    auraOpacity={0.65}
+                    speedMs={12000}
+                    angleOffset={210}
+                  />
+                  <span className="relative z-10 group-hover/btn:text-white transition-colors">
+                    Hire <span className="font-brand-rychr font-bold text-white">Rychr</span>
+                  </span>
+                </a>
               </div>
-
-              <a
-                href="#contact"
-                onClick={() => setActiveVideoModal(null)}
-                className="relative px-6 py-3 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-xs transition-all shrink-0 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.5)] overflow-visible group/btn active:scale-95"
-              >
-                <AnimatedGeminiBorder
-                  preset="gemini"
-                  borderRadius="rounded-xl"
-                  borderWidth="1.2px"
-                  auraBlur="blur-sm"
-                  auraOpacity={0.65}
-                  speedMs={12000}
-                  angleOffset={210}
-                />
-                <span className="relative z-10 group-hover/btn:text-white transition-colors">
-                  Hire <span className="font-brand-rychr font-bold text-white">Rychr</span> for Similar Edit
-                </span>
-              </a>
             </div>
           </div>
         </div>
