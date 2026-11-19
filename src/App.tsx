@@ -4,6 +4,8 @@ import { RevealOnScroll } from './RevealOnScroll.tsx';
 import { CalmNavbarBorder } from './CalmNavbarBorder.tsx';
 import { AnimatedGeminiBorder, GeminiColorPreset } from './AnimatedGeminiBorder.tsx';
 import { CustomVideoPlayer } from './CustomVideoPlayer.tsx';
+import { AboutShowcase3D } from './AboutShowcase3D.tsx';
+import { Spatial3DEngine } from './Spatial3DEngine.tsx';
 import { FaqItem } from './types.ts';
 import {
   Play,
@@ -267,6 +269,55 @@ export default function App() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Mouse-reactive & scroll-driven light state for the #about 3D spotlight stage (zero React re-renders)
+  const aboutSectionRef = useRef<HTMLElement>(null);
+  const aboutPointerRef = useRef({ x: 0, y: 0 });
+  const aboutScrollLightRef = useRef(0);
+  const aboutStageFrameRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const section = aboutSectionRef.current;
+    if (!section) return;
+
+    const updateScrollLight = () => {
+      const targetEl = aboutStageFrameRef.current || section;
+      const rect = targetEl.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      // 0 light at the end of #whyme (rect.top >= 88% vh), fading smoothly to 1.0 as you scroll into #about
+      const raw = (vh * 0.88 - rect.top) / (vh * 0.54);
+      const clamped = Math.max(0, Math.min(1, raw));
+      aboutScrollLightRef.current = clamped * clamped * (3 - 2 * clamped);
+    };
+
+    updateScrollLight();
+
+    const onPointerMove = (e: PointerEvent) => {
+      const rect = section.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+      aboutPointerRef.current.x = Math.max(-1, Math.min(1, nx));
+      aboutPointerRef.current.y = Math.max(-1, Math.min(1, ny));
+    };
+
+    const onPointerLeave = () => {
+      aboutPointerRef.current.x = 0;
+      aboutPointerRef.current.y = 0;
+    };
+
+    section.addEventListener('pointermove', onPointerMove, { passive: true });
+    section.addEventListener('pointerleave', onPointerLeave);
+    window.addEventListener('scroll', updateScrollLight, { passive: true });
+    window.addEventListener('resize', updateScrollLight, { passive: true });
+
+    return () => {
+      section.removeEventListener('pointermove', onPointerMove);
+      section.removeEventListener('pointerleave', onPointerLeave);
+      window.removeEventListener('scroll', updateScrollLight);
+      window.removeEventListener('resize', updateScrollLight);
+    };
+  }, []);
+
   // Smooth Dropdown Outside Click & Escape Key Listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -362,16 +413,33 @@ export default function App() {
     <div className="relative min-h-screen bg-black text-white font-['Inter',sans-serif] selection:bg-white/20 selection:text-white overflow-x-hidden">
       {/* PROCEDURAL PLANET HORIZON BACKGROUND (Top horizon + Underside on scroll to bottom + Glowing Cursor with Stars) */}
       <CosmicHorizonBackground scrollY={scrollY} />
+      <Spatial3DEngine />
 
       {/* PERSISTENT HEADER NAVBAR */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-10 py-5 transition-all duration-300">
-        <div className="relative max-w-6xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.9)]">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-10 py-5 transition-colors duration-300">
+        <div
+          data-s3d="bar"
+          data-s3d-depth="0.45"
+          data-s3d-global-tilt="1.1"
+          data-s3d-scale="1.022"
+          data-s3d-tilt="7.5"
+          data-s3d-shift="5"
+          className="relative max-w-6xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.9)] will-change-transform"
+        >
           {/* Calm, slow subtle dual parallel glowing border covering all sides of the rounded tab */}
           <CalmNavbarBorder />
 
           {/* Top Left: Animated Crescent Moon & Brand Video Playing as GIF (15 FPS, Monochromatic) */}
-          <a href="#" className="flex items-center gap-3 group">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-white/20 bg-black flex items-center justify-center shadow-[0_0_18px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_26px_rgba(255,255,255,0.45)] group-hover:border-white/50 transition-all shrink-0">
+          <a
+            href="#"
+            data-s3d="button"
+            data-s3d-depth="0.55"
+            data-s3d-global-tilt="1.0"
+            data-s3d-scale="1.06"
+            data-s3d-tilt="9"
+            className="inline-flex items-center gap-3 group will-change-transform"
+          >
+            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-white/20 bg-black flex items-center justify-center shadow-[0_0_18px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_26px_rgba(255,255,255,0.45)] group-hover:border-white/50 transition-[border-color,box-shadow] shrink-0">
               <video
                 src="/assets/aistudio/export_2_-_15_fps_dc6d6217.mp4"
                 poster="/assets/aistudio/image_5a1c3c4a.png"
@@ -390,19 +458,59 @@ export default function App() {
 
           {/* Center Tabs: Work, Shorts, Why me, About, FAQ */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
-            <a href="#work" className="hover:text-white transition-colors">
+            <a
+              href="#work"
+              data-s3d="button"
+              data-s3d-depth="0.5"
+              data-s3d-global-tilt="1.0"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
               Work
             </a>
-            <a href="#shorts" className="hover:text-white transition-colors">
+            <a
+              href="#shorts"
+              data-s3d="button"
+              data-s3d-depth="0.5"
+              data-s3d-global-tilt="1.0"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
               Shorts
             </a>
-            <a href="#whyme" className="hover:text-white transition-colors">
+            <a
+              href="#whyme"
+              data-s3d="button"
+              data-s3d-depth="0.5"
+              data-s3d-global-tilt="1.0"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
               Why me
             </a>
-            <a href="#about" className="hover:text-white transition-colors">
+            <a
+              href="#about"
+              data-s3d="button"
+              data-s3d-depth="0.5"
+              data-s3d-global-tilt="1.0"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
               About
             </a>
-            <a href="#faq" className="hover:text-white transition-colors">
+            <a
+              href="#faq"
+              data-s3d="button"
+              data-s3d-depth="0.5"
+              data-s3d-global-tilt="1.0"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
               FAQ
             </a>
           </nav>
@@ -411,7 +519,12 @@ export default function App() {
           <div className="flex items-center gap-3">
             <a
               href="#contact"
-              className="relative px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all active:scale-95 cursor-pointer overflow-visible group/btn"
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.07"
+              data-s3d-tilt="9.5"
+              className="relative inline-flex px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-[background-color,box-shadow,color] cursor-pointer overflow-visible group/btn will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -434,23 +547,43 @@ export default function App() {
       <section className="relative min-h-[95vh] flex flex-col justify-center items-center px-6 pt-32 pb-20 z-20 pointer-events-auto">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
           {/* Status Badge in signature crisp style with Pure White rim */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/20 backdrop-blur-md mb-8 text-xs font-mono text-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.8"
+            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/20 backdrop-blur-md mb-8 text-xs font-mono text-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:border-white/40 hover:shadow-[0_0_28px_rgba(255,255,255,0.35)] transition-[border-color,box-shadow] will-change-transform"
+          >
             <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff]" />
             <span className="tracking-wide">Available for New Projects</span>
           </div>
 
           {/* Main Title: Rychr strictly in Mazzard M Black with deep luminous white aura */}
-          <h1 className="text-7xl sm:text-8xl md:text-9xl font-brand-rychr tracking-tight mb-4 text-white drop-shadow-[0_10px_45px_rgba(255,255,255,0.22)]">
+          <h1
+            data-s3d="global"
+            data-s3d-depth="1.35"
+            data-s3d-global-tilt="2.6"
+            className="text-7xl sm:text-8xl md:text-9xl font-brand-rychr tracking-tight mb-4 text-white drop-shadow-[0_10px_45px_rgba(255,255,255,0.22)] px-4 will-change-transform"
+          >
             Rychr
           </h1>
 
           {/* Subheading in crisp Plus Jakarta Sans */}
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold tracking-tight text-white/95 mb-6">
+          <h2
+            data-s3d="global"
+            data-s3d-depth="1.05"
+            data-s3d-global-tilt="2.0"
+            className="text-2xl sm:text-3xl md:text-4xl font-heading font-bold tracking-tight text-white/95 mb-6 px-3 will-change-transform"
+          >
             Creative Video Editor & Motion Designer
           </h2>
 
           {/* Bio text (cleanly situated above the planet's outline) */}
-          <p className="text-base sm:text-lg text-white/75 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+          <p
+            data-s3d="global"
+            data-s3d-depth="0.8"
+            data-s3d-global-tilt="1.5"
+            className="text-base sm:text-lg text-white/75 max-w-2xl mx-auto leading-relaxed mb-10 font-normal px-3 py-1 will-change-transform"
+          >
             I edit cinematic, fast-paced, and engaging videos tailored for YouTube, streams, and social media. Let's make content that hooks your audience and drives growth.
           </p>
 
@@ -458,7 +591,12 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
               href="#work"
-              className="px-8 py-4 rounded-xl font-semibold text-sm md:text-base bg-white text-black hover:bg-neutral-200 transition-all duration-300 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:shadow-[0_0_45px_rgba(255,255,255,0.45)] flex items-center gap-2 group cursor-pointer"
+              data-s3d="button"
+              data-s3d-depth="1.05"
+              data-s3d-global-tilt="1.8"
+              data-s3d-scale="1.065"
+              data-s3d-tilt="9.5"
+              className="px-8 py-4 rounded-xl font-semibold text-sm md:text-base bg-white text-black hover:bg-neutral-200 transition-[background-color,box-shadow] duration-300 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:shadow-[0_0_45px_rgba(255,255,255,0.45)] flex items-center gap-2 group cursor-pointer will-change-transform"
             >
               <span>Explore My Work</span>
               <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
@@ -466,7 +604,12 @@ export default function App() {
 
             <a
               href="#contact"
-              className="relative px-7 py-4 rounded-xl font-semibold text-sm md:text-base bg-black/90 hover:bg-black text-white hover:text-white/80 transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] overflow-visible group/btn active:scale-95"
+              data-s3d="button"
+              data-s3d-depth="1.05"
+              data-s3d-global-tilt="1.8"
+              data-s3d-scale="1.065"
+              data-s3d-tilt="9.5"
+              className="relative inline-block px-7 py-4 rounded-xl font-semibold text-sm md:text-base bg-black/90 hover:bg-black text-white hover:text-white/80 transition-[background-color,color,box-shadow] duration-300 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] overflow-visible group/btn will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -482,7 +625,12 @@ export default function App() {
           </div>
 
           {/* Indicator: text "scroll" and glowing white line that animates downward */}
-          <div className="mt-14 flex flex-col items-center gap-2 select-none pointer-events-none">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.6"
+            data-s3d-global-tilt="1.2"
+            className="mt-14 flex flex-col items-center gap-2 select-none pointer-events-none px-4 py-2 will-change-transform"
+          >
             <span className="text-[11px] uppercase tracking-[0.35em] font-mono text-white/70 font-medium">
               scroll
             </span>
@@ -496,34 +644,44 @@ export default function App() {
       {/* SECTION 1: WORK (EXACT ASYMMETRICAL 4-CARD LAYOUT WITH MONOCHROME PURE WHITE GLOW) */}
       <section id="work" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24">
         {/* Subtle grid texture overlay with faint white touch */}
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none rounded-3xl" />
+        <div
+          data-s3d="global"
+          data-s3d-depth="-0.85"
+          data-s3d-global-tilt="0.7"
+          className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none rounded-3xl will-change-transform"
+        />
 
         <RevealOnScroll className="mb-14 relative z-10">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.8"
+            className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3 will-change-transform"
+          >
             <Film className="w-3.5 h-3.5 text-white" />
             <span>01 / Selected Work</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white">
+          <h2
+            data-s3d="global"
+            data-s3d-depth="1.15"
+            data-s3d-global-tilt="2.2"
+            className="block w-fit text-4xl md:text-5xl font-mazzard tracking-tight text-white will-change-transform"
+          >
             Featured Edits
           </h2>
         </RevealOnScroll>
 
-        {/* Asymmetrical Interlocking Row Layout:
-            - Top Row: [ Card 01 (1:1 Square) ] + [ Card 02 (16:9 Widescreen) ]
-                Shifted a little towards the center (pr-8 lg:pr-14), not fully centered, preserving refined asymmetry.
-            - Bottom Row: [ Card 03 (16:9 Widescreen) ] + [ Card 04 (1:1 Square) ]
-                Shifted a little towards the center (pl-8 lg:pl-14), not fully centered, preserving refined asymmetry.
-            - 1:1 previews made a little bigger (~38% of row width vs ~58% for 16:9 widescreen), giving them bold visual presence.
-            - Top and bottom rows pulled closer to the center both horizontally and vertically.
-        */}
         <div className="flex flex-col gap-6 lg:gap-7 relative z-10 w-full">
           {/* TOP ROW: Card 01 (1:1) on left + Card 02 (16:9) on right */}
           <div className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-end md:pr-8 lg:pr-14 gap-6 lg:gap-8 w-full">
-            {/* Card 01: 1:1 Square Preview (a little bigger) */}
+            {/* Card 01: 1:1 Square Preview */}
             <RevealOnScroll className="w-full md:w-[38%] max-w-[440px] shrink-0" delay={0}>
               <div
+                data-s3d="card"
+                data-s3d-depth="0.95"
+                data-s3d-global-tilt="3.4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[0])}
-                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[0].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[0].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -569,24 +727,43 @@ export default function App() {
                 />
 
                 {/* Numeral inside top-left */}
-                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/90 drop-shadow-md tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/90 drop-shadow-md tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   {WORK_PROJECTS[0].num}
                 </span>
 
                 {/* Aspect ratio label inside top-right (1:1) */}
-                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/70 drop-shadow-md tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/70 drop-shadow-md tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   1:1
                 </span>
 
-                {/* Central Glowing Play Button (hidden on idle when video plays, reveals on hover) */}
+                {/* Central Glowing Play Button */}
                 <div
-                  className={`relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/15 border border-white/30 backdrop-blur-md flex items-center justify-center text-white transition-all duration-300 shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_40px_rgba(255,255,255,0.7)] group-hover:scale-110 group-hover:bg-white group-hover:text-black ${
-                    WORK_PROJECTS[0].videoUrl
-                      ? 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-110'
-                      : 'opacity-100'
-                  }`}
+                  data-s3d="button"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.12"
+                  data-s3d-tilt="11"
+                  className="relative z-20 will-change-transform"
                 >
-                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                  <div
+                    className={`w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/15 border border-white/30 backdrop-blur-md flex items-center justify-center text-white transition-[opacity,background-color,color,box-shadow] duration-300 shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_40px_rgba(255,255,255,0.7)] group-hover:bg-white group-hover:text-black ${
+                      WORK_PROJECTS[0].videoUrl
+                        ? 'opacity-0 group-hover:opacity-100'
+                        : 'opacity-100'
+                    }`}
+                  >
+                    <Play className="w-6 h-6 fill-current ml-0.5" />
+                  </div>
                 </div>
               </div>
             </RevealOnScroll>
@@ -594,8 +771,11 @@ export default function App() {
             {/* Card 02: 16:9 Widescreen Preview */}
             <RevealOnScroll className="w-full md:w-[58%] max-w-[680px]" delay={120}>
               <div
+                data-s3d="card"
+                data-s3d-depth="0.95"
+                data-s3d-global-tilt="3.4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[1])}
-                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[1].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[1].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -622,18 +802,37 @@ export default function App() {
                 <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
                 {/* Numeral inside top-left */}
-                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   {WORK_PROJECTS[1].num}
                 </span>
 
                 {/* Aspect ratio label inside top-right (16:9) */}
-                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   16:9
                 </span>
 
                 {/* Central Glowing Play Button */}
-                <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
-                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                <div
+                  data-s3d="button"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.12"
+                  data-s3d-tilt="11"
+                  className="relative z-20 will-change-transform"
+                >
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-black transition-[background-color,color,box-shadow] shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                    <Play className="w-6 h-6 fill-current ml-0.5" />
+                  </div>
                 </div>
               </div>
             </RevealOnScroll>
@@ -644,8 +843,11 @@ export default function App() {
             {/* Card 03: 16:9 Widescreen Preview */}
             <RevealOnScroll className="w-full md:w-[58%] max-w-[680px]" delay={240}>
               <div
+                data-s3d="card"
+                data-s3d-depth="0.95"
+                data-s3d-global-tilt="3.4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[2])}
-                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[2].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[2].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -672,27 +874,49 @@ export default function App() {
                 <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
                 {/* Numeral inside top-left */}
-                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   {WORK_PROJECTS[2].num}
                 </span>
 
                 {/* Aspect ratio label inside top-right (16:9) */}
-                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   16:9
                 </span>
 
                 {/* Central Glowing Play Button */}
-                <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
-                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                <div
+                  data-s3d="button"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.12"
+                  data-s3d-tilt="11"
+                  className="relative z-20 will-change-transform"
+                >
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-black transition-[background-color,color,box-shadow] shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                    <Play className="w-6 h-6 fill-current ml-0.5" />
+                  </div>
                 </div>
               </div>
             </RevealOnScroll>
 
-            {/* Card 04: 1:1 Square Preview (a little bigger) */}
+            {/* Card 04: 1:1 Square Preview */}
             <RevealOnScroll className="w-full md:w-[38%] max-w-[440px] shrink-0" delay={360}>
               <div
+                data-s3d="card"
+                data-s3d-depth="0.95"
+                data-s3d-global-tilt="3.4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[3])}
-                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[3].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[3].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -719,18 +943,37 @@ export default function App() {
                 <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
                 {/* Numeral inside top-left */}
-                <span className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 left-4 z-20 text-xs font-mono font-medium text-white/80 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   {WORK_PROJECTS[3].num}
                 </span>
 
                 {/* Aspect ratio label inside top-right (1:1) */}
-                <span className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-4 right-4 z-20 text-xs font-mono font-medium text-white/50 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   1:1
                 </span>
 
                 {/* Central Glowing Play Button */}
-                <div className="relative z-20 w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
-                  <Play className="w-6 h-6 fill-current ml-0.5" />
+                <div
+                  data-s3d="button"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.12"
+                  data-s3d-tilt="11"
+                  className="relative z-20 will-change-transform"
+                >
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-black transition-[background-color,color,box-shadow] shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                    <Play className="w-6 h-6 fill-current ml-0.5" />
+                  </div>
                 </div>
               </div>
             </RevealOnScroll>
@@ -742,10 +985,20 @@ export default function App() {
       <section id="shorts" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
           <div>
-            <div className="text-xs font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 uppercase mb-4">
+            <div
+              data-s3d="global"
+              data-s3d-depth="0.85"
+              data-s3d-global-tilt="1.8"
+              className="inline-block text-xs font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 uppercase mb-4 will-change-transform"
+            >
               02 / SHORTS & REELS
             </div>
-            <h2 className="text-5xl sm:text-6xl md:text-7xl font-mazzard tracking-tight text-white leading-[0.95]">
+            <h2
+              data-s3d="global"
+              data-s3d-depth="1.15"
+              data-s3d-global-tilt="2.2"
+              className="text-5xl sm:text-6xl md:text-7xl font-mazzard tracking-tight text-white leading-[0.95] will-change-transform"
+            >
               Small screen.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 drop-shadow-[0_0_30px_rgba(255,255,255,0.25)]">
                 Big energy.
@@ -753,7 +1006,12 @@ export default function App() {
             </h2>
           </div>
 
-          <div className="max-w-md lg:text-right">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.5"
+            className="max-w-md lg:text-right px-2 py-1 will-change-transform"
+          >
             <p className="text-sm md:text-base text-white/70 leading-relaxed font-normal">
               Vertical edits that hook fast, land clean, and give your audience one more reason to hit replay.
             </p>
@@ -765,6 +1023,9 @@ export default function App() {
           {SHORTS_PROJECTS.map((short) => (
             <RevealOnScroll key={short.id} delay={short.delay} className={short.stagger}>
               <div
+                data-s3d="card"
+                data-s3d-depth="1.0"
+                data-s3d-global-tilt="3.6"
                 onClick={() =>
                   setActiveVideoModal({
                     id: short.id,
@@ -784,7 +1045,7 @@ export default function App() {
                     thumbnailUrl: (short as any).thumbnailUrl,
                   })
                 }
-                className={`group relative aspect-[9/16] w-full rounded-2xl md:rounded-3xl bg-gradient-to-b ${short.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-all duration-500 cursor-pointer overflow-visible`}
+                className={`group relative aspect-[9/16] w-full rounded-2xl md:rounded-3xl bg-gradient-to-b ${short.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 <AnimatedGeminiBorder
                   preset={short.preset}
@@ -810,18 +1071,37 @@ export default function App() {
                 <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05)_0%,transparent_70%)] pointer-events-none" />
 
                 {/* Numeral inside top-left */}
-                <span className="absolute top-5 left-5 z-20 text-xs font-mono font-medium text-white/80 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-5 left-5 z-20 text-xs font-mono font-medium text-white/80 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   {short.num}
                 </span>
 
                 {/* 9:16 aspect ratio label inside top-right */}
-                <span className="absolute top-5 right-5 z-20 text-xs font-mono font-medium text-white/50 tracking-wider">
+                <span
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  className="absolute top-5 right-5 z-20 text-xs font-mono font-medium text-white/50 tracking-wider px-1 py-0.5 pointer-events-none will-change-transform"
+                >
                   9:16
                 </span>
 
                 {/* Central Glowing Play Button */}
-                <div className="relative z-20 w-14 h-14 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
-                  <Play className="w-5 h-5 fill-current ml-0.5" />
+                <div
+                  data-s3d="button"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.12"
+                  data-s3d-tilt="11"
+                  className="relative z-20 will-change-transform"
+                >
+                  <div className="w-14 h-14 rounded-full bg-white/10 border border-white/25 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-white group-hover:text-black transition-[background-color,color,box-shadow] shadow-[0_0_25px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_35px_rgba(255,255,255,0.7)]">
+                    <Play className="w-5 h-5 fill-current ml-0.5" />
+                  </div>
                 </div>
               </div>
             </RevealOnScroll>
@@ -832,14 +1112,29 @@ export default function App() {
       {/* SECTION 3: WHY ME */}
       <section id="whyme" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="max-w-3xl mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.8"
+            className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3 will-change-transform"
+          >
             <Zap className="w-3.5 h-3.5 text-white" />
             <span>The Competitive Edge</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-heading font-bold tracking-tight text-white">
+          <h2
+            data-s3d="global"
+            data-s3d-depth="1.15"
+            data-s3d-global-tilt="2.2"
+            className="text-4xl md:text-5xl font-heading font-bold tracking-tight text-white will-change-transform"
+          >
             Why Creators Work With <span className="font-brand-rychr">Rychr</span>
           </h2>
-          <p className="text-white/60 text-base mt-3 font-normal">
+          <p
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.5"
+            className="text-white/60 text-base mt-3 font-normal will-change-transform"
+          >
             Video editing isn’t just assembling clips. It's viewer psychology, pacing mathematics, and storytelling in After Effects that keeps people glued until the last frame.
           </p>
         </RevealOnScroll>
@@ -847,7 +1142,12 @@ export default function App() {
         {/* 6 Core Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <RevealOnScroll delay={0}>
-            <div className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all h-full overflow-visible">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="gemini"
                 mode="hover-brighten"
@@ -859,11 +1159,28 @@ export default function App() {
                 angleOffset={0}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.2"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-[border-color,background-color] will-change-transform"
+                >
                   <Sparkles className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">1. The 1.8s Hook Formula</h3>
-                <p className="text-sm text-white/65 leading-relaxed font-normal">
+                <h3
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="text-xl font-heading font-bold text-white mb-2 will-change-transform"
+                >
+                  1. The 1.8s Hook Formula
+                </h3>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-sm text-white/65 leading-relaxed font-normal will-change-transform"
+                >
                   Every video dies or thrives in the first 3 seconds. I engineer curiosity loops, sound stingers, and visual anchors so your viewers never scroll away.
                 </p>
               </div>
@@ -871,7 +1188,12 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={100}>
-            <div className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all h-full overflow-visible">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="discord"
                 mode="hover-brighten"
@@ -883,11 +1205,28 @@ export default function App() {
                 angleOffset={60}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.2"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-[border-color,background-color] will-change-transform"
+                >
                   <Layers className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">2. Adaptable to Any Style</h3>
-                <p className="text-sm text-white/65 leading-relaxed font-normal">
+                <h3
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="text-xl font-heading font-bold text-white mb-2 will-change-transform"
+                >
+                  2. Adaptable to Any Style
+                </h3>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-sm text-white/65 leading-relaxed font-normal will-change-transform"
+                >
                   Talking head, documentary, SaaS commercial, or gaming: I match your channel tone, brand voice, and pacing rhythm flawlessly.
                 </p>
               </div>
@@ -895,7 +1234,12 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={200}>
-            <div className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all h-full overflow-visible">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="instagram"
                 mode="hover-brighten"
@@ -907,11 +1251,28 @@ export default function App() {
                 angleOffset={120}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.2"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-[border-color,background-color] will-change-transform"
+                >
                   <Volume2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">3. 3-Layer Soundscapes</h3>
-                <p className="text-sm text-white/65 leading-relaxed font-normal">
+                <h3
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="text-xl font-heading font-bold text-white mb-2 will-change-transform"
+                >
+                  3. 3-Layer Soundscapes
+                </h3>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-sm text-white/65 leading-relaxed font-normal will-change-transform"
+                >
                   70% of perceived quality is audio. Every cut is paired with tailored risers, whooshes, sub-drops, and atmospheric foley to deliver crisp, immersive punch.
                 </p>
               </div>
@@ -919,7 +1280,12 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={300}>
-            <div className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all h-full overflow-visible">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="gmail"
                 mode="hover-brighten"
@@ -931,11 +1297,28 @@ export default function App() {
                 angleOffset={180}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.2"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-[border-color,background-color] will-change-transform"
+                >
                   <Film className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">4. 100% After Effects</h3>
-                <p className="text-sm text-white/65 leading-relaxed font-normal">
+                <h3
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="text-xl font-heading font-bold text-white mb-2 will-change-transform"
+                >
+                  4. 100% After Effects
+                </h3>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-sm text-white/65 leading-relaxed font-normal will-change-transform"
+                >
                   Edited exclusively in After Effects. Custom motion graphics, surgical speed ramping, keyframe curves, and 3D camera sweeps.
                 </p>
               </div>
@@ -943,7 +1326,12 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={400}>
-            <div className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all h-full overflow-visible">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="cyan-purple"
                 mode="hover-brighten"
@@ -955,11 +1343,28 @@ export default function App() {
                 angleOffset={240}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.2"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-[border-color,background-color] will-change-transform"
+                >
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">5. Reliable Turnaround</h3>
-                <p className="text-sm text-white/65 leading-relaxed font-normal">
+                <h3
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="text-xl font-heading font-bold text-white mb-2 will-change-transform"
+                >
+                  5. Reliable Turnaround
+                </h3>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-sm text-white/65 leading-relaxed font-normal will-change-transform"
+                >
                   Content calendars move fast. I deliver consistent drafts on schedule, respect agreed delivery dates, and keep communication clear and transparent.
                 </p>
               </div>
@@ -967,7 +1372,12 @@ export default function App() {
           </RevealOnScroll>
 
           <RevealOnScroll delay={500}>
-            <div className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all h-full overflow-visible">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="discord"
                 mode="hover-brighten"
@@ -979,11 +1389,28 @@ export default function App() {
                 angleOffset={300}
               />
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:scale-105 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.5"
+                  data-s3d-global-tilt="1.2"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-6 group-hover:border-white/50 group-hover:bg-white/12 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-[border-color,background-color] will-change-transform"
+                >
                   <Check className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-white mb-2">6. Up to 3 Revisions</h3>
-                <p className="text-sm text-white/65 leading-relaxed font-normal">
+                <h3
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="text-xl font-heading font-bold text-white mb-2 will-change-transform"
+                >
+                  6. Up to 3 Revisions
+                </h3>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-sm text-white/65 leading-relaxed font-normal will-change-transform"
+                >
                   Each project includes up to 3 focused revisions. If you ever want to change more or explore additional passes, just contact me to discuss!
                 </p>
               </div>
@@ -992,163 +1419,166 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION 4: ABOUT RYCHR */}
-      <section id="about" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
-          <RevealOnScroll className="md:col-span-5 relative" delay={100}>
-            {/* Glowing Motion Showcase Card - Full Animation in Monochromatic Grayscale */}
-            <div className="group relative rounded-3xl overflow-visible aspect-square bg-[#050505] border border-white/15 hover:border-transparent shadow-[0_0_60px_rgba(255,255,255,0.15)] transition-all">
-              {/* Animated Gemini Outline & Outer Aura */}
-              <AnimatedGeminiBorder
-                preset="gemini"
-                mode="hover-brighten"
-                borderRadius="rounded-3xl"
-                borderWidth="1.5px"
-                auraBlur="blur-xl"
-                auraOpacity={0.45}
-                speedMs={18000}
-                angleOffset={45}
-              />
-
-              {/* Full-Card Looping After Effects Video Animation (15 FPS, Monochromatic) */}
-              <div className="relative w-full h-full rounded-3xl overflow-hidden bg-black z-10">
-                <video
-                  src="/assets/aistudio/export_2_-_15_fps_dc6d6217.mp4"
-                  poster="/assets/aistudio/image_5a1c3c4a.png"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  disablePictureInPicture
-                  className="w-full h-full object-cover scale-[1.01] grayscale contrast-125 pointer-events-none select-none"
-                />
-
-                {/* Floating "Available Now" Status Badge in Top Right */}
-                <div className="absolute top-5 right-5 z-20 pointer-events-none">
-                  <span className="px-3.5 py-1.5 rounded-full text-xs font-mono bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-                    Available Now
-                  </span>
-                </div>
-
-                {/* Floating "Taking on Select Creators" Glass Pill in Bottom Left */}
-                <div className="absolute bottom-5 left-5 z-20 pointer-events-none">
-                  <div className="px-3.5 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-[11px] font-mono text-white flex items-center gap-1.5 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-                    <Check className="w-3.5 h-3.5 text-white" />
-                    <span>Taking on Select Creators</span>
-                  </div>
-                </div>
+      {/* SECTION 4: ABOUT RYCHR — SEAMLESS FULL-BLEED 3D STUDIO PROTRACTOR SHOWCASE */}
+      <section
+        id="about"
+        ref={aboutSectionRef}
+        className="relative py-28 z-20 w-full scroll-mt-24 overflow-visible"
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <RevealOnScroll className="mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <div
+                data-s3d="global"
+                data-s3d-depth="0.85"
+                data-s3d-global-tilt="1.8"
+                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-2 will-change-transform"
+              >
+                <span>04 / About The Editor</span>
               </div>
+              <h2
+                data-s3d="global"
+                data-s3d-depth="1.15"
+                data-s3d-global-tilt="2.2"
+                className="block w-fit text-3xl sm:text-4xl font-mazzard font-bold tracking-tight text-white will-change-transform"
+              >
+                Meet <span className="font-brand-rychr">Rychr</span>
+              </h2>
             </div>
           </RevealOnScroll>
+        </div>
 
-          <RevealOnScroll className="md:col-span-7" delay={200}>
-            {/* Passage Glass Card with Animated Gemini Outline */}
-            <div className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 border border-white/10 hover:border-transparent backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-visible transition-all flex flex-col justify-between">
-              <AnimatedGeminiBorder
-                preset="cyan-purple"
-                mode="hover-brighten"
-                borderRadius="rounded-3xl"
-                borderWidth="1.5px"
-                auraBlur="blur-xl"
-                auraOpacity={0.35}
-                speedMs={20000}
-                angleOffset={135}
-              />
+        {/* Full-Width Borderless 3D Character Stage (Light fades in smoothly on scroll) */}
+        <div ref={aboutStageFrameRef} className="relative w-full overflow-visible">
+          <AboutShowcase3D
+            pointerTargetRef={aboutPointerRef}
+            scrollLightRef={aboutScrollLightRef}
+          />
+        </div>
 
-              <div className="relative z-10">
-                <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
-                  <span>About the editor</span>
-                </div>
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          {/* Mobile Stats Strip (< md) so curved desktop stats remain crisp on small screens */}
+          <div className="grid grid-cols-2 gap-3 mt-5 md:hidden">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.9"
+              data-s3d-global-tilt="3.0"
+              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+            >
+              <div className="text-2xl font-mazzard font-bold text-white tabular-nums">4+</div>
+              <div className="text-xs text-white/60 mt-0.5">years experience</div>
+            </div>
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.9"
+              data-s3d-global-tilt="3.0"
+              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+            >
+              <div className="text-2xl font-mazzard font-bold text-white tabular-nums">50+</div>
+              <div className="text-xs text-white/60 mt-0.5">videos edited</div>
+            </div>
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.9"
+              data-s3d-global-tilt="3.0"
+              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+            >
+              <div className="text-xl font-mazzard font-bold text-white">Reliable</div>
+              <div className="text-xs text-white/60 mt-0.5">turnaround time</div>
+            </div>
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.9"
+              data-s3d-global-tilt="3.0"
+              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+            >
+              <div className="text-2xl font-mazzard font-bold text-white tabular-nums">100%</div>
+              <div className="text-xs text-white/60 mt-0.5">After Effects</div>
+            </div>
+          </div>
 
-                <div className="flex flex-wrap items-baseline gap-2.5 sm:gap-3 mb-5">
-                  <h2 className="text-4xl sm:text-5xl font-mazzard font-bold text-white tracking-tight">
-                    I'm Ray.
-                  </h2>
-                  <span className="font-brand-rychr text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 font-bold">
-                    (Rychr)
-                  </span>
-                </div>
+          {/* 3 Glowing-Border Editorial Cards Below Stage */}
+          <RevealOnScroll delay={160}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-2">
+              <div
+                data-s3d="card"
+                data-s3d-depth="0.95"
+                data-s3d-global-tilt="3.4"
+                className="group relative rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              >
+                <AnimatedGeminiBorder
+                  preset="gemini"
+                  mode="always"
+                  borderRadius="rounded-3xl"
+                  borderWidth="1.5px"
+                  auraBlur="blur-lg"
+                  auraOpacity={0.32}
+                  innerGlowOpacity={0.9}
+                  speedMs={18000}
+                  angleOffset={0}
+                />
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="relative z-10 text-sm sm:text-base text-white/70 leading-relaxed font-normal will-change-transform"
+                >
+                  I’ve spent the last <strong className="text-white">4+ years</strong> deep in <strong className="text-white">Adobe After Effects</strong>, engineering and cutting 50+ high-retention videos for creators across YouTube, Reels, and TikTok. Video editing isn't just trimming fat—it's pacing mathematics and keeping a viewer hooked from frame zero.
+                </p>
+              </div>
 
-                <div className="space-y-4 text-sm sm:text-base text-white/70 leading-relaxed font-normal">
-                  <p>
-                    I’ve spent the last 3+ years deep in <strong className="text-white">Adobe After Effects</strong>, engineering and cutting 50+ high-retention videos for creators across YouTube, Reels, and TikTok. Video editing isn't just trimming fat—it's pacing mathematics, auditory immersion, and keeping a viewer hooked from frame zero.
-                  </p>
-                  <p>
-                    Whether your channel runs on fast-paced gaming cuts, documentary storytelling, clean talking-head essays, or viral vertical hooks: <strong className="text-white">I adapt completely to your exact style and brand voice.</strong> No generic cookie-cutter templates—every cut is built from scratch to match your channel rhythm.
-                  </p>
-                  <p>
-                    From surgical keyframing, whip zooms, and kinetic captions to 3-layer sound design with atmospheric risers and sub-drops: you bring the vision and raw footage, I engineer the cut that turns casual scrollers into loyal subscribers.
-                  </p>
-                </div>
+              <div
+                data-s3d="card"
+                data-s3d-depth="0.95"
+                data-s3d-global-tilt="3.4"
+                className="group relative rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              >
+                <AnimatedGeminiBorder
+                  preset="discord"
+                  mode="always"
+                  borderRadius="rounded-3xl"
+                  borderWidth="1.5px"
+                  auraBlur="blur-lg"
+                  auraOpacity={0.32}
+                  innerGlowOpacity={0.9}
+                  speedMs={18000}
+                  angleOffset={120}
+                />
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="relative z-10 text-sm sm:text-base text-white/70 leading-relaxed font-normal will-change-transform"
+                >
+                  Whether your channel runs on fast-paced gaming cuts, documentary storytelling, clean talking-head essays, or viral vertical hooks: <strong className="text-white">I adapt completely to your exact style and brand voice.</strong> Every cut is built from scratch to match your rhythm.
+                </p>
+              </div>
 
-                {/* 3 Small Stat Cards with Animated Gemini Outlines */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-8 pt-7 border-t border-white/10">
-                  {/* Card 1: 3+ years experience */}
-                  <div className="group/stat relative rounded-2xl p-4 bg-black/90 border border-white/10 hover:border-transparent transition-all overflow-visible shadow-lg flex flex-col justify-between">
-                    <AnimatedGeminiBorder
-                      preset="discord"
-                      mode="hover-brighten"
-                      borderRadius="rounded-2xl"
-                      borderWidth="1.2px"
-                      auraBlur="blur-md"
-                      auraOpacity={0.65}
-                      speedMs={14000}
-                      angleOffset={30}
-                    />
-                    <div className="relative z-10">
-                      <div className="text-xl sm:text-2xl font-mazzard font-bold text-white tracking-tight group-hover/stat:text-white transition-colors">
-                        3+ Years
-                      </div>
-                      <div className="text-xs font-mono text-white/55 mt-1 tracking-wider uppercase">
-                        Experience
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 2: 50+ videos edited */}
-                  <div className="group/stat relative rounded-2xl p-4 bg-black/90 border border-white/10 hover:border-transparent transition-all overflow-visible shadow-lg flex flex-col justify-between">
-                    <AnimatedGeminiBorder
-                      preset="instagram"
-                      mode="hover-brighten"
-                      borderRadius="rounded-2xl"
-                      borderWidth="1.2px"
-                      auraBlur="blur-md"
-                      auraOpacity={0.65}
-                      speedMs={14000}
-                      angleOffset={150}
-                    />
-                    <div className="relative z-10">
-                      <div className="text-xl sm:text-2xl font-mazzard font-bold text-white tracking-tight group-hover/stat:text-white transition-colors">
-                        50+ Videos
-                      </div>
-                      <div className="text-xs font-mono text-white/55 mt-1 tracking-wider uppercase">
-                        Edited
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card 3: turnaround time-depends on project */}
-                  <div className="group/stat relative rounded-2xl p-4 bg-black/90 border border-white/10 hover:border-transparent transition-all overflow-visible shadow-lg flex flex-col justify-between">
-                    <AnimatedGeminiBorder
-                      preset="gmail"
-                      mode="hover-brighten"
-                      borderRadius="rounded-2xl"
-                      borderWidth="1.2px"
-                      auraBlur="blur-md"
-                      auraOpacity={0.65}
-                      speedMs={14000}
-                      angleOffset={270}
-                    />
-                    <div className="relative z-10">
-                      <div className="text-xs font-mono text-white/50 tracking-wider uppercase mb-1">
-                        Turnaround Time
-                      </div>
-                      <div className="text-sm sm:text-[15px] font-mazzard font-semibold text-white leading-snug group-hover/stat:text-white transition-colors">
-                        Depends on project
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div
+                data-s3d="card"
+                data-s3d-depth="0.95"
+                data-s3d-global-tilt="3.4"
+                className="group relative rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              >
+                <AnimatedGeminiBorder
+                  preset="instagram"
+                  mode="always"
+                  borderRadius="rounded-3xl"
+                  borderWidth="1.5px"
+                  auraBlur="blur-lg"
+                  auraOpacity={0.32}
+                  innerGlowOpacity={0.9}
+                  speedMs={18000}
+                  angleOffset={240}
+                />
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="relative z-10 text-sm sm:text-base text-white/70 leading-relaxed font-normal will-change-transform"
+                >
+                  From surgical keyframing, whip zooms, and kinetic captions to 3-layer sound design with atmospheric risers and sub-drops: you bring the vision and raw footage, I engineer the cut that turns casual scrollers into loyal subscribers.
+                </p>
               </div>
             </div>
           </RevealOnScroll>
@@ -1158,13 +1588,28 @@ export default function App() {
       {/* SECTION 5: FAQ */}
       <section id="faq" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.8"
+            className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3 will-change-transform"
+          >
             <span>Got Questions?</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white">
+          <h2
+            data-s3d="global"
+            data-s3d-depth="1.15"
+            data-s3d-global-tilt="2.2"
+            className="text-4xl md:text-5xl font-mazzard tracking-tight text-white will-change-transform"
+          >
             Frequently Asked Questions
           </h2>
-          <p className="text-white/60 text-base mt-3 font-normal">
+          <p
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.5"
+            className="text-white/60 text-base mt-3 font-normal will-change-transform"
+          >
             Everything you need to know about turnaround times, revisions, software, and payment terms.
           </p>
         </RevealOnScroll>
@@ -1176,7 +1621,10 @@ export default function App() {
             return (
               <RevealOnScroll key={index} delay={index * 70}>
                 <div
-                  className="group relative rounded-2xl bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent transition-all overflow-visible shadow-lg"
+                  data-s3d="card"
+                  data-s3d-depth="0.85"
+                  data-s3d-global-tilt="2.8"
+                  className="group relative rounded-2xl bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent transition-[border-color,box-shadow] overflow-visible shadow-lg will-change-transform"
                 >
                   <AnimatedGeminiBorder
                     preset={
@@ -1197,16 +1645,33 @@ export default function App() {
                       onClick={() => setActiveFaq(isOpen ? null : index)}
                       className="w-full px-6 py-5 flex items-center justify-between text-left gap-4 cursor-pointer"
                     >
-                      <span className="text-base md:text-lg font-mazzard text-white">
+                      <span
+                        data-s3d="global"
+                        data-s3d-depth="0.35"
+                        data-s3d-global-tilt="0.8"
+                        className="inline-block text-base md:text-lg font-mazzard text-white will-change-transform"
+                      >
                         {faq.question}
                       </span>
-                      <div className={`w-8 h-8 rounded-full bg-white/[0.05] border border-white/15 flex items-center justify-center shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 bg-white/20' : ''}`}>
-                        <ChevronDown className="w-4 h-4 text-white" />
+                      <div
+                        data-s3d="button"
+                        data-s3d-depth="0.45"
+                        data-s3d-global-tilt="1.0"
+                        data-s3d-scale="1.12"
+                        data-s3d-tilt="10"
+                        className={`w-8 h-8 rounded-full bg-white/[0.05] border border-white/15 flex items-center justify-center shrink-0 transition-colors duration-300 will-change-transform ${isOpen ? 'bg-white/20' : ''}`}
+                      >
+                        <ChevronDown className={`w-4 h-4 text-white transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                       </div>
                     </button>
 
                     {isOpen && (
-                      <div className="px-6 pb-6 pt-1 text-sm md:text-base text-white/70 leading-relaxed border-t border-white/10 font-normal">
+                      <div
+                        data-s3d="global"
+                        data-s3d-depth="0.25"
+                        data-s3d-global-tilt="0.6"
+                        className="px-6 pb-6 pt-1 text-sm md:text-base text-white/70 leading-relaxed border-t border-white/10 font-normal will-change-transform"
+                      >
                         {faq.answer}
                       </div>
                     )}
@@ -1221,23 +1686,42 @@ export default function App() {
       {/* SECTION 6: CONTACT & SOCIALS */}
       <section id="contact" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
         <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.8"
+            className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3 will-change-transform"
+          >
             <span>Direct Channels</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-mazzard tracking-tight text-white">
+          <h2
+            data-s3d="global"
+            data-s3d-depth="1.15"
+            data-s3d-global-tilt="2.2"
+            className="text-4xl md:text-5xl font-mazzard tracking-tight text-white will-change-transform"
+          >
             Let's Make High-Retention Edits
           </h2>
-          <p className="text-white/60 text-base mt-3 font-normal">
+          <p
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.5"
+            className="text-white/60 text-base mt-3 font-normal will-change-transform"
+          >
             Ready to upgrade your videos? Reach out directly via Gmail, Discord, or Instagram to discuss your vision, rates, and test edits.
           </p>
         </RevealOnScroll>
 
         {/* 3 Explicit Social Cards with Asymmetric Animated Gemini Outlines */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {/* Discord: @ray_christo (Monochromatic Pure White & Silver) */}
+          {/* Discord: @ray_christo */}
           <RevealOnScroll delay={0}>
-            <div className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group">
-              {/* Animated Gemini Outline on Card */}
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="discord"
                 borderRadius="rounded-3xl"
@@ -1249,20 +1733,49 @@ export default function App() {
               />
 
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] group-hover:scale-105 transition-transform">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.1"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] will-change-transform"
+                >
                   <MessageSquare className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="text-lg font-mazzard text-white mb-1">Discord</h4>
-                <p className="text-xs text-white/50 mb-4">Fast messaging & file reviews</p>
-                <div className="p-3 rounded-xl bg-black border border-white/20 font-mono text-sm text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)]">
+                <h4
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="inline-block text-lg font-mazzard text-white mb-1 will-change-transform"
+                >
+                  Discord
+                </h4>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-xs text-white/50 mb-4 will-change-transform"
+                >
+                  Fast messaging & file reviews
+                </p>
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="p-3 rounded-xl bg-black border border-white/20 font-mono text-sm text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)] will-change-transform"
+                >
                   @ray_christo
                 </div>
               </div>
 
               <div className="relative z-10 mt-6 flex gap-2">
                 <button
+                  data-s3d="button"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.055"
+                  data-s3d-tilt="8.5"
                   onClick={() => handleCopy('@ray_christo', 'discord')}
-                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible active:scale-[0.98]"
+                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-[background-color,box-shadow] cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible will-change-transform"
                 >
                   <AnimatedGeminiBorder
                     preset="discord"
@@ -1282,10 +1795,14 @@ export default function App() {
             </div>
           </RevealOnScroll>
 
-          {/* Instagram: rychr.prod (Monochromatic Pure White & Silver) */}
+          {/* Instagram: rychr.prod */}
           <RevealOnScroll delay={120}>
-            <div className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group">
-              {/* Animated Gemini Outline on Card */}
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="instagram"
                 borderRadius="rounded-3xl"
@@ -1297,22 +1814,51 @@ export default function App() {
               />
 
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] group-hover:scale-105 transition-transform">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.1"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] will-change-transform"
+                >
                   <Instagram className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="text-lg font-mazzard text-white mb-1">Instagram</h4>
-                <p className="text-xs text-white/50 mb-4">Direct messages & reel edits</p>
-                <div className="p-3 rounded-xl bg-black border border-white/20 font-mono text-sm text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)]">
+                <h4
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="inline-block text-lg font-mazzard text-white mb-1 will-change-transform"
+                >
+                  Instagram
+                </h4>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-xs text-white/50 mb-4 will-change-transform"
+                >
+                  Direct messages & reel edits
+                </p>
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="p-3 rounded-xl bg-black border border-white/20 font-mono text-sm text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)] will-change-transform"
+                >
                   rychr.prod
                 </div>
               </div>
 
               <div className="relative z-10 mt-6 flex gap-2">
                 <a
+                  data-s3d="button"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.055"
+                  data-s3d-tilt="8.5"
                   href="https://instagram.com/rychr.prod"
                   target="_blank"
                   rel="noreferrer"
-                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible active:scale-[0.98]"
+                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-[background-color,box-shadow] cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible will-change-transform"
                 >
                   <AnimatedGeminiBorder
                     preset="instagram"
@@ -1329,8 +1875,13 @@ export default function App() {
                   </span>
                 </a>
                 <button
+                  data-s3d="button"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.1"
+                  data-s3d-tilt="10"
                   onClick={() => handleCopy('rychr.prod', 'instagram')}
-                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-white/40 transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95"
+                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-white/40 transition-[background-color,border-color,box-shadow] cursor-pointer hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] will-change-transform"
                   title="Copy Instagram Handle"
                 >
                   {copiedSocial === 'instagram' ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white/70" />}
@@ -1339,10 +1890,14 @@ export default function App() {
             </div>
           </RevealOnScroll>
 
-          {/* Gmail: rychr.edits@gmail.com (Monochromatic Pure White & Silver) */}
+          {/* Gmail: rychr.edits@gmail.com */}
           <RevealOnScroll delay={240}>
-            <div className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group">
-              {/* Animated Gemini Outline on Card */}
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.95"
+              data-s3d-global-tilt="3.4"
+              className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
+            >
               <AnimatedGeminiBorder
                 preset="gmail"
                 borderRadius="rounded-3xl"
@@ -1354,22 +1909,51 @@ export default function App() {
               />
 
               <div className="relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] group-hover:scale-105 transition-transform">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.1"
+                  className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/20 flex items-center justify-center text-white mb-5 shadow-[0_0_20px_rgba(255,255,255,0.12)] will-change-transform"
+                >
                   <Mail className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="text-lg font-mazzard text-white mb-1">Gmail</h4>
-                <p className="text-xs text-white/50 mb-4">Official business inquiries</p>
-                <div className="p-3 rounded-xl bg-black border border-white/20 font-mono text-xs text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)]">
+                <h4
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="inline-block text-lg font-mazzard text-white mb-1 will-change-transform"
+                >
+                  Gmail
+                </h4>
+                <p
+                  data-s3d="global"
+                  data-s3d-depth="0.3"
+                  data-s3d-global-tilt="0.7"
+                  className="text-xs text-white/50 mb-4 will-change-transform"
+                >
+                  Official business inquiries
+                </p>
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="p-3 rounded-xl bg-black border border-white/20 font-mono text-xs text-white break-all select-all font-semibold shadow-[inset_0_1px_12px_rgba(255,255,255,0.06)] will-change-transform"
+                >
                   rychr.edits@gmail.com
                 </div>
               </div>
 
               <div className="relative z-10 mt-6 flex gap-2">
                 <a
+                  data-s3d="button"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.055"
+                  data-s3d-tilt="8.5"
                   href="https://mail.google.com/mail/?view=cm&fs=1&to=rychr.edits@gmail.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible active:scale-[0.98]"
+                  className="relative flex-1 py-3 px-4 rounded-xl bg-black/90 hover:bg-black text-white font-mazzard text-xs font-semibold flex items-center justify-center gap-2 transition-[background-color,box-shadow] cursor-pointer shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.45)] group/btn overflow-visible will-change-transform"
                 >
                   <AnimatedGeminiBorder
                     preset="gmail"
@@ -1386,8 +1970,13 @@ export default function App() {
                   </span>
                 </a>
                 <button
+                  data-s3d="button"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.1"
+                  data-s3d-tilt="10"
                   onClick={() => handleCopy('rychr.edits@gmail.com', 'email')}
-                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-white/40 transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-95"
+                  className="relative p-3 rounded-xl bg-black/85 hover:bg-black text-white border border-white/15 hover:border-white/40 transition-[background-color,border-color,box-shadow] cursor-pointer hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] will-change-transform"
                   title="Copy Email"
                 >
                   {copiedSocial === 'email' ? <Check className="w-4 h-4 text-white" /> : <Copy className="w-4 h-4 text-white/70" />}
@@ -1399,7 +1988,14 @@ export default function App() {
 
         {/* WORKING ON-SITE INQUIRY FORM */}
         <RevealOnScroll delay={140} className="mb-14">
-          <div className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible">
+          <div
+            data-s3d="card"
+            data-s3d-depth="0.7"
+            data-s3d-global-tilt="2.4"
+            data-s3d-pause-on-input="true"
+            data-s3d-paused={isDropdownOpen ? 'true' : undefined}
+            className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible will-change-transform"
+          >
             {/* Animated Gemini Glowing White Halo */}
             <AnimatedGeminiBorder
               preset="gemini"
@@ -1413,7 +2009,12 @@ export default function App() {
 
             <div className="relative z-10">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10 mb-7">
-                <div>
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="will-change-transform"
+                >
                   <div className="text-xs uppercase font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-1">
                     Send Direct Message
                   </div>
@@ -1421,7 +2022,12 @@ export default function App() {
                     Project Inquiry & Booking
                   </h3>
                 </div>
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-mono text-white/80 shrink-0 self-start sm:self-auto">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.4"
+                  data-s3d-global-tilt="0.9"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-mono text-white/80 shrink-0 self-start sm:self-auto will-change-transform"
+                >
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
                   <span>Direct to Inbox • 24h Response</span>
                 </div>
@@ -1441,8 +2047,13 @@ export default function App() {
                   </p>
                   <button
                     type="button"
+                    data-s3d="button"
+                    data-s3d-depth="0.45"
+                    data-s3d-global-tilt="1.0"
+                    data-s3d-scale="1.06"
+                    data-s3d-tilt="8.5"
                     onClick={() => setFormStatus('idle')}
-                    className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition-all cursor-pointer shadow-md"
+                    className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition-colors cursor-pointer shadow-md will-change-transform"
                   >
                     Send Another Message
                   </button>
@@ -1463,8 +2074,13 @@ export default function App() {
                   </p>
                   <button
                     type="button"
+                    data-s3d="button"
+                    data-s3d-depth="0.45"
+                    data-s3d-global-tilt="1.0"
+                    data-s3d-scale="1.06"
+                    data-s3d-tilt="8.5"
                     onClick={() => setFormStatus('idle')}
-                    className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition-all cursor-pointer shadow-md"
+                    className="px-6 py-2.5 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition-colors cursor-pointer shadow-md will-change-transform"
                   >
                     Back to Form
                   </button>
@@ -1485,7 +2101,12 @@ export default function App() {
                         href="https://mail.google.com/mail/?view=cm&fs=1&to=rychr.edits@gmail.com"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition-all shrink-0"
+                        data-s3d="button"
+                        data-s3d-depth="0.45"
+                        data-s3d-global-tilt="1.0"
+                        data-s3d-scale="1.06"
+                        data-s3d-tilt="8.5"
+                        className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-semibold hover:bg-neutral-200 transition-colors shrink-0 will-change-transform"
                       >
                         Open Gmail
                       </a>
@@ -1493,7 +2114,13 @@ export default function App() {
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
+                    <div
+                      data-s3d="global"
+                      data-s3d-depth="0.3"
+                      data-s3d-global-tilt="0.7"
+                      data-s3d-pause-on-input="true"
+                      className="will-change-transform"
+                    >
                       <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
                         Your Name / Channel Name <span className="text-white">*</span>
                       </label>
@@ -1503,11 +2130,17 @@ export default function App() {
                         placeholder="e.g. Liam | Apex Creator"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all"
+                        className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-colors"
                       />
                     </div>
 
-                    <div>
+                    <div
+                      data-s3d="global"
+                      data-s3d-depth="0.3"
+                      data-s3d-global-tilt="0.7"
+                      data-s3d-pause-on-input="true"
+                      className="will-change-transform"
+                    >
                       <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
                         Your Email or Discord Tag <span className="text-white">*</span>
                       </label>
@@ -1517,7 +2150,7 @@ export default function App() {
                         placeholder="e.g. you@creator.com or @discord_tag"
                         value={formData.contact}
                         onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                        className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all"
+                        className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-colors"
                       />
                     </div>
                   </div>
@@ -1534,10 +2167,16 @@ export default function App() {
                     {/* Custom Animated Trigger Button */}
                     <button
                       type="button"
+                      data-s3d="button"
+                      data-s3d-depth="0.35"
+                      data-s3d-global-tilt="0.8"
+                      data-s3d-scale="1.022"
+                      data-s3d-tilt="4.5"
+                      data-s3d-paused={isDropdownOpen ? 'true' : undefined}
                       onClick={() => setIsDropdownOpen((prev) => !prev)}
                       aria-expanded={isDropdownOpen}
                       aria-haspopup="listbox"
-                      className={`w-full px-4 py-3.5 rounded-xl bg-black border text-left text-sm text-white flex items-center justify-between transition-all duration-300 cursor-pointer shadow-inner ${
+                      className={`w-full px-4 py-3.5 rounded-xl bg-black border text-left text-sm text-white flex items-center justify-between transition-[border-color,background-color,box-shadow] duration-300 cursor-pointer shadow-inner will-change-transform ${
                         isDropdownOpen
                           ? 'border-white ring-1 ring-white/50 shadow-[0_0_25px_rgba(255,255,255,0.2)] bg-neutral-950'
                           : 'border-white/20 hover:border-white/40 hover:bg-neutral-950/80'
@@ -1617,7 +2256,13 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div>
+                  <div
+                    data-s3d="global"
+                    data-s3d-depth="0.3"
+                    data-s3d-global-tilt="0.7"
+                    data-s3d-pause-on-input="true"
+                    className="will-change-transform"
+                  >
                     <label className="block text-xs font-mono uppercase tracking-wider text-white/70 mb-2">
                       Project Details, Footage Links & Deadlines <span className="text-white">*</span>
                     </label>
@@ -1627,15 +2272,20 @@ export default function App() {
                       placeholder="Share your raw footage length, turnaround deadline, channel link, and any reference editing styles you want me to match..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-all resize-none font-normal"
+                      className="w-full px-4 py-3.5 rounded-xl bg-black border border-white/20 text-white placeholder-white/30 text-sm focus:outline-none focus:border-white focus:ring-1 focus:ring-white/40 transition-colors resize-none font-normal"
                     />
                   </div>
 
                   <div className="pt-2">
                     <button
                       type="submit"
+                      data-s3d="button"
+                      data-s3d-depth="0.4"
+                      data-s3d-global-tilt="0.9"
+                      data-s3d-scale="1.025"
+                      data-s3d-tilt="5.5"
                       disabled={formStatus === 'submitting'}
-                      className="relative w-full py-4 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-sm transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:shadow-[0_0_45px_rgba(255,255,255,0.5)] cursor-pointer overflow-visible active:scale-[0.99] group/btn disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="relative w-full py-4 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-sm transition-[background-color,box-shadow] duration-300 shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:shadow-[0_0_45px_rgba(255,255,255,0.5)] cursor-pointer overflow-visible group/btn disabled:opacity-60 disabled:cursor-not-allowed will-change-transform"
                     >
                       <AnimatedGeminiBorder
                         preset="gemini"
@@ -1669,7 +2319,12 @@ export default function App() {
 
         {/* ENHANCED PROMINENT ACCEPTED PAYMENTS CARD */}
         <RevealOnScroll delay={150}>
-          <div className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible">
+          <div
+            data-s3d="card"
+            data-s3d-depth="0.75"
+            data-s3d-global-tilt="2.5"
+            className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible will-change-transform"
+          >
             {/* Animated Gemini Glowing White Halo */}
             <AnimatedGeminiBorder
               preset="gemini"
@@ -1683,10 +2338,20 @@ export default function App() {
 
             <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-white/10">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/25 flex items-center justify-center text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] shrink-0">
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="w-12 h-12 rounded-2xl bg-white/10 border border-white/25 flex items-center justify-center text-white shadow-[0_0_20px_rgba(255,255,255,0.2)] shrink-0 will-change-transform"
+                >
                   <CreditCard className="w-6 h-6 text-white" />
                 </div>
-                <div>
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="will-change-transform"
+                >
                   <div className="text-xs uppercase font-mono tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400">
                     Payment Terms & Invoicing
                   </div>
@@ -1696,7 +2361,12 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-mono text-white/90 shadow-sm shrink-0">
+              <div
+                data-s3d="global"
+                data-s3d-depth="0.35"
+                data-s3d-global-tilt="0.8"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-mono text-white/90 shadow-sm shrink-0 will-change-transform"
+              >
                 <ShieldCheck className="w-4 h-4 text-white" />
                 <span>Verified Creator Invoicing</span>
               </div>
@@ -1705,7 +2375,12 @@ export default function App() {
             {/* Payment Method Cards */}
             <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
               {/* Method 1: Direct Bank Transfer */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors">
+              <div
+                data-s3d="card"
+                data-s3d-depth="0.45"
+                data-s3d-global-tilt="1.8"
+                className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors will-change-transform"
+              >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg font-mazzard font-bold text-white">Direct Bank Transfer</span>
                   <span className="px-2.5 py-1 rounded-md bg-white/10 text-[11px] font-mono text-white/85 border border-white/15">
@@ -1718,7 +2393,12 @@ export default function App() {
               </div>
 
               {/* Method 2: UPI */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors">
+              <div
+                data-s3d="card"
+                data-s3d-depth="0.45"
+                data-s3d-global-tilt="1.8"
+                className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors will-change-transform"
+              >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg font-mazzard font-bold text-white">UPI (Instant)</span>
                   <span className="px-2.5 py-1 rounded-md bg-white/10 text-[11px] font-mono text-white/85 border border-white/15">
@@ -1733,14 +2413,24 @@ export default function App() {
 
             {/* Bottom Support Footnote */}
             <div className="relative z-10 mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-white/60">
-              <p>
+              <p
+                data-s3d="global"
+                data-s3d-depth="0.3"
+                data-s3d-global-tilt="0.7"
+                className="will-change-transform"
+              >
                 Need custom milestones, PayPal, international escrow, or alternative payment options? Let's discuss directly.
               </p>
               <a
                 href="https://mail.google.com/mail/?view=cm&fs=1&to=rychr.edits@gmail.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white hover:underline font-mono text-xs font-semibold shrink-0"
+                data-s3d="button"
+                data-s3d-depth="0.45"
+                data-s3d-global-tilt="1.0"
+                data-s3d-scale="1.06"
+                data-s3d-tilt="9"
+                className="inline-block text-white hover:underline font-mono text-xs font-semibold shrink-0 px-1 py-0.5 will-change-transform"
               >
                 rychr.edits@gmail.com →
               </a>
@@ -1752,7 +2442,12 @@ export default function App() {
       {/* FOOTER */}
       <footer className="relative py-12 px-6 border-t border-white/10 z-20 text-center text-xs text-white/40 font-mono">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.6"
+            data-s3d-global-tilt="1.2"
+            className="flex items-center gap-2.5 px-2 py-1 will-change-transform"
+          >
             <div className="w-5 h-5 rounded-md overflow-hidden bg-black border border-white/20 shrink-0 flex items-center justify-center">
               <video
                 src="/assets/aistudio/export_2_-_15_fps_dc6d6217.mp4"
@@ -1770,15 +2465,82 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-6 font-medium text-xs text-white/70">
-            <a href="#work" className="hover:text-white transition-colors">Work</a>
-            <a href="#shorts" className="hover:text-white transition-colors">Shorts</a>
-            <a href="#whyme" className="hover:text-white transition-colors">Why me</a>
-            <a href="#about" className="hover:text-white transition-colors">About</a>
-            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
-            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+            <a
+              href="#work"
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
+              Work
+            </a>
+            <a
+              href="#shorts"
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
+              Shorts
+            </a>
+            <a
+              href="#whyme"
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
+              Why me
+            </a>
+            <a
+              href="#about"
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
+              About
+            </a>
+            <a
+              href="#faq"
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
+              FAQ
+            </a>
+            <a
+              href="#contact"
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.1"
+              data-s3d-tilt="10"
+              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+            >
+              Contact
+            </a>
           </div>
 
-          <span>© {new Date().getFullYear()} <span className="font-brand-rychr font-bold text-white/70">Rychr</span>. All rights reserved.</span>
+          <span
+            data-s3d="global"
+            data-s3d-depth="0.6"
+            data-s3d-global-tilt="1.2"
+            className="inline-block px-2 py-1 will-change-transform"
+          >
+            © {new Date().getFullYear()} <span className="font-brand-rychr font-bold text-white/70">Rychr</span>. All rights reserved.
+          </span>
         </div>
       </footer>
 
@@ -1802,16 +2564,26 @@ export default function App() {
           >
             {/* Close Button positioned outside preview next to top-right corner */}
             <button
+              data-s3d="button"
+              data-s3d-depth="0.6"
+              data-s3d-global-tilt="1.2"
+              data-s3d-scale="1.14"
+              data-s3d-tilt="12"
               onClick={() => setActiveVideoModal(null)}
               aria-label="Close preview"
               title="Close (Esc)"
-              className="absolute -top-3.5 -right-3.5 md:-top-5 md:-right-5 z-50 w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#0a0a0a] hover:bg-white text-white hover:text-black border border-white/25 hover:border-white shadow-[0_0_25px_rgba(0,0,0,0.9)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110 active:scale-95"
+              className="absolute -top-3.5 -right-3.5 md:-top-5 md:-right-5 z-50 w-9 h-9 md:w-11 md:h-11 rounded-full bg-[#0a0a0a] hover:bg-white text-white hover:text-black border border-white/25 hover:border-white shadow-[0_0_25px_rgba(0,0,0,0.9)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] flex items-center justify-center transition-[background-color,color,border-color,box-shadow] duration-200 cursor-pointer will-change-transform"
             >
               <X className="w-4 h-4 md:w-5 md:h-5 stroke-[2.2]" />
             </button>
 
             {/* Inner Modal Card */}
-            <div className="relative w-full rounded-3xl p-5 md:p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden">
+            <div
+              data-s3d="card"
+              data-s3d-depth="0.65"
+              data-s3d-global-tilt="2.2"
+              className="relative w-full rounded-3xl p-5 md:p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden will-change-transform"
+            >
               {(() => {
                 const embed = getVideoEmbedInfo(activeVideoModal.videoUrl);
                 const aspectClass = activeVideoModal.format.includes('9:16')
@@ -1871,7 +2643,12 @@ export default function App() {
               })()}
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-white/10">
-                <div>
+                <div
+                  data-s3d="global"
+                  data-s3d-depth="0.35"
+                  data-s3d-global-tilt="0.8"
+                  className="will-change-transform"
+                >
                   <h3 className="text-xl font-heading font-bold text-white">
                     {activeVideoModal.title}
                   </h3>
@@ -1879,8 +2656,13 @@ export default function App() {
 
                 <a
                   href="#contact"
+                  data-s3d="button"
+                  data-s3d-depth="0.45"
+                  data-s3d-global-tilt="1.0"
+                  data-s3d-scale="1.07"
+                  data-s3d-tilt="9.5"
                   onClick={() => setActiveVideoModal(null)}
-                  className="relative px-6 py-3 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-xs transition-all shrink-0 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.5)] overflow-visible group/btn active:scale-95"
+                  className="relative inline-block px-6 py-3 rounded-xl bg-black/90 hover:bg-black text-white font-semibold text-xs transition-[background-color,box-shadow] shrink-0 shadow-[0_0_25px_rgba(255,255,255,0.25)] hover:shadow-[0_0_35px_rgba(255,255,255,0.5)] overflow-visible group/btn will-change-transform"
                 >
                   <AnimatedGeminiBorder
                     preset="gemini"

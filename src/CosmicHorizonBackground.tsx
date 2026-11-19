@@ -28,6 +28,9 @@ interface ShootingStar {
 
 export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = ({ scrollY }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const starsWrapRef = useRef<HTMLDivElement>(null);
+  const topHorizonRef = useRef<HTMLDivElement>(null);
+  const bottomHorizonRef = useRef<HTMLDivElement>(null);
 
   // Compute scroll progress
   const totalScrollHeight = typeof document !== 'undefined'
@@ -35,11 +38,30 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
     : 3200;
   const progress = Math.min(1.0, Math.max(0, scrollY / totalScrollHeight));
 
+  const scrollYRef = useRef(scrollY);
+  scrollYRef.current = scrollY;
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    const targetMouse = { x: 0, y: 0 };
+    const smoothMouse = { x: 0, y: 0 };
+    const onPointerMove = (e: PointerEvent) => {
+      const vw = Math.max(1, window.innerWidth);
+      const vh = Math.max(1, window.innerHeight);
+      targetMouse.x = Math.max(-1, Math.min(1, (e.clientX / vw) * 2 - 1));
+      targetMouse.y = Math.max(-1, Math.min(1, (e.clientY / vh) * 2 - 1));
+    };
+    const onPointerReset = () => {
+      targetMouse.x = 0;
+      targetMouse.y = 0;
+    };
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    document.addEventListener('mouseleave', onPointerReset);
+    window.addEventListener('blur', onPointerReset);
 
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = Math.round(window.innerHeight * 1.5));
@@ -107,6 +129,35 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
       if (lastTime === 0) lastTime = timeSec;
       const dt = Math.min(0.1, timeSec - lastTime);
       lastTime = timeSec;
+
+      // Ultra-slow deep-space 3D parallax & horizon sphere drift
+      const spaceAlpha = 1 - Math.exp(-1.45 * dt);
+      smoothMouse.x += (targetMouse.x - smoothMouse.x) * spaceAlpha;
+      smoothMouse.y += (targetMouse.y - smoothMouse.y) * spaceAlpha;
+      const mx = smoothMouse.x;
+      const my = smoothMouse.y;
+      const sy = scrollYRef.current;
+
+      if (starsWrapRef.current) {
+        starsWrapRef.current.style.transform = `translate3d(${(-mx * 22).toFixed(2)}px, ${(
+          -sy * 0.14 -
+          my * 18
+        ).toFixed(2)}px, 0) scale(1.04)`;
+      }
+      if (topHorizonRef.current) {
+        topHorizonRef.current.style.transform = `translate3d(calc(-50% + ${(mx * 32).toFixed(
+          2
+        )}px), ${(-sy * 0.45 + my * 20).toFixed(2)}px, 0) perspective(1600px) rotateX(${(
+          -my * 2.0
+        ).toFixed(2)}deg) rotateY(${(mx * 2.4).toFixed(2)}deg)`;
+      }
+      if (bottomHorizonRef.current) {
+        bottomHorizonRef.current.style.transform = `translate3d(calc(-50% + ${(mx * 32).toFixed(
+          2
+        )}px), ${(my * 20).toFixed(2)}px, 0) perspective(1600px) rotateX(${(-my * 2.0).toFixed(
+          2
+        )}deg) rotateY(${(mx * 2.4).toFixed(2)}deg)`;
+      }
 
       // 1. Draw static twinkling stars
       for (let i = 0; i < stars.length; i++) {
@@ -183,29 +234,30 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('mouseleave', onPointerReset);
+      window.removeEventListener('blur', onPointerReset);
     };
   }, []);
 
   return (
     <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-black">
-      {/* 1. Twinkling Stars moving VERY SLIGHTLY with scroll (scrollY * 0.14) */}
+      {/* 1. Twinkling Stars moving VERY SLIGHTLY with scroll & slow 3D mouse depth */}
       <div
+        ref={starsWrapRef}
         className="absolute inset-0 w-full h-[150vh] will-change-transform"
-        style={{
-          transform: `translate3d(0, ${-scrollY * 0.14}px, 0)`,
-        }}
       >
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
       </div>
 
       {/* 2. TOP OF PLANET (Peak moved to the LEFT: Q 700,-100, pronounced sweeping slanted curve) */}
       <div
-        className="absolute left-1/2 pointer-events-none transition-opacity duration-500"
+        ref={topHorizonRef}
+        className="absolute left-1/2 pointer-events-none transition-opacity duration-500 will-change-transform"
         style={{
           width: '240vw',
           maxWidth: '4800px',
           top: '72vh',
-          transform: `translate3d(-50%, ${-scrollY * 0.45}px, 0)`,
           // Fades out completely by progress 0.25 so it never overlaps with the bottom curve
           opacity: Math.max(0, 1 - progress * 3.6),
         }}
@@ -282,12 +334,12 @@ export const CosmicHorizonBackground: React.FC<CosmicHorizonBackgroundProps> = (
 
       {/* 3. UNDERSIDE OF PLANET (Properly separated: emerges after top curve departs, sits comfortably low) */}
       <div
-        className="absolute left-1/2 pointer-events-none transition-opacity duration-700"
+        ref={bottomHorizonRef}
+        className="absolute left-1/2 pointer-events-none transition-opacity duration-700 will-change-transform"
         style={{
           width: '240vw',
           maxWidth: '4800px',
           bottom: `${-250 + Math.pow(Math.max(0, (progress - 0.28) / 0.72), 1.1) * 260}px`,
-          transform: 'translate3d(-50%, 0, 0)',
           opacity: Math.min(1.0, Math.max(0, (progress - 0.28) * 2.2)),
         }}
       >
