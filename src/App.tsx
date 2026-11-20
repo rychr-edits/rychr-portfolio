@@ -29,6 +29,7 @@ import {
   CheckCircle2,
   AlertCircle,
   X,
+  Menu,
 } from 'lucide-react';
 
 interface WorkProject {
@@ -267,6 +268,7 @@ export default function App() {
     message: '',
   });
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Mouse-reactive & scroll-driven light state for the #about 3D spotlight stage (zero React re-renders)
@@ -328,6 +330,8 @@ export default function App() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         setIsDropdownOpen(false);
+        setIsMobileNavOpen(false);
+        setActiveVideoModal(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -411,20 +415,27 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-black text-white font-['Inter',sans-serif] selection:bg-white/20 selection:text-white overflow-x-hidden">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2.5 focus:rounded-xl focus:bg-white focus:text-black focus:font-semibold focus:text-sm focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-white"
+      >
+        Skip to main content
+      </a>
+
       {/* PROCEDURAL PLANET HORIZON BACKGROUND (Top horizon + Underside on scroll to bottom + Glowing Cursor with Stars) */}
       <CosmicHorizonBackground scrollY={scrollY} />
       <Spatial3DEngine />
 
       {/* PERSISTENT HEADER NAVBAR */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 md:px-10 py-5 transition-colors duration-300">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-10 py-4 sm:py-5 transition-colors duration-300">
         <div
           data-s3d="bar"
           data-s3d-depth="0.45"
           data-s3d-global-tilt="1.1"
-          data-s3d-scale="1.022"
+          data-s3d-scale="1.024"
           data-s3d-tilt="7.5"
           data-s3d-shift="5"
-          className="relative max-w-6xl mx-auto flex items-center justify-between px-6 py-3.5 rounded-2xl bg-black/85 backdrop-blur-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.9)] will-change-transform"
+          className="relative max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 py-4 rounded-2xl bg-black/88 backdrop-blur-xl border border-white/15 shadow-[0_6px_36px_rgba(0,0,0,0.92)] will-change-transform"
         >
           {/* Calm, slow subtle dual parallel glowing border covering all sides of the rounded tab */}
           <CalmNavbarBorder />
@@ -432,14 +443,15 @@ export default function App() {
           {/* Top Left: Animated Crescent Moon & Brand Video Playing as GIF (15 FPS, Monochromatic) */}
           <a
             href="#"
+            aria-label="Rychr — back to top"
             data-s3d="button"
             data-s3d-depth="0.55"
             data-s3d-global-tilt="1.0"
             data-s3d-scale="1.06"
             data-s3d-tilt="9"
-            className="inline-flex items-center gap-3 group will-change-transform"
+            className="inline-flex items-center gap-3.5 py-1 px-1.5 rounded-xl group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 will-change-transform"
           >
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-white/20 bg-black flex items-center justify-center shadow-[0_0_18px_rgba(255,255,255,0.25)] group-hover:shadow-[0_0_26px_rgba(255,255,255,0.45)] group-hover:border-white/50 transition-[border-color,box-shadow] shrink-0">
+            <div className="relative w-11 h-11 rounded-xl overflow-hidden border border-white/25 bg-black flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.28)] group-hover:shadow-[0_0_28px_rgba(255,255,255,0.5)] group-hover:border-white/55 transition-[border-color,box-shadow] shrink-0">
               <video
                 src="/assets/aistudio/export_2_-_15_fps_dc6d6217.mp4"
                 poster="/assets/aistudio/image_5a1c3c4a.png"
@@ -451,13 +463,16 @@ export default function App() {
                 className="w-full h-full object-cover scale-[1.03] grayscale contrast-125 pointer-events-none select-none"
               />
             </div>
-            <span className="font-brand-rychr text-xl tracking-tight text-white group-hover:text-white/80 transition-colors">
+            <span className="font-brand-rychr text-2xl tracking-tight text-white group-hover:text-white/85 transition-colors">
               Rychr
             </span>
           </a>
 
           {/* Center Tabs: Work, Shorts, Why me, About, FAQ */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
+          <nav
+            aria-label="Primary navigation"
+            className="hidden md:flex items-center gap-1.5 lg:gap-3 text-[15px] lg:text-base font-medium text-white/80"
+          >
             <a
               href="#work"
               data-s3d="button"
@@ -465,7 +480,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               Work
             </a>
@@ -476,7 +491,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               Shorts
             </a>
@@ -487,7 +502,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               Why me
             </a>
@@ -498,7 +513,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               About
             </a>
@@ -509,14 +524,14 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-block px-1 py-0.5 hover:text-white transition-colors will-change-transform"
+              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               FAQ
             </a>
           </nav>
 
-          {/* Right Action: Let's Talk CTA with Glowing White Outline */}
-          <div className="flex items-center gap-3">
+          {/* Right Action: Let's Talk CTA + Accessible Mobile Menu Toggle */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <a
               href="#contact"
               data-s3d="button"
@@ -524,7 +539,7 @@ export default function App() {
               data-s3d-global-tilt="1.2"
               data-s3d-scale="1.07"
               data-s3d-tilt="9.5"
-              className="relative inline-flex px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-[background-color,box-shadow,color] cursor-pointer overflow-visible group/btn will-change-transform"
+              className="relative inline-flex items-center min-h-[44px] px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-[15px] font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(255,255,255,0.28)] hover:shadow-[0_0_32px_rgba(255,255,255,0.52)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 transition-[background-color,box-shadow,color] cursor-pointer overflow-visible group/btn will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -535,16 +550,60 @@ export default function App() {
                 speedMs={12000}
                 angleOffset={60}
               />
-              <span className="relative z-10 group-hover/btn:text-white/90 transition-colors">
+              <span className="relative z-10 group-hover/btn:text-white/95 transition-colors">
                 Let's Talk
               </span>
             </a>
+
+            <button
+              type="button"
+              data-s3d="button"
+              data-s3d-depth="0.55"
+              data-s3d-global-tilt="1.0"
+              data-s3d-scale="1.08"
+              data-s3d-tilt="9"
+              onClick={() => setIsMobileNavOpen((prev) => !prev)}
+              aria-expanded={isMobileNavOpen}
+              aria-controls="mobile-primary-nav"
+              aria-label={isMobileNavOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              className="md:hidden w-11 h-11 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/20 text-white flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 transition-[background-color,border-color] cursor-pointer will-change-transform"
+            >
+              {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Accessible Mobile Navigation Drawer (< md) */}
+        {isMobileNavOpen && (
+          <nav
+            id="mobile-primary-nav"
+            aria-label="Mobile navigation"
+            className="md:hidden max-w-7xl mx-auto mt-3 p-3 rounded-2xl bg-[#070707]/95 backdrop-blur-2xl border border-white/15 shadow-[0_18px_50px_rgba(0,0,0,0.92)] flex flex-col gap-1"
+          >
+            {[
+              { href: '#work', label: 'Work' },
+              { href: '#shorts', label: 'Shorts' },
+              { href: '#whyme', label: 'Why me' },
+              { href: '#about', label: 'About' },
+              { href: '#faq', label: 'FAQ' },
+              { href: '#contact', label: "Let's Talk" },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsMobileNavOpen(false)}
+                className="flex items-center justify-between min-h-[48px] px-4 py-3 rounded-xl text-base font-medium text-white/85 hover:text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 transition-[color,background-color]"
+              >
+                <span>{item.label}</span>
+              </a>
+            ))}
+          </nav>
+        )}
       </header>
 
+      <main id="main-content" className="focus:outline-none">
       {/* HERO SECTION (Text floats cleanly above the planet horizon; description is NEVER hidden!) */}
-      <section className="relative min-h-[95vh] flex flex-col justify-center items-center px-6 pt-32 pb-20 z-20 pointer-events-auto">
+      <section className="relative min-h-[95vh] flex flex-col justify-center items-center px-6 pt-36 md:pt-40 pb-20 z-20 pointer-events-auto">
         <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
           {/* Status Badge in signature crisp style with Pure White rim */}
           <div
@@ -675,13 +734,16 @@ export default function App() {
           {/* TOP ROW: Card 01 (1:1) on left + Card 02 (16:9) on right */}
           <div className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-end md:pr-8 lg:pr-14 gap-6 lg:gap-8 w-full">
             {/* Card 01: 1:1 Square Preview */}
-            <RevealOnScroll className="w-full md:w-[38%] max-w-[440px] shrink-0" delay={0}>
+            <RevealOnScroll className="relative hover:z-30 w-full md:w-[38%] max-w-[440px] shrink-0" delay={0}>
               <div
                 data-s3d="card"
                 data-s3d-depth="0.95"
                 data-s3d-global-tilt="3.4"
+                data-s3d-scale="1.045"
+                data-s3d-tilt="8.5"
+                data-s3d-shift="4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[0])}
-                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[0].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
+                className={`group relative hover:z-30 aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[0].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -769,13 +831,16 @@ export default function App() {
             </RevealOnScroll>
 
             {/* Card 02: 16:9 Widescreen Preview */}
-            <RevealOnScroll className="w-full md:w-[58%] max-w-[680px]" delay={120}>
+            <RevealOnScroll className="relative hover:z-30 w-full md:w-[58%] max-w-[680px]" delay={120}>
               <div
                 data-s3d="card"
                 data-s3d-depth="0.95"
                 data-s3d-global-tilt="3.4"
+                data-s3d-scale="1.045"
+                data-s3d-tilt="8.5"
+                data-s3d-shift="4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[1])}
-                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[1].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
+                className={`group relative hover:z-30 aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[1].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -841,13 +906,16 @@ export default function App() {
           {/* BOTTOM ROW: Card 03 (16:9) on left + Card 04 (1:1) on right */}
           <div className="flex flex-col md:flex-row items-center md:items-center justify-center md:justify-start md:pl-8 lg:pl-14 gap-6 lg:gap-8 w-full">
             {/* Card 03: 16:9 Widescreen Preview */}
-            <RevealOnScroll className="w-full md:w-[58%] max-w-[680px]" delay={240}>
+            <RevealOnScroll className="relative hover:z-30 w-full md:w-[58%] max-w-[680px]" delay={240}>
               <div
                 data-s3d="card"
                 data-s3d-depth="0.95"
                 data-s3d-global-tilt="3.4"
+                data-s3d-scale="1.045"
+                data-s3d-tilt="8.5"
+                data-s3d-shift="4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[2])}
-                className={`group relative aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[2].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
+                className={`group relative hover:z-30 aspect-video w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[2].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -910,13 +978,16 @@ export default function App() {
             </RevealOnScroll>
 
             {/* Card 04: 1:1 Square Preview */}
-            <RevealOnScroll className="w-full md:w-[38%] max-w-[440px] shrink-0" delay={360}>
+            <RevealOnScroll className="relative hover:z-30 w-full md:w-[38%] max-w-[440px] shrink-0" delay={360}>
               <div
                 data-s3d="card"
                 data-s3d-depth="0.95"
                 data-s3d-global-tilt="3.4"
+                data-s3d-scale="1.045"
+                data-s3d-tilt="8.5"
+                data-s3d-shift="4"
                 onClick={() => setActiveVideoModal(WORK_PROJECTS[3])}
-                className={`group relative aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[3].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
+                className={`group relative hover:z-30 aspect-square w-full rounded-2xl md:rounded-3xl bg-gradient-to-br ${WORK_PROJECTS[3].gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 {/* Gemini Rotating Border Halo */}
                 <AnimatedGeminiBorder
@@ -1021,11 +1092,14 @@ export default function App() {
         {/* 3 Staggered Phone-style Vertical Preview Frames with No Subtitles (Only Preview) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-4 pb-12">
           {SHORTS_PROJECTS.map((short) => (
-            <RevealOnScroll key={short.id} delay={short.delay} className={short.stagger}>
+            <RevealOnScroll key={short.id} delay={short.delay} className={`relative hover:z-30 ${short.stagger}`}>
               <div
                 data-s3d="card"
                 data-s3d-depth="1.0"
                 data-s3d-global-tilt="3.6"
+                data-s3d-scale="1.045"
+                data-s3d-tilt="9"
+                data-s3d-shift="4"
                 onClick={() =>
                   setActiveVideoModal({
                     id: short.id,
@@ -1045,7 +1119,7 @@ export default function App() {
                     thumbnailUrl: (short as any).thumbnailUrl,
                   })
                 }
-                className={`group relative aspect-[9/16] w-full rounded-2xl md:rounded-3xl bg-gradient-to-b ${short.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
+                className={`group relative hover:z-30 aspect-[9/16] w-full rounded-2xl md:rounded-3xl bg-gradient-to-b ${short.gradient} border border-white/10 hover:border-transparent flex items-center justify-center p-6 shadow-[0_0_40px_rgba(0,0,0,0.8)] hover:shadow-[0_0_60px_rgba(255,255,255,0.22)] transition-[border-color,box-shadow] duration-500 cursor-pointer overflow-visible will-change-transform`}
               >
                 <AnimatedGeminiBorder
                   preset={short.preset}
@@ -1141,12 +1215,15 @@ export default function App() {
 
         {/* 6 Core Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <RevealOnScroll delay={0}>
+          <RevealOnScroll delay={0} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              data-s3d-scale="1.095"
+              data-s3d-tilt="10"
+              data-s3d-shift="5"
+              className="group relative hover:z-30 rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_55px_rgba(255,255,255,0.18)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="gemini"
@@ -1187,12 +1264,15 @@ export default function App() {
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll delay={100}>
+          <RevealOnScroll delay={100} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              data-s3d-scale="1.095"
+              data-s3d-tilt="10"
+              data-s3d-shift="5"
+              className="group relative hover:z-30 rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_55px_rgba(255,255,255,0.18)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="discord"
@@ -1233,12 +1313,15 @@ export default function App() {
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll delay={200}>
+          <RevealOnScroll delay={200} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              data-s3d-scale="1.095"
+              data-s3d-tilt="10"
+              data-s3d-shift="5"
+              className="group relative hover:z-30 rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_55px_rgba(255,255,255,0.18)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -1279,12 +1362,15 @@ export default function App() {
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll delay={300}>
+          <RevealOnScroll delay={300} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              data-s3d-scale="1.095"
+              data-s3d-tilt="10"
+              data-s3d-shift="5"
+              className="group relative hover:z-30 rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_55px_rgba(255,255,255,0.18)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="gmail"
@@ -1325,12 +1411,15 @@ export default function App() {
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll delay={400}>
+          <RevealOnScroll delay={400} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              data-s3d-scale="1.095"
+              data-s3d-tilt="10"
+              data-s3d-shift="5"
+              className="group relative hover:z-30 rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_55px_rgba(255,255,255,0.18)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="cyan-purple"
@@ -1371,12 +1460,15 @@ export default function App() {
             </div>
           </RevealOnScroll>
 
-          <RevealOnScroll delay={500}>
+          <RevealOnScroll delay={500} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="group relative rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+              data-s3d-scale="1.095"
+              data-s3d-tilt="10"
+              data-s3d-shift="5"
+              className="group relative hover:z-30 rounded-3xl p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_55px_rgba(255,255,255,0.18)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="discord"
@@ -1463,7 +1555,9 @@ export default function App() {
               data-s3d="card"
               data-s3d-depth="0.9"
               data-s3d-global-tilt="3.0"
-              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+              data-s3d-scale="1.05"
+              data-s3d-tilt="9"
+              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
             >
               <div className="text-2xl font-mazzard font-bold text-white tabular-nums">4+</div>
               <div className="text-xs text-white/60 mt-0.5">years experience</div>
@@ -1472,7 +1566,9 @@ export default function App() {
               data-s3d="card"
               data-s3d-depth="0.9"
               data-s3d-global-tilt="3.0"
-              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+              data-s3d-scale="1.05"
+              data-s3d-tilt="9"
+              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
             >
               <div className="text-2xl font-mazzard font-bold text-white tabular-nums">50+</div>
               <div className="text-xs text-white/60 mt-0.5">videos edited</div>
@@ -1481,7 +1577,9 @@ export default function App() {
               data-s3d="card"
               data-s3d-depth="0.9"
               data-s3d-global-tilt="3.0"
-              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+              data-s3d-scale="1.05"
+              data-s3d-tilt="9"
+              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
             >
               <div className="text-xl font-mazzard font-bold text-white">Reliable</div>
               <div className="text-xs text-white/60 mt-0.5">turnaround time</div>
@@ -1490,7 +1588,9 @@ export default function App() {
               data-s3d="card"
               data-s3d-depth="0.9"
               data-s3d-global-tilt="3.0"
-              className="rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+              data-s3d-scale="1.05"
+              data-s3d-tilt="9"
+              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
             >
               <div className="text-2xl font-mazzard font-bold text-white tabular-nums">100%</div>
               <div className="text-xs text-white/60 mt-0.5">After Effects</div>
@@ -1504,7 +1604,10 @@ export default function App() {
                 data-s3d="card"
                 data-s3d-depth="0.95"
                 data-s3d-global-tilt="3.4"
-                className="group relative rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+                data-s3d-scale="1.055"
+                data-s3d-tilt="8.5"
+                data-s3d-shift="4"
+                className="group relative hover:z-30 rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
               >
                 <AnimatedGeminiBorder
                   preset="gemini"
@@ -1531,7 +1634,10 @@ export default function App() {
                 data-s3d="card"
                 data-s3d-depth="0.95"
                 data-s3d-global-tilt="3.4"
-                className="group relative rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+                data-s3d-scale="1.055"
+                data-s3d-tilt="8.5"
+                data-s3d-shift="4"
+                className="group relative hover:z-30 rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
               >
                 <AnimatedGeminiBorder
                   preset="discord"
@@ -1558,7 +1664,10 @@ export default function App() {
                 data-s3d="card"
                 data-s3d-depth="0.95"
                 data-s3d-global-tilt="3.4"
-                className="group relative rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
+                data-s3d-scale="1.055"
+                data-s3d-tilt="8.5"
+                data-s3d-shift="4"
+                className="group relative hover:z-30 rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
               >
                 <AnimatedGeminiBorder
                   preset="instagram"
@@ -1619,12 +1728,14 @@ export default function App() {
           {FAQS.map((faq, index) => {
             const isOpen = activeFaq === index;
             return (
-              <RevealOnScroll key={index} delay={index * 70}>
+              <RevealOnScroll key={index} delay={index * 70} className="relative hover:z-30">
                 <div
                   data-s3d="card"
                   data-s3d-depth="0.85"
                   data-s3d-global-tilt="2.8"
-                  className="group relative rounded-2xl bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent transition-[border-color,box-shadow] overflow-visible shadow-lg will-change-transform"
+                  data-s3d-scale="1.022"
+                  data-s3d-tilt="5.5"
+                  className="group relative hover:z-30 rounded-2xl bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent transition-[border-color,box-shadow] overflow-visible shadow-lg will-change-transform"
                 >
                   <AnimatedGeminiBorder
                     preset={
@@ -1642,8 +1753,10 @@ export default function App() {
                   />
                   <div className="relative z-10 overflow-hidden rounded-2xl">
                     <button
+                      type="button"
+                      aria-expanded={isOpen}
                       onClick={() => setActiveFaq(isOpen ? null : index)}
-                      className="w-full px-6 py-5 flex items-center justify-between text-left gap-4 cursor-pointer"
+                      className="w-full px-6 py-5 flex items-center justify-between text-left gap-4 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/80 rounded-2xl"
                     >
                       <span
                         data-s3d="global"
@@ -1715,12 +1828,15 @@ export default function App() {
         {/* 3 Explicit Social Cards with Asymmetric Animated Gemini Outlines */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {/* Discord: @ray_christo */}
-          <RevealOnScroll delay={0}>
+          <RevealOnScroll delay={0} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
+              data-s3d-scale="1.05"
+              data-s3d-tilt="8.5"
+              data-s3d-shift="4"
+              className="relative hover:z-30 rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="discord"
@@ -1796,12 +1912,15 @@ export default function App() {
           </RevealOnScroll>
 
           {/* Instagram: rychr.prod */}
-          <RevealOnScroll delay={120}>
+          <RevealOnScroll delay={120} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
+              data-s3d-scale="1.05"
+              data-s3d-tilt="8.5"
+              data-s3d-shift="4"
+              className="relative hover:z-30 rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -1891,12 +2010,15 @@ export default function App() {
           </RevealOnScroll>
 
           {/* Gmail: rychr.edits@gmail.com */}
-          <RevealOnScroll delay={240}>
+          <RevealOnScroll delay={240} className="relative hover:z-30">
             <div
               data-s3d="card"
               data-s3d-depth="0.95"
               data-s3d-global-tilt="3.4"
-              className="relative rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
+              data-s3d-scale="1.05"
+              data-s3d-tilt="8.5"
+              data-s3d-shift="4"
+              className="relative hover:z-30 rounded-3xl p-6 bg-[#050505]/95 backdrop-blur-xl border border-white/10 shadow-[0_0_35px_rgba(0,0,0,0.8)] overflow-visible flex flex-col justify-between h-full group will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="gmail"
@@ -1992,6 +2114,8 @@ export default function App() {
             data-s3d="card"
             data-s3d-depth="0.7"
             data-s3d-global-tilt="2.4"
+            data-s3d-scale="1.01"
+            data-s3d-tilt="4"
             data-s3d-pause-on-input="true"
             data-s3d-paused={isDropdownOpen ? 'true' : undefined}
             className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible will-change-transform"
@@ -2323,6 +2447,8 @@ export default function App() {
             data-s3d="card"
             data-s3d-depth="0.75"
             data-s3d-global-tilt="2.5"
+            data-s3d-scale="1.015"
+            data-s3d-tilt="4.5"
             className="group relative rounded-3xl p-7 sm:p-9 md:p-10 bg-[#050505]/95 backdrop-blur-xl border border-white/15 shadow-[0_0_50px_rgba(0,0,0,0.85)] overflow-visible will-change-transform"
           >
             {/* Animated Gemini Glowing White Halo */}
@@ -2379,7 +2505,9 @@ export default function App() {
                 data-s3d="card"
                 data-s3d-depth="0.45"
                 data-s3d-global-tilt="1.8"
-                className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors will-change-transform"
+                data-s3d-scale="1.045"
+                data-s3d-tilt="8"
+                className="relative hover:z-30 p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors will-change-transform"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg font-mazzard font-bold text-white">Direct Bank Transfer</span>
@@ -2397,7 +2525,9 @@ export default function App() {
                 data-s3d="card"
                 data-s3d-depth="0.45"
                 data-s3d-global-tilt="1.8"
-                className="p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors will-change-transform"
+                data-s3d-scale="1.045"
+                data-s3d-tilt="8"
+                className="relative hover:z-30 p-5 sm:p-6 rounded-2xl bg-black/85 border border-white/15 shadow-inner flex flex-col justify-between group/pm hover:border-white/40 transition-colors will-change-transform"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-lg font-mazzard font-bold text-white">UPI (Instant)</span>
@@ -2438,6 +2568,7 @@ export default function App() {
           </div>
         </RevealOnScroll>
       </section>
+      </main>
 
       {/* FOOTER */}
       <footer className="relative py-12 px-6 border-t border-white/10 z-20 text-center text-xs text-white/40 font-mono">
@@ -2582,6 +2713,8 @@ export default function App() {
               data-s3d="card"
               data-s3d-depth="0.65"
               data-s3d-global-tilt="2.2"
+              data-s3d-scale="1.012"
+              data-s3d-tilt="3.5"
               className="relative w-full rounded-3xl p-5 md:p-6 bg-[#050505] border border-white/15 shadow-[0_0_100px_rgba(0,0,0,0.9)] overflow-hidden will-change-transform"
             >
               {(() => {

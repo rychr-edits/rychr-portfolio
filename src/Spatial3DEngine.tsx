@@ -89,12 +89,13 @@ export const Spatial3DEngine: React.FC = () => {
       const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
       lastTime = now;
 
-      // Slow, fluid global camera drift + silky button hover damping
+      // Slow, fluid global camera drift + silky button/card hover damping
       const globalAlpha = 1 - Math.exp(-1.9 * dt);
-      const cardAlpha = 1 - Math.exp(-2.4 * dt);
-      const btnHoverBendAlpha = 1 - Math.exp(-5.6 * dt);
-      const btnHoverScaleAlpha = 1 - Math.exp(-4.8 * dt);
-      const btnRestAlpha = 1 - Math.exp(-3.4 * dt);
+      const hoverBendAlpha = 1 - Math.exp(-5.4 * dt);
+      const hoverScaleAlpha = 1 - Math.exp(-4.6 * dt);
+      const cardHoverBendAlpha = 1 - Math.exp(-4.8 * dt);
+      const cardHoverScaleAlpha = 1 - Math.exp(-4.3 * dt);
+      const restAlpha = 1 - Math.exp(-3.1 * dt);
 
       smooth.x += (target.x - smooth.x) * globalAlpha;
       smooth.y += (target.y - smooth.y) * globalAlpha;
@@ -154,7 +155,7 @@ export const Spatial3DEngine: React.FC = () => {
           paused = true;
         }
 
-        if (mode === 'button' || mode === 'bar') {
+        if (mode === 'button' || mode === 'bar' || mode === 'card') {
           const isHovered = !paused && topHit !== null && el.contains(topHit);
           const rect = el.getBoundingClientRect();
           if (rect.bottom < -180 || rect.top > vh + 180) continue;
@@ -163,7 +164,9 @@ export const Spatial3DEngine: React.FC = () => {
           const targetScale = Number.isFinite(parsedScale)
             ? parsedScale
             : mode === 'bar'
-            ? 1.022
+            ? 1.024
+            : mode === 'card'
+            ? 1.045
             : 1.065;
 
           const parsedTilt = Number.parseFloat(el.dataset.s3dTilt ?? '');
@@ -171,6 +174,8 @@ export const Spatial3DEngine: React.FC = () => {
             ? parsedTilt
             : mode === 'bar'
             ? 7.5
+            : mode === 'card'
+            ? 8.5
             : 9.5;
 
           const parsedShift = Number.parseFloat(el.dataset.s3dShift ?? '');
@@ -180,7 +185,8 @@ export const Spatial3DEngine: React.FC = () => {
             ? 5
             : 4;
 
-          const pressed = isHovered && pointerClient.down && directClickTarget === el;
+          const pressed =
+            mode === 'button' && isHovered && pointerClient.down && directClickTarget === el;
 
           batch.push({
             el,
@@ -194,23 +200,6 @@ export const Spatial3DEngine: React.FC = () => {
             targetScale,
             hoverTilt,
             hoverShift,
-          });
-        } else if (mode === 'card') {
-          const rect = el.getBoundingClientRect();
-          if (rect.bottom < -180 || rect.top > vh + 180) continue;
-
-          batch.push({
-            el,
-            mode,
-            depth,
-            globalTilt,
-            rect,
-            hovered: false,
-            pressed: false,
-            paused,
-            targetScale: 1,
-            hoverTilt: 0,
-            hoverShift: 0,
           });
         } else {
           // Pure global spatial layer (text, headings, badges, background grid, etc.)
@@ -247,7 +236,7 @@ export const Spatial3DEngine: React.FC = () => {
           hoverShift,
         } = item;
 
-        if (mode === 'button' || mode === 'bar') {
+        if (mode === 'button' || mode === 'bar' || mode === 'card') {
           let state = states.get(el);
           if (!state) {
             state = { tx: 0, ty: 0, rx: 0, ry: 0, scale: 1 };
@@ -255,9 +244,9 @@ export const Spatial3DEngine: React.FC = () => {
           }
 
           let goalTx = paused ? 0 : mx * depth * 11;
-          let goalTy = paused ? 0 : my * depth * 7.5;
-          let goalRx = paused ? 0 : -my * globalTilt;
-          let goalRy = paused ? 0 : mx * globalTilt;
+          let goalTy = paused ? 0 : my * depth * (mode === 'card' ? 8 : 7.5);
+          let goalRx = paused ? 0 : -my * globalTilt * (mode === 'card' ? 0.65 : 1);
+          let goalRy = paused ? 0 : mx * globalTilt * (mode === 'card' ? 0.65 : 1);
           let goalScale = 1;
 
           if (hovered && rect && rect.width > 0 && rect.height > 0) {
@@ -274,15 +263,42 @@ export const Spatial3DEngine: React.FC = () => {
             const effTiltY = Math.min(13, hoverTilt * tiltYScale);
             const effTiltX = Math.min(13, hoverTilt * tiltXScale);
 
-            goalRx = -my * globalTilt * 0.35 + -localY * effTiltX;
-            goalRy = mx * globalTilt * 0.35 + localX * effTiltY;
-            goalTx = mx * depth * 6 + localX * hoverShift;
+            goalRx = -my * globalTilt * 0.3 + -localY * effTiltX;
+            goalRy = mx * globalTilt * 0.3 + localX * effTiltY;
+            goalTx = mx * depth * 5.5 + localX * hoverShift;
             goalTy = my * depth * 4 + localY * hoverShift;
             goalScale = pressed ? Math.max(0.97, targetScale - 0.03) : targetScale;
+          } else if (
+            mode === 'card' &&
+            !paused &&
+            pointerClient.active &&
+            rect &&
+            rect.width > 0 &&
+            rect.height > 0
+          ) {
+            const cx = rect.left + rect.width * 0.5;
+            const cy = rect.top + rect.height * 0.5;
+            const dx = (pointerClient.x - cx) / Math.max(rect.width * 0.65, vw * 0.25);
+            const dy = (pointerClient.y - cy) / Math.max(rect.height * 0.65, vh * 0.25);
+            const dist = Math.hypot(dx, dy);
+            const proximity = Math.max(0, 1 - dist * 0.45);
+            const localX = Math.max(-1, Math.min(1, dx));
+            const localY = Math.max(-1, Math.min(1, dy));
+
+            goalRx = -my * globalTilt * 0.45 + -localY * globalTilt * (0.55 + 0.5 * proximity);
+            goalRy = mx * globalTilt * 0.45 + localX * globalTilt * (0.55 + 0.5 * proximity);
           }
 
-          const bendA = hovered ? btnHoverBendAlpha : btnRestAlpha;
-          const scaleA = hovered ? btnHoverScaleAlpha : btnRestAlpha;
+          const bendA = hovered
+            ? mode === 'card'
+              ? cardHoverBendAlpha
+              : hoverBendAlpha
+            : restAlpha;
+          const scaleA = hovered
+            ? mode === 'card'
+              ? cardHoverScaleAlpha
+              : hoverScaleAlpha
+            : restAlpha;
 
           state.tx += (goalTx - state.tx) * bendA;
           state.ty += (goalTy - state.ty) * bendA;
@@ -297,43 +313,6 @@ export const Spatial3DEngine: React.FC = () => {
           )}deg) rotateY(${state.ry.toFixed(2)}deg) scale3d(${state.scale.toFixed(
             4
           )}, ${state.scale.toFixed(4)}, 1)`;
-        } else if (mode === 'card') {
-          let state = states.get(el);
-          if (!state) {
-            state = { tx: 0, ty: 0, rx: 0, ry: 0, scale: 1 };
-            states.set(el, state);
-          }
-
-          let goalRx = paused ? 0 : -my * globalTilt * 0.65;
-          let goalRy = paused ? 0 : mx * globalTilt * 0.65;
-
-          if (!paused && pointerClient.active && rect && rect.width > 0 && rect.height > 0) {
-            const cx = rect.left + rect.width * 0.5;
-            const cy = rect.top + rect.height * 0.5;
-            const dx = (pointerClient.x - cx) / Math.max(rect.width * 0.65, vw * 0.25);
-            const dy = (pointerClient.y - cy) / Math.max(rect.height * 0.65, vh * 0.25);
-            const dist = Math.hypot(dx, dy);
-            const proximity = Math.max(0, 1 - dist * 0.45);
-            const localX = Math.max(-1, Math.min(1, dx));
-            const localY = Math.max(-1, Math.min(1, dy));
-
-            goalRx = -my * globalTilt * 0.45 + -localY * globalTilt * (0.6 + 0.55 * proximity);
-            goalRy = mx * globalTilt * 0.45 + localX * globalTilt * (0.6 + 0.55 * proximity);
-          }
-
-          const goalTx = paused ? 0 : mx * depth * 11;
-          const goalTy = paused ? 0 : my * depth * 8;
-
-          state.tx += (goalTx - state.tx) * cardAlpha;
-          state.ty += (goalTy - state.ty) * cardAlpha;
-          state.rx += (goalRx - state.rx) * cardAlpha;
-          state.ry += (goalRy - state.ry) * cardAlpha;
-
-          el.style.transform = `perspective(1200px) translate3d(${state.tx.toFixed(
-            2
-          )}px, ${state.ty.toFixed(2)}px, 0) rotateX(${state.rx.toFixed(
-            2
-          )}deg) rotateY(${state.ry.toFixed(2)}deg)`;
         } else {
           // Pure global collective cursor parallax (for text, headings, badges, inner labels)
           const tx = paused ? 0 : mx * depth * 12;
