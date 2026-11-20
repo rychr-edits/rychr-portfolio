@@ -282,28 +282,28 @@ function createSpotlightBeamTexture(): THREE.CanvasTexture {
 
   for (let y = 0; y < h; y++) {
     const ny = y / (h - 1);
-    const coneHalfWidth = 0.08 + ny * 0.24;
-    const edgeFeather = 0.14 + ny * 0.12;
-    const botFade = 1 - smoothstep(0.55, 0.98, ny);
-    const verticalIntensity = botFade * (0.95 * Math.pow(1 - ny * 0.52, 1.25) + 0.05);
+    const coneHalfWidth = 0.048 + ny * 0.175;
+    const edgeFeather = 0.022 + ny * 0.045;
+    const botFade = 1 - smoothstep(0.58, 0.97, ny);
+    const verticalIntensity = botFade * (0.9 * Math.pow(1 - ny * 0.56, 1.35) + 0.06);
 
     for (let x = 0; x < w; x++) {
       const u = x / (w - 1) - 0.5;
       const dist = Math.abs(u);
       const insideCone =
-        1 - smoothstep(coneHalfWidth - edgeFeather * 0.45, coneHalfWidth + edgeFeather, dist);
-      const sigma = coneHalfWidth * 0.65;
-      const coreBoost = 0.6 + 0.4 * Math.exp(-(dist * dist) / (2 * sigma * sigma));
-      const rayStreaks = 0.86 + 0.14 * Math.cos(u * 26.0 + ny * 1.4) * Math.cos(u * 11.0);
+        1 - smoothstep(coneHalfWidth - edgeFeather * 0.55, coneHalfWidth + edgeFeather, dist);
+      const sigma = coneHalfWidth * 0.58;
+      const coreBoost = 0.52 + 0.48 * Math.exp(-(dist * dist) / (2 * sigma * sigma));
+      const rayStreaks = 0.88 + 0.12 * Math.cos(u * 34.0 + ny * 1.1) * Math.cos(u * 15.0);
       const alpha = Math.max(
         0,
         Math.min(1, insideCone * coreBoost * verticalIntensity * rayStreaks)
       );
 
       const idx = (y * w + x) * 4;
-      data[idx + 0] = 242;
-      data[idx + 1] = 246;
-      data[idx + 2] = 255;
+      data[idx + 0] = 204;
+      data[idx + 1] = 216;
+      data[idx + 2] = 236;
       data[idx + 3] = Math.round(alpha * 255);
     }
   }
@@ -388,7 +388,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     renderer.setPixelRatio(dpr);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.NeutralToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 0.96;
     renderer.shadowMap.enabled = !isSoftwareGl;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -399,7 +399,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     const envTex = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = envTex;
-    scene.environmentIntensity = 0.28;
+    scene.environmentIntensity = 0.2;
     pmremGenerator.dispose();
 
     const handleContextLost = (e: Event) => {
@@ -490,11 +490,11 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     skinTexture.minFilter = THREE.NearestFilter;
     skinTexture.generateMipmaps = false;
 
-    // 3. Cinema Studio Lighting Rig (Back Rim Silhouette -> Dramatic Front Key Reveal)
-    const hemiLight = new THREE.HemisphereLight(0xeef2fa, 0x1e2026, 0.55);
+    // 3. Cinema Studio Lighting Rig (Crisp Silhouette Rim -> Focused Dramatic Key Reveal)
+    const hemiLight = new THREE.HemisphereLight(0xd8e2f2, 0x101218, 0.26);
     scene.add(hemiLight);
 
-    const keySpot = new THREE.SpotLight(0xffffff, 0, 14, Math.PI / 6.2, 0.65, 1.2);
+    const keySpot = new THREE.SpotLight(0xf3f6fc, 0, 14, Math.PI / 8.5, 0.24, 1.15);
     keySpot.position.set(1.9, 3.6, 2.3);
     keySpot.target.position.set(0.52, 1.4, 0);
     if (!isSoftwareGl) {
@@ -503,25 +503,25 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
       keySpot.shadow.mapSize.height = 1024;
       keySpot.shadow.camera.near = 1.2;
       keySpot.shadow.camera.far = 8.5;
-      keySpot.shadow.focus = 0.85;
-      keySpot.shadow.bias = -0.0005;
-      keySpot.shadow.normalBias = 0.015;
+      keySpot.shadow.focus = 0.95;
+      keySpot.shadow.bias = -0.0004;
+      keySpot.shadow.normalBias = 0.012;
     }
     scene.add(keySpot);
     scene.add(keySpot.target);
 
-    const crownFill = new THREE.SpotLight(0xf6f9ff, 0, 12, Math.PI / 5, 0.88, 1.3);
+    const crownFill = new THREE.SpotLight(0xe6eeff, 0, 12, Math.PI / 6.8, 0.32, 1.25);
     crownFill.position.set(0.45, 3.85, 0.65);
     crownFill.target.position.set(0.52, 1.45, 0);
     scene.add(crownFill);
     scene.add(crownFill.target);
 
-    const frontFill = new THREE.DirectionalLight(0xe4ecfb, 0.15);
+    const frontFill = new THREE.DirectionalLight(0xd4e0f5, 0.08);
     frontFill.position.set(-1.6, 1.2, 2.5);
     scene.add(frontFill);
 
     // Cool edge rim stays active even when facing backwards, tracing shoulders/hair before reveal
-    const rimLight = new THREE.DirectionalLight(0xd8e4ff, 1.35);
+    const rimLight = new THREE.DirectionalLight(0xcddcff, 1.2);
     rimLight.position.set(-1.2, 2.6, -2.5);
     scene.add(rimLight);
 
@@ -534,7 +534,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     beamPivot.position.set(0, 2.9, -0.58);
     stageAnchor.add(beamPivot);
 
-    const beamPlaneGeo = registerGeo(new THREE.PlaneGeometry(3.8, 2.75));
+    const beamPlaneGeo = registerGeo(new THREE.PlaneGeometry(3.15, 2.75));
     const beamPlaneMat = registerMat(
       new THREE.MeshBasicMaterial({
         map: beamTex,
@@ -945,25 +945,25 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
       leftArmGroup.rotation.x = 0.06 + Math.sin(elapsed * 1.4) * 0.028 + my * 0.07 * frontFacing;
       leftArmGroup.rotation.z = 0.07 + Math.abs(yawVelocity) * 0.014 + mx * 0.02 * frontFacing;
 
-      // D. Cinema Lighting (Silhouette Rim when Backward -> Full Studio Key on Front Reveal)
+      // D. Cinema Lighting (Crisp Silhouette Rim when Backward -> Focused Studio Key on Front Reveal)
       const lightCurve = smoothProgress * smoothProgress * (3 - 2 * smoothProgress);
-      hemiLight.intensity = 0.45 + 0.55 * lightCurve;
-      keySpot.intensity = 38.0 * lightCurve;
+      hemiLight.intensity = 0.22 + 0.26 * lightCurve;
+      keySpot.intensity = 21.0 * lightCurve;
       keySpot.target.position.x = stageAnchor.position.x;
       keySpot.position.x = stageAnchor.position.x + 1.35 + mx * 0.65;
       keySpot.position.z = 2.3 - my * 0.45;
 
-      crownFill.intensity = 9.0 * lightCurve;
+      crownFill.intensity = 4.8 * lightCurve;
       crownFill.position.x = stageAnchor.position.x - 0.1 + mx * 0.25;
       crownFill.target.position.x = stageAnchor.position.x;
 
-      frontFill.intensity = 0.12 + 0.32 * lightCurve;
-      rimLight.intensity = 1.45 - 0.35 * lightCurve;
+      frontFill.intensity = 0.06 + 0.14 * lightCurve;
+      rimLight.intensity = 1.25 - 0.25 * lightCurve;
 
       beamPivot.position.x = mx * 0.1;
       beamPivot.rotation.z = mx * 0.04;
-      beamPlaneMat.opacity = 0.12 + 0.38 * lightCurve;
-      motesMat.opacity = 0.2 + 0.48 * lightCurve;
+      beamPlaneMat.opacity = 0.06 + 0.18 * lightCurve;
+      motesMat.opacity = 0.16 + 0.36 * lightCurve;
 
       // E. Orbital Gimbal Rings + AE Keyframe Diamond Crystals
       const haloRevealScale = 0.78 + 0.22 * smoothProgress;
@@ -1075,7 +1075,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
         <div
           ref={backdropGlowRef}
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_78%,rgba(255,255,255,0.11)_0%,rgba(210,224,255,0.035)_38%,transparent_68%)] md:bg-[radial-gradient(circle_at_70%_48%,rgba(255,255,255,0.11)_0%,rgba(210,224,255,0.035)_34%,transparent_64%)]"
+          className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_78%,rgba(205,220,245,0.065)_0%,rgba(180,198,228,0.025)_26%,transparent_52%)] md:bg-[radial-gradient(circle_at_70%_48%,rgba(205,220,245,0.065)_0%,rgba(180,198,228,0.025)_25%,transparent_48%)]"
         />
 
         {/* Subtle Top Edge Light Line Inside Card */}
