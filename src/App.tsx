@@ -284,30 +284,31 @@ export default function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Mouse-reactive & scroll-driven light state for the #about 3D spotlight stage (zero React re-renders)
+  // Mouse-reactive & scroll-driven spin state for the #about 3D showcase card (zero React re-renders)
   const aboutSectionRef = useRef<HTMLElement>(null);
   const aboutPointerRef = useRef({ x: 0, y: 0 });
-  const aboutScrollLightRef = useRef(0);
+  const aboutScrollProgressRef = useRef(0);
   const aboutStageFrameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const section = aboutSectionRef.current;
     if (!section) return;
 
-    const updateScrollLight = () => {
+    const updateScrollProgress = () => {
       const targetEl = aboutStageFrameRef.current || section;
       const rect = targetEl.getBoundingClientRect();
       const vh = window.innerHeight || 800;
-      // 0 light at the end of #whyme (rect.top >= 88% vh), fading smoothly to 1.0 as you scroll into #about
-      const raw = (vh * 0.88 - rect.top) / (vh * 0.54);
+      // 0 (facing backwards) near #whyme, spinning smoothly 180deg to 1.0 (facing front) as the card enters view
+      const raw = (vh * 0.90 - rect.top) / (vh * 0.56);
       const clamped = Math.max(0, Math.min(1, raw));
-      aboutScrollLightRef.current = clamped * clamped * (3 - 2 * clamped);
+      aboutScrollProgressRef.current = clamped * clamped * (3 - 2 * clamped);
     };
 
-    updateScrollLight();
+    updateScrollProgress();
 
     const onPointerMove = (e: PointerEvent) => {
-      const rect = section.getBoundingClientRect();
+      const targetEl = aboutStageFrameRef.current || section;
+      const rect = targetEl.getBoundingClientRect();
       if (rect.width <= 0 || rect.height <= 0) return;
       const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
@@ -315,21 +316,23 @@ export default function App() {
       aboutPointerRef.current.y = Math.max(-1, Math.min(1, ny));
     };
 
-    const onPointerLeave = () => {
+    const onPointerReset = () => {
       aboutPointerRef.current.x = 0;
       aboutPointerRef.current.y = 0;
     };
 
-    section.addEventListener('pointermove', onPointerMove, { passive: true });
-    section.addEventListener('pointerleave', onPointerLeave);
-    window.addEventListener('scroll', updateScrollLight, { passive: true });
-    window.addEventListener('resize', updateScrollLight, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    document.addEventListener('mouseleave', onPointerReset);
+    window.addEventListener('blur', onPointerReset);
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    window.addEventListener('resize', updateScrollProgress, { passive: true });
 
     return () => {
-      section.removeEventListener('pointermove', onPointerMove);
-      section.removeEventListener('pointerleave', onPointerLeave);
-      window.removeEventListener('scroll', updateScrollLight);
-      window.removeEventListener('resize', updateScrollLight);
+      window.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('mouseleave', onPointerReset);
+      window.removeEventListener('blur', onPointerReset);
+      window.removeEventListener('scroll', updateScrollProgress);
+      window.removeEventListener('resize', updateScrollProgress);
     };
   }, []);
 
@@ -1525,96 +1528,91 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION 4: ABOUT RYCHR — SEAMLESS FULL-BLEED 3D STUDIO PROTRACTOR SHOWCASE */}
+      {/* SECTION 4: ABOUT RAY — EDITORIAL 3D CHARACTER CARD & STATS */}
       <section
         id="about"
         ref={aboutSectionRef}
-        className="relative py-28 z-20 w-full scroll-mt-24 overflow-visible"
+        className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10"
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <RevealOnScroll className="mb-2 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div>
-              <div
-                data-s3d="global"
-                data-s3d-depth="0.85"
-                data-s3d-global-tilt="1.8"
-                className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-2 will-change-transform"
-              >
-                <span>04 / About The Editor</span>
-              </div>
-              <h2
-                data-s3d="global"
-                data-s3d-depth="1.15"
-                data-s3d-global-tilt="2.2"
-                className="block w-fit text-3xl sm:text-4xl font-mazzard font-bold tracking-tight text-white will-change-transform"
-              >
-                Meet Ray
-              </h2>
-            </div>
-          </RevealOnScroll>
-        </div>
+        <SubtleGridLines />
+        <RevealOnScroll className="relative z-10 max-w-3xl mb-10">
+          <div
+            data-s3d="global"
+            data-s3d-depth="0.85"
+            data-s3d-global-tilt="1.8"
+            className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-white via-neutral-200 to-neutral-400 mb-3 will-change-transform"
+          >
+            <span>04 / About The Editor</span>
+          </div>
+          <h2
+            data-s3d="global"
+            data-s3d-depth="1.15"
+            data-s3d-global-tilt="2.2"
+            className="block w-fit text-4xl md:text-5xl font-heading font-bold tracking-tight text-white will-change-transform"
+          >
+            Meet Ray
+          </h2>
+        </RevealOnScroll>
 
-        {/* Full-Width Borderless 3D Character Stage (Light fades in smoothly on scroll) */}
-        <div ref={aboutStageFrameRef} className="relative w-full overflow-visible">
+        {/* Scroll-Driven 3D Showcase Card (Spins Back-to-Front on Scroll Down, Turns Back on Scroll Up) */}
+        <div ref={aboutStageFrameRef} className="relative z-10 overflow-visible">
           <AboutShowcase3D
             pointerTargetRef={aboutPointerRef}
-            scrollLightRef={aboutScrollLightRef}
+            scrollProgressRef={aboutScrollProgressRef}
           />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          {/* Mobile Stats Strip (< md) so curved desktop stats remain crisp on small screens */}
-          <div className="grid grid-cols-2 gap-3 mt-5 md:hidden">
-            <div
-              data-s3d="card"
-              data-s3d-depth="0.9"
-              data-s3d-global-tilt="3.0"
-              data-s3d-scale="1.05"
-              data-s3d-tilt="9"
-              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-            >
-              <div className="text-2xl font-mazzard font-bold text-white tabular-nums">4+</div>
-              <div className="text-xs text-white/60 mt-0.5">years experience</div>
-            </div>
-            <div
-              data-s3d="card"
-              data-s3d-depth="0.9"
-              data-s3d-global-tilt="3.0"
-              data-s3d-scale="1.05"
-              data-s3d-tilt="9"
-              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-            >
-              <div className="text-2xl font-mazzard font-bold text-white tabular-nums">50+</div>
-              <div className="text-xs text-white/60 mt-0.5">videos edited</div>
-            </div>
-            <div
-              data-s3d="card"
-              data-s3d-depth="0.9"
-              data-s3d-global-tilt="3.0"
-              data-s3d-scale="1.05"
-              data-s3d-tilt="9"
-              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-            >
-              <div className="text-xl font-mazzard font-bold text-white">Reliable</div>
-              <div className="text-xs text-white/60 mt-0.5">turnaround time</div>
-            </div>
-            <div
-              data-s3d="card"
-              data-s3d-depth="0.9"
-              data-s3d-global-tilt="3.0"
-              data-s3d-scale="1.05"
-              data-s3d-tilt="9"
-              className="relative hover:z-30 rounded-2xl p-4 bg-[#050505] border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-            >
-              <div className="text-2xl font-mazzard font-bold text-white tabular-nums">100%</div>
-              <div className="text-xs text-white/60 mt-0.5">After Effects</div>
-            </div>
+        {/* 4 Key Proof Metrics Across All Viewports */}
+        <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+          <div
+            data-s3d="card"
+            data-s3d-depth="0.9"
+            data-s3d-global-tilt="3.0"
+            data-s3d-scale="1.05"
+            data-s3d-tilt="9"
+            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+          >
+            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white tabular-nums">4+</div>
+            <div className="text-xs sm:text-sm text-white/60 mt-1">years experience</div>
           </div>
+          <div
+            data-s3d="card"
+            data-s3d-depth="0.9"
+            data-s3d-global-tilt="3.0"
+            data-s3d-scale="1.05"
+            data-s3d-tilt="9"
+            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+          >
+            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white tabular-nums">50+</div>
+            <div className="text-xs sm:text-sm text-white/60 mt-1">videos edited</div>
+          </div>
+          <div
+            data-s3d="card"
+            data-s3d-depth="0.9"
+            data-s3d-global-tilt="3.0"
+            data-s3d-scale="1.05"
+            data-s3d-tilt="9"
+            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+          >
+            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white">Reliable</div>
+            <div className="text-xs sm:text-sm text-white/60 mt-1">turnaround time</div>
+          </div>
+          <div
+            data-s3d="card"
+            data-s3d-depth="0.9"
+            data-s3d-global-tilt="3.0"
+            data-s3d-scale="1.05"
+            data-s3d-tilt="9"
+            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
+          >
+            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white tabular-nums">100%</div>
+            <div className="text-xs sm:text-sm text-white/60 mt-1">After Effects</div>
+          </div>
+        </div>
 
-          {/* 3 Glowing-Border Editorial Cards Below Stage */}
-          <div className="relative mt-8 pt-2">
-            <SubtleGridLines className="-inset-x-6 -inset-y-8" />
-            <RevealOnScroll delay={160} className="relative z-10">
+        {/* 3 Glowing-Border Editorial Cards Below Stage */}
+        <div className="relative z-10 mt-8 pt-2">
+          <RevealOnScroll delay={160} className="relative z-10">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div
                 data-s3d="card"
@@ -1707,7 +1705,6 @@ export default function App() {
               </div>
             </div>
             </RevealOnScroll>
-          </div>
         </div>
       </section>
 
