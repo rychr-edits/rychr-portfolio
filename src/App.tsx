@@ -6,6 +6,7 @@ import { AnimatedGeminiBorder, GeminiColorPreset } from './AnimatedGeminiBorder.
 import { CustomVideoPlayer } from './CustomVideoPlayer.tsx';
 import { AboutShowcase3D } from './AboutShowcase3D.tsx';
 import { Spatial3DEngine } from './Spatial3DEngine.tsx';
+import { CustomCursor } from './CustomCursor.tsx';
 import { FaqItem } from './types.ts';
 import {
   Play,
@@ -253,6 +254,18 @@ const SERVICE_OPTIONS: ServiceOption[] = [
   },
 ];
 
+function SubtleGridLines({ className = 'inset-0' }: { className?: string }) {
+  return (
+    <div
+      aria-hidden="true"
+      data-s3d="global"
+      data-s3d-depth="-0.85"
+      data-s3d-global-tilt="0.7"
+      className={`absolute ${className} z-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:36px_36px] [mask-image:radial-gradient(ellipse_at_center,black_38%,transparent_88%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_38%,transparent_88%)] pointer-events-none rounded-3xl will-change-transform`}
+    />
+  );
+}
+
 export default function App() {
   const [scrollY, setScrollY] = useState(0);
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
@@ -425,6 +438,7 @@ export default function App() {
       {/* PROCEDURAL PLANET HORIZON BACKGROUND (Top horizon + Underside on scroll to bottom + Glowing Cursor with Stars) */}
       <CosmicHorizonBackground scrollY={scrollY} />
       <Spatial3DEngine />
+      <CustomCursor />
 
       {/* PERSISTENT HEADER NAVBAR */}
       <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-10 py-4 sm:py-5 transition-colors duration-300">
@@ -604,7 +618,9 @@ export default function App() {
       <main id="main-content" className="focus:outline-none">
       {/* HERO SECTION (Text floats cleanly above the planet horizon; description is NEVER hidden!) */}
       <section className="relative min-h-[95vh] flex flex-col justify-center items-center px-6 pt-36 md:pt-40 pb-20 z-20 pointer-events-auto">
-        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+        <div className="relative max-w-4xl mx-auto text-center flex flex-col items-center">
+          <SubtleGridLines className="-inset-x-6 sm:-inset-x-14 -inset-y-10 opacity-85" />
+          <div className="relative z-10 flex flex-col items-center w-full">
           {/* Status Badge in signature crisp style with Pure White rim */}
           <div
             data-s3d="global"
@@ -697,18 +713,14 @@ export default function App() {
               <div className="absolute top-0 left-0 w-full h-5 bg-gradient-to-b from-transparent via-white to-white/60 shadow-[0_0_10px_#ffffff] animate-scrollIndicator" />
             </div>
           </div>
+          </div>
         </div>
       </section>
 
       {/* SECTION 1: WORK (EXACT ASYMMETRICAL 4-CARD LAYOUT WITH MONOCHROME PURE WHITE GLOW) */}
       <section id="work" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24">
-        {/* Subtle grid texture overlay with faint white touch */}
-        <div
-          data-s3d="global"
-          data-s3d-depth="-0.85"
-          data-s3d-global-tilt="0.7"
-          className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:28px_28px] pointer-events-none rounded-3xl will-change-transform"
-        />
+        {/* Subtle grid lines backdrop with soft radial fade */}
+        <SubtleGridLines />
 
         <RevealOnScroll className="mb-14 relative z-10">
           <div
@@ -1054,7 +1066,8 @@ export default function App() {
 
       {/* SECTION 2: SHORTS / VERTICAL REELS */}
       <section id="shorts" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
-        <RevealOnScroll className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
+        <SubtleGridLines />
+        <RevealOnScroll className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16">
           <div>
             <div
               data-s3d="global"
@@ -1090,7 +1103,7 @@ export default function App() {
         </RevealOnScroll>
 
         {/* 3 Staggered Phone-style Vertical Preview Frames with No Subtitles (Only Preview) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-4 pb-12">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-start pt-4 pb-12">
           {SHORTS_PROJECTS.map((short) => (
             <RevealOnScroll key={short.id} delay={short.delay} className={`relative hover:z-30 ${short.stagger}`}>
               <div
@@ -1185,7 +1198,8 @@ export default function App() {
 
       {/* SECTION 3: WHY ME */}
       <section id="whyme" className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10">
-        <RevealOnScroll className="max-w-3xl mb-16">
+        <SubtleGridLines />
+        <RevealOnScroll className="relative z-10 max-w-3xl mb-16">
           <div
             data-s3d="global"
             data-s3d-depth="0.85"
@@ -1214,7 +1228,7 @@ export default function App() {
         </RevealOnScroll>
 
         {/* 6 Core Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <RevealOnScroll delay={0} className="relative hover:z-30">
             <div
               data-s3d="card"
@@ -1534,7 +1548,7 @@ export default function App() {
                 data-s3d-global-tilt="2.2"
                 className="block w-fit text-3xl sm:text-4xl font-mazzard font-bold tracking-tight text-white will-change-transform"
               >
-                Meet <span className="font-brand-rychr">Rychr</span>
+                Meet Ray
               </h2>
             </div>
           </RevealOnScroll>
@@ -1598,8 +1612,10 @@ export default function App() {
           </div>
 
           {/* 3 Glowing-Border Editorial Cards Below Stage */}
-          <RevealOnScroll delay={160}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-2">
+          <div className="relative mt-8 pt-2">
+            <SubtleGridLines className="-inset-x-6 -inset-y-8" />
+            <RevealOnScroll delay={160} className="relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div
                 data-s3d="card"
                 data-s3d-depth="0.95"
@@ -1690,13 +1706,15 @@ export default function App() {
                 </p>
               </div>
             </div>
-          </RevealOnScroll>
+            </RevealOnScroll>
+          </div>
         </div>
       </section>
 
       {/* SECTION 5: FAQ */}
       <section id="faq" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
-        <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
+        <SubtleGridLines />
+        <RevealOnScroll className="relative z-10 text-center max-w-2xl mx-auto mb-16">
           <div
             data-s3d="global"
             data-s3d-depth="0.85"
@@ -1724,7 +1742,7 @@ export default function App() {
         </RevealOnScroll>
 
         {/* Glass Accordions in neutral dark glass */}
-        <div className="space-y-4">
+        <div className="relative z-10 space-y-4">
           {FAQS.map((faq, index) => {
             const isOpen = activeFaq === index;
             return (
@@ -1798,7 +1816,9 @@ export default function App() {
 
       {/* SECTION 6: CONTACT & SOCIALS */}
       <section id="contact" className="relative py-28 px-6 md:px-12 z-20 max-w-5xl mx-auto scroll-mt-24 border-t border-white/10">
-        <RevealOnScroll className="text-center max-w-2xl mx-auto mb-16">
+        <div className="relative mb-16">
+          <SubtleGridLines className="-inset-x-6 -inset-y-8" />
+          <RevealOnScroll className="relative z-10 text-center max-w-2xl mx-auto mb-16">
           <div
             data-s3d="global"
             data-s3d-depth="0.85"
@@ -1825,8 +1845,8 @@ export default function App() {
           </p>
         </RevealOnScroll>
 
-        {/* 3 Explicit Social Cards with Asymmetric Animated Gemini Outlines */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          {/* 3 Explicit Social Cards with Asymmetric Animated Gemini Outlines */}
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Discord: @ray_christo */}
           <RevealOnScroll delay={0} className="relative hover:z-30">
             <div
@@ -2106,10 +2126,13 @@ export default function App() {
               </div>
             </div>
           </RevealOnScroll>
+          </div>
         </div>
 
         {/* WORKING ON-SITE INQUIRY FORM */}
-        <RevealOnScroll delay={140} className="mb-14">
+        <div className="relative mb-14">
+          <SubtleGridLines className="-inset-6 sm:-inset-10" />
+          <RevealOnScroll delay={140} className="relative z-20">
           <div
             data-s3d="card"
             data-s3d-depth="0.7"
@@ -2439,10 +2462,13 @@ export default function App() {
               )}
             </div>
           </div>
-        </RevealOnScroll>
+          </RevealOnScroll>
+        </div>
 
         {/* ENHANCED PROMINENT ACCEPTED PAYMENTS CARD */}
-        <RevealOnScroll delay={150}>
+        <div className="relative">
+          <SubtleGridLines className="-inset-6 sm:-inset-10" />
+          <RevealOnScroll delay={150} className="relative z-10">
           <div
             data-s3d="card"
             data-s3d-depth="0.75"
@@ -2566,7 +2592,8 @@ export default function App() {
               </a>
             </div>
           </div>
-        </RevealOnScroll>
+          </RevealOnScroll>
+        </div>
       </section>
       </main>
 

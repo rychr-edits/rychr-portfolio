@@ -25,30 +25,246 @@ function createMinecraftBoxGeometry(
   const geo = new THREE.BoxGeometry(w, h, d);
 
   const texSize = 64;
-  const eps = 0.015 / texSize;
+  const eps = 0.08 / texSize;
 
-  const setFaceUV = (faceIndex: number, px: number, py: number, pw: number, ph: number) => {
+  const setFaceUV = (
+    faceIndex: number,
+    px: number,
+    py: number,
+    pw: number,
+    ph: number,
+    flipV = false
+  ) => {
     const u0 = px / texSize + eps;
     const u1 = (px + pw) / texSize - eps;
     const vTop = 1 - py / texSize - eps;
     const vBot = 1 - (py + ph) / texSize + eps;
+    const v0 = flipV ? vBot : vTop;
+    const v1 = flipV ? vTop : vBot;
 
     const uvAttr = geo.attributes.uv as THREE.BufferAttribute;
     const base = faceIndex * 4;
-    uvAttr.setXY(base + 0, u0, vTop);
-    uvAttr.setXY(base + 1, u1, vTop);
-    uvAttr.setXY(base + 2, u0, vBot);
-    uvAttr.setXY(base + 3, u1, vBot);
+    uvAttr.setXY(base + 0, u0, v0);
+    uvAttr.setXY(base + 1, u1, v0);
+    uvAttr.setXY(base + 2, u0, v1);
+    uvAttr.setXY(base + 3, u1, v1);
   };
 
   setFaceUV(0, texX + dPx + wPx, texY + dPx, dPx, hPx); // +X Character Left
   setFaceUV(1, texX, texY + dPx, dPx, hPx); // -X Character Right
   setFaceUV(2, texX + dPx, texY, wPx, dPx); // +Y Top
-  setFaceUV(3, texX + dPx + wPx, texY, wPx, dPx); // -Y Bottom
+  // -Y Bottom: BoxGeometry v0/v1 are +Z (Front) and v2/v3 are -Z (Back), so flipV aligns Front/Back edges
+  setFaceUV(3, texX + dPx + wPx, texY, wPx, dPx, true);
   setFaceUV(4, texX + dPx, texY + dPx, wPx, hPx); // +Z Front
   setFaceUV(5, texX + dPx + wPx + dPx, texY + dPx, wPx, hPx); // -Z Back
 
   geo.attributes.uv.needsUpdate = true;
+  return geo;
+}
+
+/**
+ * Builds a watertight solid 3D extruded voxel mesh for a Minecraft 64x64 2nd-layer overlay.
+ * Each opaque texel becomes a closed 3D prism rooted into the base limb/head/torso surface,
+ * eliminating floating 2D sticker gaps, DoubleSide edges, and stray corner overhang.
+ */
+function buildExtrudedOverlayGeometry(
+  wPx: number,
+  hPx: number,
+  dPx: number,
+  texX: number,
+  texY: number,
+  pixelScale: number,
+  reliefDepth: number,
+  pixels: Uint8ClampedArray,
+  texWidth: number,
+  texHeight: number
+): THREE.BufferGeometry {
+  const isOpaque = (tx: number, ty: number): boolean => {
+    if (tx < 0 || ty < 0 || tx >= texWidth || ty >= texHeight) return false;
+    return pixels[(ty * texWidth + tx) * 4 + 3] >= 128;
+  };
+
+  const W = wPx * pixelScale;
+  const H = hPx * pixelScale;
+  const D = dPx * pixelScale;
+  const embed = Math.min(0.003, pixelScale * 0.06);
+
+  const positions: number[] = [];
+  const normals: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+
+  const pushBox = (
+    x0: number,
+    x1: number,
+    y0: number,
+    y1: number,
+    z0: number,
+    z1: number,
+    tx: number,
+    ty: number
+  ) => {
+    const u = (tx + 0.5) / texWidth;
+    const v = 1 - (ty + 0.5) / texHeight;
+
+    const addQuad = (
+      ax: number,
+      ay: number,
+      az: number,
+      bx: number,
+      by: number,
+      bz: number,
+      cx: number,
+      cy: number,
+      cz: number,
+      dx: number,
+      dy: number,
+      dz: number,
+      nx: number,
+      ny: number,
+      nz: number
+    ) => {
+      const base = positions.length / 3;
+      positions.push(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz);
+      for (let k = 0; k < 4; k++) {
+        normals.push(nx, ny, nz);
+        uvs.push(u, v);
+      }
+      indices.push(base, base + 1, base + 2, base, base + 2, base + 3);
+    };
+
+    // Outward CCW winding for all 6 faces
+    addQuad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, 0, 0, 1); // +Z
+    addQuad(x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, 0, 0, -1); // -Z
+    addQuad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, 1, 0, 0); // +X
+    addQuad(x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, -1, 0, 0); // -X
+    addQuad(x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, y1, z0, 0, 1, 0); // +Y
+    addQuad(x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1, 0, -1, 0); // -Y
+  };
+
+  // 1. Front (+Z)
+  for (let fy = 0; fy < hPx; fy++) {
+    for (let fx = 0; fx < wPx; fx++) {
+      const tx = texX + dPx + fx;
+      const ty = texY + dPx + fy;
+      if (!isOpaque(tx, ty)) continue;
+
+      let x0 = -W / 2 + fx * pixelScale;
+      let x1 = x0 + pixelScale;
+      let y1 = H / 2 - fy * pixelScale;
+      let y0 = y1 - pixelScale;
+
+      if (fx === 0 && isOpaque(texX + dPx - 1, ty)) x0 -= reliefDepth;
+      if (fx === wPx - 1 && isOpaque(texX + dPx + wPx, ty)) x1 += reliefDepth;
+      if (fy === 0 && isOpaque(texX + dPx + fx, texY + dPx - 1)) y1 += reliefDepth;
+      if (fy === hPx - 1 && isOpaque(texX + dPx + wPx + fx, texY + dPx - 1)) y0 -= reliefDepth;
+
+      pushBox(x0, x1, y0, y1, D / 2 - embed, D / 2 + reliefDepth, tx, ty);
+    }
+  }
+
+  // 2. Back (-Z)
+  for (let fy = 0; fy < hPx; fy++) {
+    for (let fx = 0; fx < wPx; fx++) {
+      const tx = texX + dPx + wPx + dPx + fx;
+      const ty = texY + dPx + fy;
+      if (!isOpaque(tx, ty)) continue;
+
+      let x1 = W / 2 - fx * pixelScale;
+      let x0 = x1 - pixelScale;
+      let y1 = H / 2 - fy * pixelScale;
+      let y0 = y1 - pixelScale;
+
+      if (fx === 0 && isOpaque(tx - 1, ty)) x1 += reliefDepth;
+      if (fx === wPx - 1 && isOpaque(texX, ty)) x0 -= reliefDepth;
+      if (fy === 0 && isOpaque(texX + dPx + (wPx - 1 - fx), texY)) y1 += reliefDepth;
+      if (fy === hPx - 1 && isOpaque(texX + dPx + wPx + (wPx - 1 - fx), texY)) y0 -= reliefDepth;
+
+      pushBox(x0, x1, y0, y1, -D / 2 - reliefDepth, -D / 2 + embed, tx, ty);
+    }
+  }
+
+  // 3. Char Left (+X)
+  for (let fy = 0; fy < hPx; fy++) {
+    for (let fx = 0; fx < dPx; fx++) {
+      const tx = texX + dPx + wPx + fx;
+      const ty = texY + dPx + fy;
+      if (!isOpaque(tx, ty)) continue;
+
+      let z1 = D / 2 - fx * pixelScale;
+      let z0 = z1 - pixelScale;
+      let y1 = H / 2 - fy * pixelScale;
+      let y0 = y1 - pixelScale;
+
+      if (fx === 0 && isOpaque(tx - 1, ty)) z1 += reliefDepth;
+      if (fx === dPx - 1 && isOpaque(tx + 1, ty)) z0 -= reliefDepth;
+      if (fy === 0 && isOpaque(texX + dPx + wPx - 1, texY + dPx - 1 - fx)) y1 += reliefDepth;
+      if (fy === hPx - 1 && isOpaque(texX + dPx + wPx + wPx - 1, texY + dPx - 1 - fx))
+        y0 -= reliefDepth;
+
+      pushBox(W / 2 - embed, W / 2 + reliefDepth, y0, y1, z0, z1, tx, ty);
+    }
+  }
+
+  // 4. Char Right (-X)
+  for (let fy = 0; fy < hPx; fy++) {
+    for (let fx = 0; fx < dPx; fx++) {
+      const tx = texX + fx;
+      const ty = texY + dPx + fy;
+      if (!isOpaque(tx, ty)) continue;
+
+      let z0 = -D / 2 + fx * pixelScale;
+      let z1 = z0 + pixelScale;
+      let y1 = H / 2 - fy * pixelScale;
+      let y0 = y1 - pixelScale;
+
+      if (fx === 0 && isOpaque(texX + dPx * 2 + wPx * 2 - 1, ty)) z0 -= reliefDepth;
+      if (fx === dPx - 1 && isOpaque(tx + 1, ty)) z1 += reliefDepth;
+      if (fy === 0 && isOpaque(texX + dPx, texY + fx)) y1 += reliefDepth;
+      if (fy === hPx - 1 && isOpaque(texX + dPx + wPx, texY + fx)) y0 -= reliefDepth;
+
+      pushBox(-W / 2 - reliefDepth, -W / 2 + embed, y0, y1, z0, z1, tx, ty);
+    }
+  }
+
+  // 5. Top (+Y)
+  for (let fy = 0; fy < dPx; fy++) {
+    for (let fx = 0; fx < wPx; fx++) {
+      const tx = texX + dPx + fx;
+      const ty = texY + fy;
+      if (!isOpaque(tx, ty)) continue;
+
+      const x0 = -W / 2 + fx * pixelScale;
+      const x1 = x0 + pixelScale;
+      const z0 = -D / 2 + fy * pixelScale;
+      const z1 = z0 + pixelScale;
+
+      pushBox(x0, x1, H / 2 - embed, H / 2 + reliefDepth, z0, z1, tx, ty);
+    }
+  }
+
+  // 6. Bottom (-Y) — fy=0 is -Z Back, fy=dPx-1 is +Z Front
+  for (let fy = 0; fy < dPx; fy++) {
+    for (let fx = 0; fx < wPx; fx++) {
+      const tx = texX + dPx + wPx + fx;
+      const ty = texY + fy;
+      if (!isOpaque(tx, ty)) continue;
+
+      const x0 = -W / 2 + fx * pixelScale;
+      const x1 = x0 + pixelScale;
+      const z0 = -D / 2 + fy * pixelScale;
+      const z1 = z0 + pixelScale;
+
+      pushBox(x0, x1, -H / 2 - reliefDepth, -H / 2 + embed, z0, z1, tx, ty);
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
+  geo.computeBoundingSphere();
   return geo;
 }
 
@@ -369,9 +585,62 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const maxAniso = renderer.capabilities.getMaxAnisotropy();
     const textures = createStageTextures(maxAniso);
 
+    let isDisposed = false;
+    const geometriesToDispose: THREE.BufferGeometry[] = [];
+    const registerGeo = <T extends THREE.BufferGeometry>(g: T): T => {
+      geometriesToDispose.push(g);
+      return g;
+    };
+    const px = 0.049;
+    const emptyOverlayPlaceholderGeo = registerGeo(new THREE.BufferGeometry());
+
+    const overlaySpecs: Array<{
+      mesh: THREE.Mesh;
+      wPx: number;
+      hPx: number;
+      dPx: number;
+      texX: number;
+      texY: number;
+      relief: number;
+    }> = [];
+
     const textureLoader = new THREE.TextureLoader();
-    const skinTexture = textureLoader.load('/assets/aistudio/raychristo_ea864ecd.png', () => {
-      skinTexture.needsUpdate = true;
+    const skinTexture = textureLoader.load('/assets/aistudio/raychristo_ea864ecd.png', (loadedTex) => {
+      if (isDisposed) return;
+      loadedTex.needsUpdate = true;
+
+      const img = loadedTex.image as HTMLImageElement | HTMLCanvasElement | undefined;
+      if (!img) return;
+      const texW = img.width || 64;
+      const texH = img.height || 64;
+      const probeCanvas = document.createElement('canvas');
+      probeCanvas.width = texW;
+      probeCanvas.height = texH;
+      const probeCtx = probeCanvas.getContext('2d');
+      if (!probeCtx) return;
+      probeCtx.drawImage(img, 0, 0, texW, texH);
+      const imgData = probeCtx.getImageData(0, 0, texW, texH).data;
+
+      for (const spec of overlaySpecs) {
+        const extrudedGeo = buildExtrudedOverlayGeometry(
+          spec.wPx,
+          spec.hPx,
+          spec.dPx,
+          spec.texX,
+          spec.texY,
+          px,
+          spec.relief,
+          imgData,
+          texW,
+          texH
+        );
+        geometriesToDispose.push(extrudedGeo);
+        if (spec.mesh.geometry !== emptyOverlayPlaceholderGeo) {
+          spec.mesh.geometry.dispose();
+        }
+        spec.mesh.geometry = extrudedGeo;
+        spec.mesh.visible = true;
+      }
     });
     skinTexture.colorSpace = THREE.SRGBColorSpace;
     skinTexture.magFilter = THREE.NearestFilter;
@@ -587,14 +856,12 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const motesPoints = new THREE.Points(motesGeo, motesMat);
     stageGroup.add(motesPoints);
 
-    // 6. Authentic Slim (3px Arm) 64x64 Minecraft Character + Full 2nd-Layer Overlays
-    // Base core meshes cast & receive crisp self-shadows (e.g. tilted head shadow onto chest!);
-    // 2nd-layer clothing/hair overlays receive shadows cleanly without casting acne onto base meshes below!
+    // 6. Authentic Slim (3px Arm) 64x64 Minecraft Character + Solid 3D Extruded 2nd-Layer Overlays
     const characterGroup = new THREE.Group();
     scene.add(characterGroup);
 
-    const px = 0.049;
-    const overlayExpand = 0.015;
+    const headOverlayRelief = px * 0.22;
+    const bodyOverlayRelief = px * 0.14;
 
     const skinBaseMat = new THREE.MeshStandardMaterial({
       map: skinTexture,
@@ -606,11 +873,9 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
       map: skinTexture,
       roughness: 0.76,
       metalness: 0.05,
-      alphaTest: 0.5,
-      side: THREE.DoubleSide,
     });
 
-    const geometriesToDispose: THREE.BufferGeometry[] = [
+    geometriesToDispose.push(
       litFloorGeo,
       protractorGeo,
       contactGeo,
@@ -618,8 +883,8 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
       triGeo,
       outerTriGeo,
       sightLineGeo,
-      motesGeo,
-    ];
+      motesGeo
+    );
     const materialsToDispose: THREE.Material[] = [
       litFloorMat,
       protractorMat,
@@ -633,15 +898,29 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
       skinOverlayMat,
     ];
 
-    const registerGeo = <T extends THREE.BufferGeometry>(g: T): T => {
-      geometriesToDispose.push(g);
-      return g;
-    };
-
     // Base meshes cast crisp shadows onto torso & floor; overlays receive shadows without acne
     const setCharPartShadow = (mesh: THREE.Mesh, isOverlay = false) => {
       mesh.castShadow = !isSoftwareGl && !isOverlay;
       mesh.receiveShadow = !isSoftwareGl;
+      return mesh;
+    };
+
+    const createExtrudedOverlayMesh = (
+      wPx: number,
+      hPx: number,
+      dPx: number,
+      texX: number,
+      texY: number,
+      relief: number,
+      yOffset: number
+    ): THREE.Mesh => {
+      const mesh = setCharPartShadow(
+        new THREE.Mesh(emptyOverlayPlaceholderGeo, skinOverlayMat),
+        true
+      );
+      mesh.position.y = yOffset;
+      mesh.visible = false;
+      overlaySpecs.push({ mesh, wPx, hPx, dPx, texX, texY, relief });
       return mesh;
     };
 
@@ -654,11 +933,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const rLegGeo = registerGeo(createMinecraftBoxGeometry(4, 12, 4, 0, 16, px));
     const rLegMesh = setCharPartShadow(new THREE.Mesh(rLegGeo, skinBaseMat));
     rLegMesh.position.y = halfLegY;
-    const rLegOverlayGeo = registerGeo(
-      createMinecraftBoxGeometry(4, 12, 4, 0, 32, px, overlayExpand)
-    );
-    const rLegOverlay = setCharPartShadow(new THREE.Mesh(rLegOverlayGeo, skinOverlayMat), true);
-    rLegOverlay.position.y = halfLegY;
+    const rLegOverlay = createExtrudedOverlayMesh(4, 12, 4, 0, 32, bodyOverlayRelief, halfLegY);
     rightLegGroup.add(rLegMesh, rLegOverlay);
     rightLegGroup.rotation.x = 0.04;
     rightLegGroup.rotation.z = -0.015;
@@ -669,11 +944,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const lLegGeo = registerGeo(createMinecraftBoxGeometry(4, 12, 4, 16, 48, px));
     const lLegMesh = setCharPartShadow(new THREE.Mesh(lLegGeo, skinBaseMat));
     lLegMesh.position.y = halfLegY;
-    const lLegOverlayGeo = registerGeo(
-      createMinecraftBoxGeometry(4, 12, 4, 0, 48, px, overlayExpand)
-    );
-    const lLegOverlay = setCharPartShadow(new THREE.Mesh(lLegOverlayGeo, skinOverlayMat), true);
-    lLegOverlay.position.y = halfLegY;
+    const lLegOverlay = createExtrudedOverlayMesh(4, 12, 4, 0, 48, bodyOverlayRelief, halfLegY);
     leftLegGroup.add(lLegMesh, lLegOverlay);
     leftLegGroup.rotation.x = -0.04;
     leftLegGroup.rotation.z = 0.015;
@@ -687,11 +958,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const torsoGeo = registerGeo(createMinecraftBoxGeometry(8, 12, 4, 16, 16, px));
     const torsoMesh = setCharPartShadow(new THREE.Mesh(torsoGeo, skinBaseMat));
     torsoMesh.position.y = 6 * px;
-    const torsoOverlayGeo = registerGeo(
-      createMinecraftBoxGeometry(8, 12, 4, 16, 32, px, overlayExpand)
-    );
-    const torsoOverlay = setCharPartShadow(new THREE.Mesh(torsoOverlayGeo, skinOverlayMat), true);
-    torsoOverlay.position.y = 6 * px;
+    const torsoOverlay = createExtrudedOverlayMesh(8, 12, 4, 16, 32, bodyOverlayRelief, 6 * px);
     upperBodyGroup.add(torsoMesh, torsoOverlay);
 
     // -- HEAD + HAIR/CROWN OVERLAY --
@@ -702,9 +969,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const headGeo = registerGeo(createMinecraftBoxGeometry(8, 8, 8, 0, 0, px));
     const headMesh = setCharPartShadow(new THREE.Mesh(headGeo, skinBaseMat));
     headMesh.position.y = 4 * px;
-    const hatGeo = registerGeo(createMinecraftBoxGeometry(8, 8, 8, 32, 0, px, overlayExpand * 1.45));
-    const hatMesh = setCharPartShadow(new THREE.Mesh(hatGeo, skinOverlayMat), true);
-    hatMesh.position.y = 4 * px;
+    const hatMesh = createExtrudedOverlayMesh(8, 8, 8, 32, 0, headOverlayRelief, 4 * px);
     headGroup.add(headMesh, hatMesh);
 
     // -- SLIM ARMS --
@@ -716,11 +981,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const rArmGeo = registerGeo(createMinecraftBoxGeometry(3, 12, 4, 40, 16, px));
     const rArmMesh = setCharPartShadow(new THREE.Mesh(rArmGeo, skinBaseMat));
     rArmMesh.position.y = armOffsetY;
-    const rArmOverlayGeo = registerGeo(
-      createMinecraftBoxGeometry(3, 12, 4, 40, 32, px, overlayExpand)
-    );
-    const rArmOverlay = setCharPartShadow(new THREE.Mesh(rArmOverlayGeo, skinOverlayMat), true);
-    rArmOverlay.position.y = armOffsetY;
+    const rArmOverlay = createExtrudedOverlayMesh(3, 12, 4, 40, 32, bodyOverlayRelief, armOffsetY);
     rightArmGroup.add(rArmMesh, rArmOverlay);
     rightArmGroup.rotation.z = -0.07;
     rightArmGroup.rotation.x = -0.08;
@@ -731,11 +992,7 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
     const lArmGeo = registerGeo(createMinecraftBoxGeometry(3, 12, 4, 32, 48, px));
     const lArmMesh = setCharPartShadow(new THREE.Mesh(lArmGeo, skinBaseMat));
     lArmMesh.position.y = armOffsetY;
-    const lArmOverlayGeo = registerGeo(
-      createMinecraftBoxGeometry(3, 12, 4, 48, 48, px, overlayExpand)
-    );
-    const lArmOverlay = setCharPartShadow(new THREE.Mesh(lArmOverlayGeo, skinOverlayMat), true);
-    lArmOverlay.position.y = armOffsetY;
+    const lArmOverlay = createExtrudedOverlayMesh(3, 12, 4, 48, 48, bodyOverlayRelief, armOffsetY);
     leftArmGroup.add(lArmMesh, lArmOverlay);
     leftArmGroup.rotation.z = 0.07;
     leftArmGroup.rotation.x = 0.08;
@@ -825,7 +1082,6 @@ export const AboutShowcase3D: React.FC<AboutShowcase3DProps> = ({
 
     // 8. Animation Loop
     let frameId = 0;
-    let isDisposed = false;
     const clock = new THREE.Clock();
     const smoothMouse = { x: 0, y: 0 };
     let smoothLight = 0;
