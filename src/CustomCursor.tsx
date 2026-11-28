@@ -28,14 +28,17 @@ const FLICKER_PATTERNS: ReadonlyArray<readonly number[]> = [
   [0.12, 0.92, 0.05, 0.35, 1.0, 0.18, 0.9],
 ];
 
+// 3-pixel L-shape with top-left corner at (0,0) on a 2x2 grid
+const L_POINTS = '0,0 2,0 2,1 1,1 1,2 0,2';
+
 export const CustomCursor: React.FC = () => {
   const [enabled, setEnabled] = useState(false);
 
   const glitchLayerRef = React.useRef<HTMLDivElement>(null);
   const invertLayerRef = React.useRef<HTMLDivElement>(null);
   const invertFillRef = React.useRef<HTMLDivElement>(null);
-  const outlineLayerRef = React.useRef<HTMLDivElement>(null);
-  const outlineRingRef = React.useRef<HTMLDivElement>(null);
+  const glowLayerRef = React.useRef<HTMLDivElement>(null);
+  const glowShapeRef = React.useRef<HTMLDivElement>(null);
   const sparkRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
@@ -75,7 +78,7 @@ export const CustomCursor: React.FC = () => {
     let smoothOpacity = 0;
     let appliedBoxSize = -1;
 
-    // Pixel maneuver state (hover/click flips, velocity flicks, chromatic glitch)
+    // L-pointer maneuver state (hover/click twist, velocity flick, chromatic glitch)
     let targetBaseAngle = 0;
     let smoothAngle = 0;
     let flipImpulse = 0;
@@ -138,12 +141,11 @@ export const CustomCursor: React.FC = () => {
       isPressed = true;
       isVisible = !document.fullscreenElement;
       if (isVisible) {
-        burstOriginX = mouseX;
-        burstOriginY = mouseY;
+        burstOriginX = mouseX + 4;
+        burstOriginY = mouseY + 4;
         burstLife = 1;
-        targetBaseAngle += 90;
         flipImpulse = 1;
-        glitchTimer = 0.11;
+        glitchTimer = 0.1;
       }
       updateInteractiveHit(mouseX, mouseY, e.target);
     };
@@ -196,15 +198,15 @@ export const CustomCursor: React.FC = () => {
       const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
       lastTime = now;
 
-      // Detect hover enter / exit transitions for lock-on maneuvers
+      // Subtle quantized maneuver on interactive hover transitions while keeping top-left L clear
       if (isInteractive !== prevInteractive) {
         if (isInteractive) {
-          targetBaseAngle += 90;
+          targetBaseAngle = 15;
           flipImpulse = 1;
-          glitchTimer = 0.1;
+          glitchTimer = 0.09;
         } else {
-          targetBaseAngle -= 90;
-          glitchTimer = 0.065;
+          targetBaseAngle = 0;
+          glitchTimer = 0.06;
         }
         prevInteractive = isInteractive;
       }
@@ -223,11 +225,11 @@ export const CustomCursor: React.FC = () => {
       }
 
       if (flipImpulse > 0) {
-        flipImpulse = Math.max(0, flipImpulse - dt * 7.2);
+        flipImpulse = Math.max(0, flipImpulse - dt * 7.8);
       }
 
       // Continuous Streetlight Glitch Flicker (active whether moving or idle)
-      let flickerIntensity = 0.82;
+      let flickerIntensity = 0.84;
       let flickerChromatic = false;
       let flickerJitterX = 0;
 
@@ -238,10 +240,8 @@ export const CustomCursor: React.FC = () => {
             flickerStepIndex += 1;
             if (flickerStepIndex >= activeFlickerPattern.length) {
               flickerStepIndex = -1;
-              // Pseudo-random natural streetlight interval (1.2s – 3.4s)
               flickerCooldown = 1.2 + ((Math.sin(now * 0.017) + 1) * 0.5) * 2.2;
             } else {
-              // Fast irregular stutter ticks (28ms – 58ms)
               flickerStepTimer = 0.028 + ((flickerStepIndex * 19 + Math.round(now)) % 30) / 1000;
             }
           }
@@ -253,9 +253,8 @@ export const CustomCursor: React.FC = () => {
             }
           }
         } else {
-          // Subtle high-frequency lamp hum micro-shimmer between major flicker bursts
           const hum = Math.sin(now * 0.045) * 0.03 + Math.sin(now * 0.11) * 0.02;
-          flickerIntensity = 0.84 + hum;
+          flickerIntensity = 0.85 + hum;
           flickerCooldown -= dt;
           if (flickerCooldown <= 0) {
             patternCursor = (patternCursor + 1) % FLICKER_PATTERNS.length;
@@ -266,53 +265,47 @@ export const CustomCursor: React.FC = () => {
         }
       }
 
-      // Normally 10px filled inverted -> Hover 16px filled inverted; crunch inward by 2px on press
-      const baseSize = isInteractive ? 16 : 10;
+      // Crisp 3-pixel L-shape: 10px normally (5px per pixel) -> 14px on hover (7px per pixel)
+      const baseSize = isInteractive ? 14 : 10;
       const targetBoxSize = isPressed ? Math.max(8, baseSize - 2) : baseSize;
       const targetOpacity = isVisible ? 1 : 0;
 
       smoothBoxSize += (targetBoxSize - smoothBoxSize) * morphAlpha;
       smoothOpacity += (targetOpacity - smoothOpacity) * opacityAlpha;
 
-      // Fast flick tilts cursor briefly into a 45deg diamond maneuver
-      const flickAngle = speed > 14 ? 45 : 0;
-      smoothAngle += (targetBaseAngle + flickAngle - smoothAngle) * morphAlpha;
-
-      // Quantize angle onto crisp 15deg digital steps
+      const flickTilt = speed > 16 ? 15 : 0;
+      smoothAngle += (targetBaseAngle + flickTilt - smoothAngle) * morphAlpha;
       const steppedAngle = Math.round(smoothAngle / 15) * 15;
 
-      // Crisp horizontal flip pulse during lock-on / click
-      const flipScaleX = flipImpulse > 0.05 ? Math.cos(flipImpulse * Math.PI) : 1;
+      const flipScale = flipImpulse > 0.05 ? 0.85 + 0.15 * Math.cos(flipImpulse * Math.PI) : 1;
 
-      // Velocity directional squash/stretch on brisk flicks
       let stretchX = 1;
       let stretchY = 1;
-      if (speed > 10 && flipImpulse <= 0.05) {
+      if (speed > 12 && flipImpulse <= 0.05) {
         const ax = Math.abs(velX);
         const ay = Math.abs(velY);
         if (ax > ay * 1.35) {
-          stretchX = 1.25;
-          stretchY = 0.85;
+          stretchX = 1.2;
+          stretchY = 0.9;
         } else if (ay > ax * 1.35) {
-          stretchX = 0.85;
-          stretchY = 1.25;
+          stretchX = 0.9;
+          stretchY = 1.2;
         }
       }
 
-      // Brief quantized pixel glitch offset (±2px on action glitch, ±1px on sharpest streetlight drop)
       const actionGlitchX = glitchTimer > 0 ? (glitchTick % 2 === 0 ? 2 : -2) : 0;
       const actionGlitchY = glitchTimer > 0 && glitchTick % 3 === 0 ? -1 : 0;
       const glitchShiftX = actionGlitchX !== 0 ? actionGlitchX : flickerJitterX;
       const glitchShiftY = actionGlitchY;
 
-      // Quantize box size onto crisp even integer pixel steps (8, 10, 12, 14, 16)
-      const quantizedBox = Math.max(8, Math.min(16, Math.round(smoothBoxSize / 2) * 2));
+      // Quantize cleanly onto even integer steps (8, 10, 12, 14 -> 4px..7px blocks)
+      const quantizedBox = Math.max(8, Math.min(14, Math.round(smoothBoxSize / 2) * 2));
 
-      const half = quantizedBox / 2;
-      const px = Math.round(mouseX - half + glitchShiftX);
-      const py = Math.round(mouseY - half + glitchShiftY);
+      // Top-left L corner sits directly at pointer coordinate (mouseX, mouseY)
+      const px = Math.round(mouseX + glitchShiftX);
+      const py = Math.round(mouseY + glitchShiftY);
       const posTransform = `translate3d(${px}px, ${py}px, 0)`;
-      const maneuverTransform = `rotate(${steppedAngle}deg) scale(${(flipScaleX * stretchX).toFixed(3)}, ${stretchY.toFixed(3)})`;
+      const maneuverTransform = `rotate(${steppedAngle}deg) scale(${(flipScale * stretchX).toFixed(3)}, ${(flipScale * stretchY).toFixed(3)})`;
 
       if (quantizedBox !== appliedBoxSize) {
         appliedBoxSize = quantizedBox;
@@ -325,50 +318,47 @@ export const CustomCursor: React.FC = () => {
           invertLayerRef.current.style.width = sizeStr;
           invertLayerRef.current.style.height = sizeStr;
         }
-        if (outlineLayerRef.current) {
-          outlineLayerRef.current.style.width = sizeStr;
-          outlineLayerRef.current.style.height = sizeStr;
+        if (glowLayerRef.current) {
+          glowLayerRef.current.style.width = sizeStr;
+          glowLayerRef.current.style.height = sizeStr;
         }
       }
 
-      // Chromatic split outline flashes on hover/click glitch OR sharpest streetlight flicker dip
       if (glitchLayerRef.current) {
         if ((glitchTimer > 0 || flickerChromatic) && isVisible) {
           const splitDir = glitchShiftX !== 0 ? glitchShiftX : 1;
-          const splitX = Math.round(mouseX - half - splitDir * 1.5);
-          const splitY = Math.round(mouseY - half + (glitchTick % 2 === 0 ? 1 : -1));
+          const splitX = Math.round(mouseX - splitDir * 1.5);
+          const splitY = Math.round(mouseY + (glitchTick % 2 === 0 ? 1 : -1));
           glitchLayerRef.current.style.transform = `translate3d(${splitX}px, ${splitY}px, 0) ${maneuverTransform}`;
-          glitchLayerRef.current.style.opacity = ((flickerChromatic ? 0.55 : 0.72) * smoothOpacity).toFixed(2);
+          glitchLayerRef.current.style.opacity = ((flickerChromatic ? 0.6 : 0.78) * smoothOpacity).toFixed(2);
         } else {
           glitchLayerRef.current.style.opacity = '0';
         }
       }
 
-      // Streetlight flicker modulates both the invert core (never completely invisible, dips to 0.35) & outer glow
-      const fillAlpha = Math.max(0.32, Math.min(1, 0.32 + flickerIntensity * 0.72));
+      const fillAlpha = Math.max(0.32, Math.min(1, 0.34 + flickerIntensity * 0.7));
       if (invertLayerRef.current && invertFillRef.current) {
         invertLayerRef.current.style.transform = posTransform;
         invertLayerRef.current.style.opacity = (smoothOpacity * fillAlpha).toFixed(3);
         invertFillRef.current.style.transform = maneuverTransform;
       }
 
-      if (outlineLayerRef.current && outlineRingRef.current) {
-        const ringAlpha = Math.max(0.28, Math.min(1, 0.24 + flickerIntensity * 0.8));
+      if (glowLayerRef.current && glowShapeRef.current) {
+        const ringAlpha = Math.max(0.28, Math.min(1, 0.25 + flickerIntensity * 0.78));
         const glowInner = (flickerIntensity * 0.92).toFixed(2);
-        const glowOuter = (flickerIntensity * 0.42).toFixed(2);
-        outlineLayerRef.current.style.transform = posTransform;
-        outlineLayerRef.current.style.opacity = (smoothOpacity * ringAlpha).toFixed(3);
-        outlineRingRef.current.style.transform = maneuverTransform;
-        outlineRingRef.current.style.boxShadow = `0 0 7px rgba(255,255,255,${glowInner}), 0 0 16px rgba(255,255,255,${glowOuter})`;
+        const glowOuter = (flickerIntensity * 0.45).toFixed(2);
+        glowLayerRef.current.style.transform = posTransform;
+        glowLayerRef.current.style.opacity = (smoothOpacity * ringAlpha).toFixed(3);
+        glowShapeRef.current.style.transform = maneuverTransform;
+        glowShapeRef.current.style.filter = `drop-shadow(0 0 4px rgba(255,255,255,${glowInner})) drop-shadow(0 0 10px rgba(255,255,255,${glowOuter}))`;
       }
 
-      // Tight click corner pixel sparks (4 sharp 2x2 pixels popping around box)
       if (burstLife > 0) {
-        burstLife = Math.max(0, burstLife - dt * 7.5);
+        burstLife = Math.max(0, burstLife - dt * 8.0);
       }
       const burstProgress = 1 - burstLife;
       const sparkStep = burstProgress < 0.34 ? 7 : burstProgress < 0.68 ? 10 : 12;
-      const sparkOpacity = burstLife <= 0.02 ? 0 : burstLife > 0.55 ? 0.9 : 0.42;
+      const sparkOpacity = burstLife <= 0.02 ? 0 : burstLife > 0.55 ? 0.9 : 0.4;
 
       for (let i = 0; i < SPARK_DIRS.length; i++) {
         const el = sparkRefs.current[i];
@@ -377,8 +367,8 @@ export const CustomCursor: React.FC = () => {
             el.style.opacity = '0';
           } else {
             const [dx, dy] = SPARK_DIRS[i];
-            const sx = Math.round(burstOriginX + dx * sparkStep - 1);
-            const sy = Math.round(burstOriginY + dy * sparkStep - 1);
+            const sx = Math.round(burstOriginX + dx * sparkStep);
+            const sy = Math.round(burstOriginY + dy * sparkStep);
             el.style.transform = `translate3d(${sx}px, ${sy}px, 0)`;
             el.style.opacity = sparkOpacity.toFixed(2);
           }
@@ -407,7 +397,7 @@ export const CustomCursor: React.FC = () => {
 
   return createPortal(
     <>
-      {/* Click corner pixel sparks */}
+      {/* Tight click pixel sparks */}
       {SPARK_DIRS.map((_, i) => (
         <div
           key={`spark-${i}`}
@@ -419,35 +409,52 @@ export const CustomCursor: React.FC = () => {
         />
       ))}
 
-      {/* Transient chromatic glitch split outline during hover/click or sharp flicker dip */}
+      {/* Transient cyan glitch silhouette on flickers/actions */}
       <div
         ref={glitchLayerRef}
         aria-hidden="true"
-        className="fixed top-0 left-0 w-[10px] h-[10px] border border-cyan-300/80 pointer-events-none z-[9997] mix-blend-screen opacity-0 will-change-transform"
-      />
+        className="fixed top-0 left-0 w-[10px] h-[10px] pointer-events-none z-[9997] mix-blend-screen opacity-0 will-change-transform origin-[25%_25%]"
+      >
+        <svg viewBox="0 0 2 2" className="w-full h-full block" shapeRendering="crispEdges">
+          <polygon points={L_POINTS} fill="rgba(103, 232, 249, 0.85)" />
+        </svg>
+      </div>
 
-      {/* Layer 1: Always-on white pixel-invert fill square (10px normal -> 16px hover) */}
+      {/* Layer 1: White inverted 3-pixel L pointer */}
       <div
         ref={invertLayerRef}
         aria-hidden="true"
         className="fixed top-0 left-0 w-[10px] h-[10px] pointer-events-none z-[9998] mix-blend-difference opacity-0 will-change-transform"
       >
-        <div
-          ref={invertFillRef}
-          className="w-full h-full bg-white will-change-transform"
-        />
+        <div ref={invertFillRef} className="w-full h-full origin-[25%_25%] will-change-transform">
+          <svg viewBox="0 0 2 2" className="w-full h-full block" shapeRendering="crispEdges">
+            <polygon points={L_POINTS} fill="#ffffff" />
+          </svg>
+        </div>
       </div>
 
-      {/* Layer 2: Razor-sharp glowing pixel-square outline with streetlight flicker */}
+      {/* Layer 2: Streetlight-flicker luminous L silhouette */}
       <div
-        ref={outlineLayerRef}
+        ref={glowLayerRef}
         aria-hidden="true"
         className="fixed top-0 left-0 w-[10px] h-[10px] pointer-events-none z-[9999] opacity-0 will-change-transform"
       >
         <div
-          ref={outlineRingRef}
-          className="w-full h-full border border-white/95 shadow-[0_0_7px_rgba(255,255,255,0.78),0_0_16px_rgba(255,255,255,0.34)] will-change-transform"
-        />
+          ref={glowShapeRef}
+          className="w-full h-full origin-[25%_25%] will-change-transform"
+          style={{
+            filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.85)) drop-shadow(0 0 10px rgba(255,255,255,0.4))',
+          }}
+        >
+          <svg viewBox="0 0 2 2" className="w-full h-full block overflow-visible" shapeRendering="crispEdges">
+            <polygon
+              points={L_POINTS}
+              fill="none"
+              stroke="rgba(255, 255, 255, 0.92)"
+              strokeWidth="0.22"
+            />
+          </svg>
+        </div>
       </div>
     </>,
     document.body

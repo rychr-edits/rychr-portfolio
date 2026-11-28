@@ -4,7 +4,7 @@ import { RevealOnScroll } from './RevealOnScroll.tsx';
 import { CalmNavbarBorder } from './CalmNavbarBorder.tsx';
 import { AnimatedGeminiBorder, GeminiColorPreset } from './AnimatedGeminiBorder.tsx';
 import { CustomVideoPlayer } from './CustomVideoPlayer.tsx';
-import { AboutShowcase3D } from './AboutShowcase3D.tsx';
+import { AboutEditorStudio } from './AboutEditorStudio.tsx';
 import { Spatial3DEngine } from './Spatial3DEngine.tsx';
 import { CustomCursor } from './CustomCursor.tsx';
 import { FaqItem } from './types.ts';
@@ -284,58 +284,6 @@ export default function App() {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Mouse-reactive & scroll-driven spin state for the #about 3D showcase card (zero React re-renders)
-  const aboutSectionRef = useRef<HTMLElement>(null);
-  const aboutPointerRef = useRef({ x: 0, y: 0 });
-  const aboutScrollProgressRef = useRef(0);
-  const aboutStageFrameRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const section = aboutSectionRef.current;
-    if (!section) return;
-
-    const updateScrollProgress = () => {
-      const targetEl = aboutStageFrameRef.current || section;
-      const rect = targetEl.getBoundingClientRect();
-      const vh = window.innerHeight || 800;
-      // 0 (facing backwards) near #whyme, spinning smoothly 180deg to 1.0 (facing front) as the card enters view
-      const raw = (vh * 0.90 - rect.top) / (vh * 0.56);
-      const clamped = Math.max(0, Math.min(1, raw));
-      aboutScrollProgressRef.current = clamped * clamped * (3 - 2 * clamped);
-    };
-
-    updateScrollProgress();
-
-    const onPointerMove = (e: PointerEvent) => {
-      const targetEl = aboutStageFrameRef.current || section;
-      const rect = targetEl.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) return;
-      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-      aboutPointerRef.current.x = Math.max(-1, Math.min(1, nx));
-      aboutPointerRef.current.y = Math.max(-1, Math.min(1, ny));
-    };
-
-    const onPointerReset = () => {
-      aboutPointerRef.current.x = 0;
-      aboutPointerRef.current.y = 0;
-    };
-
-    window.addEventListener('pointermove', onPointerMove, { passive: true });
-    document.addEventListener('mouseleave', onPointerReset);
-    window.addEventListener('blur', onPointerReset);
-    window.addEventListener('scroll', updateScrollProgress, { passive: true });
-    window.addEventListener('resize', updateScrollProgress, { passive: true });
-
-    return () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      document.removeEventListener('mouseleave', onPointerReset);
-      window.removeEventListener('blur', onPointerReset);
-      window.removeEventListener('scroll', updateScrollProgress);
-      window.removeEventListener('resize', updateScrollProgress);
-    };
-  }, []);
-
   // Smooth Dropdown Outside Click & Escape Key Listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -444,7 +392,7 @@ export default function App() {
       <CustomCursor />
 
       {/* PERSISTENT HEADER NAVBAR */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-10 py-4 sm:py-5 transition-colors duration-300">
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-10 py-3 sm:py-3.5 transition-colors duration-300">
         <div
           data-s3d="bar"
           data-s3d-depth="0.45"
@@ -452,7 +400,7 @@ export default function App() {
           data-s3d-scale="1.024"
           data-s3d-tilt="7.5"
           data-s3d-shift="5"
-          className="relative max-w-7xl mx-auto flex items-center justify-between px-5 sm:px-8 py-4 rounded-2xl bg-black/88 backdrop-blur-xl border border-white/15 shadow-[0_6px_36px_rgba(0,0,0,0.92)] will-change-transform"
+          className="relative max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-2.5 rounded-2xl bg-black/88 backdrop-blur-xl border border-white/15 shadow-[0_6px_36px_rgba(0,0,0,0.92)] will-change-transform"
         >
           {/* Calm, slow subtle dual parallel glowing border covering all sides of the rounded tab */}
           <CalmNavbarBorder />
@@ -466,9 +414,9 @@ export default function App() {
             data-s3d-global-tilt="1.0"
             data-s3d-scale="1.06"
             data-s3d-tilt="9"
-            className="inline-flex items-center gap-3.5 py-1 px-1.5 rounded-xl group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 will-change-transform"
+            className="inline-flex items-center gap-2.5 py-0.5 px-1 rounded-xl group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 will-change-transform"
           >
-            <div className="relative w-11 h-11 rounded-xl overflow-hidden border border-white/25 bg-black flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.28)] group-hover:shadow-[0_0_28px_rgba(255,255,255,0.5)] group-hover:border-white/55 transition-[border-color,box-shadow] shrink-0">
+            <div className="relative w-9 h-9 rounded-xl overflow-hidden border border-white/25 bg-black flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.28)] group-hover:shadow-[0_0_28px_rgba(255,255,255,0.5)] group-hover:border-white/55 transition-[border-color,box-shadow] shrink-0">
               <video
                 src="/assets/aistudio/export_2_-_15_fps_dc6d6217.mp4"
                 poster="/assets/aistudio/image_5a1c3c4a.png"
@@ -480,7 +428,7 @@ export default function App() {
                 className="w-full h-full object-cover scale-[1.03] grayscale contrast-125 pointer-events-none select-none"
               />
             </div>
-            <span className="font-brand-rychr text-2xl tracking-tight text-white group-hover:text-white/85 transition-colors">
+            <span className="font-brand-rychr text-xl tracking-tight text-white group-hover:text-white/85 transition-colors">
               Rychr
             </span>
           </a>
@@ -488,7 +436,7 @@ export default function App() {
           {/* Center Tabs: Work, Shorts, Why me, About, FAQ */}
           <nav
             aria-label="Primary navigation"
-            className="hidden md:flex items-center gap-1.5 lg:gap-3 text-[15px] lg:text-base font-medium text-white/80"
+            className="hidden md:flex items-center gap-1 lg:gap-2 text-sm font-medium text-white/80"
           >
             <a
               href="#work"
@@ -497,7 +445,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
+              className="inline-flex items-center min-h-[36px] px-3.5 py-1.5 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               Work
             </a>
@@ -508,7 +456,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
+              className="inline-flex items-center min-h-[36px] px-3.5 py-1.5 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               Shorts
             </a>
@@ -519,7 +467,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
+              className="inline-flex items-center min-h-[36px] px-3.5 py-1.5 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               Why me
             </a>
@@ -530,7 +478,7 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
+              className="inline-flex items-center min-h-[36px] px-3.5 py-1.5 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               About
             </a>
@@ -541,14 +489,14 @@ export default function App() {
               data-s3d-global-tilt="1.0"
               data-s3d-scale="1.1"
               data-s3d-tilt="10"
-              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
+              className="inline-flex items-center min-h-[36px] px-3.5 py-1.5 rounded-xl hover:text-white hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:bg-white/10 focus-visible:text-white transition-[color,background-color] will-change-transform"
             >
               FAQ
             </a>
           </nav>
 
           {/* Right Action: Let's Talk CTA + Accessible Mobile Menu Toggle */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <a
               href="#contact"
               data-s3d="button"
@@ -556,7 +504,7 @@ export default function App() {
               data-s3d-global-tilt="1.2"
               data-s3d-scale="1.07"
               data-s3d-tilt="9.5"
-              className="relative inline-flex items-center min-h-[44px] px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl text-sm sm:text-[15px] font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(255,255,255,0.28)] hover:shadow-[0_0_32px_rgba(255,255,255,0.52)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 transition-[background-color,box-shadow,color] cursor-pointer overflow-visible group/btn will-change-transform"
+              className="relative inline-flex items-center min-h-[36px] px-4 sm:px-5 py-2 rounded-xl text-sm font-semibold bg-black/90 hover:bg-black text-white shadow-[0_0_20px_rgba(255,255,255,0.28)] hover:shadow-[0_0_32px_rgba(255,255,255,0.52)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 transition-[background-color,box-shadow,color] cursor-pointer overflow-visible group/btn will-change-transform"
             >
               <AnimatedGeminiBorder
                 preset="instagram"
@@ -583,9 +531,9 @@ export default function App() {
               aria-expanded={isMobileNavOpen}
               aria-controls="mobile-primary-nav"
               aria-label={isMobileNavOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              className="md:hidden w-11 h-11 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/20 text-white flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 transition-[background-color,border-color] cursor-pointer will-change-transform"
+              className="md:hidden w-9 h-9 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/20 text-white flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 transition-[background-color,border-color] cursor-pointer will-change-transform"
             >
-              {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMobileNavOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -1414,7 +1362,7 @@ export default function App() {
                   data-s3d-global-tilt="0.9"
                   className="text-xl font-heading font-bold text-white mb-2 will-change-transform"
                 >
-                  4. 100% After Effects
+                  4. After Effects Professional
                 </h3>
                 <p
                   data-s3d="global"
@@ -1422,7 +1370,7 @@ export default function App() {
                   data-s3d-global-tilt="0.7"
                   className="text-sm text-white/65 leading-relaxed font-normal will-change-transform"
                 >
-                  Edited exclusively in After Effects. Custom motion graphics, surgical speed ramping, keyframe curves, and 3D camera sweeps.
+                  Built professionally in Adobe After Effects with custom motion graphics, smooth speed ramping, keyframe curves, and 3D camera sweeps.
                 </p>
               </div>
             </div>
@@ -1528,10 +1476,9 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECTION 4: ABOUT RAY — EDITORIAL 3D CHARACTER CARD & STATS */}
+      {/* SECTION 4: ABOUT RAY — EDITORIAL CRAFT STUDIO & 4 PROOF STATS */}
       <section
         id="about"
-        ref={aboutSectionRef}
         className="relative py-28 px-6 md:px-12 z-20 max-w-7xl mx-auto scroll-mt-24 border-t border-white/10"
       >
         <SubtleGridLines />
@@ -1554,158 +1501,11 @@ export default function App() {
           </h2>
         </RevealOnScroll>
 
-        {/* Scroll-Driven 3D Showcase Card (Spins Back-to-Front on Scroll Down, Turns Back on Scroll Up) */}
-        <div ref={aboutStageFrameRef} className="relative z-10 overflow-visible">
-          <AboutShowcase3D
-            pointerTargetRef={aboutPointerRef}
-            scrollProgressRef={aboutScrollProgressRef}
-          />
-        </div>
-
-        {/* 4 Key Proof Metrics Across All Viewports */}
-        <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-          <div
-            data-s3d="card"
-            data-s3d-depth="0.9"
-            data-s3d-global-tilt="3.0"
-            data-s3d-scale="1.05"
-            data-s3d-tilt="9"
-            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-          >
-            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white tabular-nums">4+</div>
-            <div className="text-xs sm:text-sm text-white/60 mt-1">years experience</div>
-          </div>
-          <div
-            data-s3d="card"
-            data-s3d-depth="0.9"
-            data-s3d-global-tilt="3.0"
-            data-s3d-scale="1.05"
-            data-s3d-tilt="9"
-            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-          >
-            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white tabular-nums">50+</div>
-            <div className="text-xs sm:text-sm text-white/60 mt-1">videos edited</div>
-          </div>
-          <div
-            data-s3d="card"
-            data-s3d-depth="0.9"
-            data-s3d-global-tilt="3.0"
-            data-s3d-scale="1.05"
-            data-s3d-tilt="9"
-            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-          >
-            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white">Reliable</div>
-            <div className="text-xs sm:text-sm text-white/60 mt-1">turnaround time</div>
-          </div>
-          <div
-            data-s3d="card"
-            data-s3d-depth="0.9"
-            data-s3d-global-tilt="3.0"
-            data-s3d-scale="1.05"
-            data-s3d-tilt="9"
-            className="relative hover:z-30 rounded-2xl p-5 bg-[#050505]/90 border border-white/10 hover:border-white/30 transition-colors will-change-transform"
-          >
-            <div className="text-2xl sm:text-3xl font-mazzard font-bold text-white tabular-nums">100%</div>
-            <div className="text-xs sm:text-sm text-white/60 mt-1">After Effects</div>
-          </div>
-        </div>
-
-        {/* 3 Glowing-Border Editorial Cards Below Stage */}
-        <div className="relative z-10 mt-8 pt-2">
-          <RevealOnScroll delay={160} className="relative z-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div
-                data-s3d="card"
-                data-s3d-depth="0.95"
-                data-s3d-global-tilt="3.4"
-                data-s3d-scale="1.055"
-                data-s3d-tilt="8.5"
-                data-s3d-shift="4"
-                className="group relative hover:z-30 rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
-              >
-                <AnimatedGeminiBorder
-                  preset="gemini"
-                  mode="always"
-                  borderRadius="rounded-3xl"
-                  borderWidth="1.5px"
-                  auraBlur="blur-lg"
-                  auraOpacity={0.32}
-                  innerGlowOpacity={0.9}
-                  speedMs={18000}
-                  angleOffset={0}
-                />
-                <p
-                  data-s3d="global"
-                  data-s3d-depth="0.35"
-                  data-s3d-global-tilt="0.8"
-                  className="relative z-10 text-sm sm:text-base text-white/70 leading-relaxed font-normal will-change-transform"
-                >
-                  I’ve spent the last <strong className="text-white">4+ years</strong> deep in <strong className="text-white">Adobe After Effects</strong>, engineering and cutting 50+ high-retention videos for creators across YouTube, Reels, and TikTok. Video editing isn't just trimming fat—it's pacing mathematics and keeping a viewer hooked from frame zero.
-                </p>
-              </div>
-
-              <div
-                data-s3d="card"
-                data-s3d-depth="0.95"
-                data-s3d-global-tilt="3.4"
-                data-s3d-scale="1.055"
-                data-s3d-tilt="8.5"
-                data-s3d-shift="4"
-                className="group relative hover:z-30 rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
-              >
-                <AnimatedGeminiBorder
-                  preset="discord"
-                  mode="always"
-                  borderRadius="rounded-3xl"
-                  borderWidth="1.5px"
-                  auraBlur="blur-lg"
-                  auraOpacity={0.32}
-                  innerGlowOpacity={0.9}
-                  speedMs={18000}
-                  angleOffset={120}
-                />
-                <p
-                  data-s3d="global"
-                  data-s3d-depth="0.35"
-                  data-s3d-global-tilt="0.8"
-                  className="relative z-10 text-sm sm:text-base text-white/70 leading-relaxed font-normal will-change-transform"
-                >
-                  Whether your channel runs on fast-paced gaming cuts, documentary storytelling, clean talking-head essays, or viral vertical hooks: <strong className="text-white">I adapt completely to your exact style and brand voice.</strong> Every cut is built from scratch to match your rhythm.
-                </p>
-              </div>
-
-              <div
-                data-s3d="card"
-                data-s3d-depth="0.95"
-                data-s3d-global-tilt="3.4"
-                data-s3d-scale="1.055"
-                data-s3d-tilt="8.5"
-                data-s3d-shift="4"
-                className="group relative hover:z-30 rounded-3xl p-7 sm:p-8 bg-[#050505]/90 backdrop-blur-xl border border-white/10 hover:border-transparent shadow-[0_0_30px_rgba(0,0,0,0.8)] hover:shadow-[0_0_45px_rgba(255,255,255,0.12)] transition-[border-color,box-shadow] h-full overflow-visible will-change-transform"
-              >
-                <AnimatedGeminiBorder
-                  preset="instagram"
-                  mode="always"
-                  borderRadius="rounded-3xl"
-                  borderWidth="1.5px"
-                  auraBlur="blur-lg"
-                  auraOpacity={0.32}
-                  innerGlowOpacity={0.9}
-                  speedMs={18000}
-                  angleOffset={240}
-                />
-                <p
-                  data-s3d="global"
-                  data-s3d-depth="0.35"
-                  data-s3d-global-tilt="0.8"
-                  className="relative z-10 text-sm sm:text-base text-white/70 leading-relaxed font-normal will-change-transform"
-                >
-                  From surgical keyframing, whip zooms, and kinetic captions to 3-layer sound design with atmospheric risers and sub-drops: you bring the vision and raw footage, I engineer the cut that turns casual scrollers into loyal subscribers.
-                </p>
-              </div>
-            </div>
-            </RevealOnScroll>
-        </div>
+        <AboutEditorStudio
+          onStartProject={() => {
+            document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+        />
       </section>
 
       {/* SECTION 5: FAQ */}
